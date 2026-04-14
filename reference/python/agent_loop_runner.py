@@ -26,7 +26,7 @@ def run_mock_agent_loop(task: str) -> tuple[dict[str, Any], dict[str, Any]]:
         tool_name = str(inv.get("tool_name", ""))
         args = inv.get("arguments", {}) if isinstance(inv.get("arguments", {}), dict) else {}
         result = tools.call(tool_name, args)
-        obs_id = f"{step.get('id','s')}_obs"
+        obs_id = f"{step.get('id', 's')}_obs"
         obs_content = json.dumps(result.output, ensure_ascii=False)
         obs = {
             "id": obs_id,

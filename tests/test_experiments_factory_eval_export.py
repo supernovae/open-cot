@@ -34,7 +34,9 @@ def test_eval_pre_post_and_export_artifacts(tmp_path: Path) -> None:
     summary = run_dir / "pre_post_summary.json"
     assert summary.is_file()
     data = json.loads(summary.read_text(encoding="utf-8"))
-    assert "pre" in data and "post" in data and "delta" in data
+    assert "pre" in data
+    assert "post" in data
+    assert "delta" in data
     assert data["pre"]["metrics"]["num_tasks"] == 1
 
     subprocess.run(

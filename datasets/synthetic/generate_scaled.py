@@ -28,8 +28,19 @@ def build_scaled_traces() -> list[dict[str, object]]:
         )
 
     # String/code tier
-    words = ["open-cot", "reasoning", "schema", "benchmark", "validator", "trace", "agent", "memory", "policy", "budget"]
-    for idx, word in enumerate(words, start=1):
+    words = [
+        "open-cot",
+        "reasoning",
+        "schema",
+        "benchmark",
+        "validator",
+        "trace",
+        "agent",
+        "memory",
+        "policy",
+        "budget",
+    ]
+    for _idx, word in enumerate(words, start=1):
         rev = word[::-1]
         traces.append(
             {

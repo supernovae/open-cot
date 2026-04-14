@@ -59,12 +59,14 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, required=True, help="Output directory for train/val JSONL")
     parser.add_argument("--val-ratio", type=float, default=0.2, help="Validation ratio")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
-    parser.add_argument("--exclude-steps", action="store_true", help="Do not include step-by-step rationale in response")
+    parser.add_argument(
+        "--exclude-steps", action="store_true", help="Do not include step-by-step rationale in response"
+    )
     args = parser.parse_args()
 
     traces = load_traces(args.input)
     records = [_trace_to_record(t, include_steps=not args.exclude_steps) for t in traces]
-    rng = random.Random(args.seed)
+    rng = random.Random(args.seed)  # noqa: S311
     rng.shuffle(records)
 
     val_count = int(len(records) * args.val_ratio)

@@ -81,7 +81,9 @@ def _enum_shrink(before: dict[str, Any], after: dict[str, Any]) -> bool:
     return aset < bs
 
 
-def _constraint_diffs(before: dict[str, Any], after: dict[str, Any], path: str, findings: list[tuple[str, str]]) -> None:
+def _constraint_diffs(
+    before: dict[str, Any], after: dict[str, Any], path: str, findings: list[tuple[str, str]]
+) -> None:
     if _enum_shrink(before, after):
         _record(findings, "major", f"{path}: enum became more restrictive")
 

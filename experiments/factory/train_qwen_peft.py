@@ -79,12 +79,12 @@ def main() -> int:
 
     # Delayed imports keep lightweight tests independent from heavy ML deps.
     import torch
+
     random.seed(args.seed)
     torch.manual_seed(args.seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(args.seed)
 
-    from datasets import Dataset
     from peft import LoraConfig, TaskType, get_peft_model
     from transformers import (
         AutoModelForCausalLM,
@@ -93,6 +93,8 @@ def main() -> int:
         Trainer,
         TrainingArguments,
     )
+
+    from datasets import Dataset
 
     tokenizer = AutoTokenizer.from_pretrained(args.model_name)
     if tokenizer.pad_token is None:

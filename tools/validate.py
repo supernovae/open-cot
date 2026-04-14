@@ -6,17 +6,17 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 _TOOLS_DIR = Path(__file__).resolve().parent
 _REPO_ROOT = _TOOLS_DIR.parent
 if str(_TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(_TOOLS_DIR))
 
-from schema_lib import load_registry, registry_schema_paths
-from schema_lib import duplicate_rfc_ids
-from schema_resolver import SchemaResolver
+from schema_lib import duplicate_rfc_ids, load_registry, registry_schema_paths  # noqa: E402
+from schema_resolver import SchemaResolver  # noqa: E402
 
 TIER_A_SHORTNAMES: tuple[str, ...] = (
     "reasoning",

@@ -8,6 +8,7 @@ import json
 import random
 import statistics
 import sys
+from contextlib import suppress
 from pathlib import Path
 from typing import Any
 
@@ -15,8 +16,8 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from benchmarks.scoring.scorer import score_trace
-from reference.python.validator import validate_trace
+from benchmarks.scoring.scorer import score_trace  # noqa: E402
+from reference.python.validator import validate_trace  # noqa: E402
 
 
 def _load_task_specs(path: Path) -> list[dict[str, Any]]:
@@ -71,12 +72,10 @@ def _hf_generate(
     import torch
 
     random.seed(seed)
-    try:
+    with suppress(ImportError):
         import numpy as np  # type: ignore
 
         np.random.seed(seed)
-    except Exception:
-        pass
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
@@ -144,6 +143,8 @@ def run_eval(
     answer_mode: str,
     label: str,
 ) -> dict[str, Any]:
+    from jsonschema import ValidationError
+
     tasks = _filter_tasks(_load_task_specs(tasks_path), split)
     prompts = [str(t.get("prompt", "")) for t in tasks]
     expected = [str(t.get("expected_final_answer", "")) for t in tasks]
@@ -163,14 +164,12 @@ def run_eval(
     traces: list[dict[str, Any]] = []
     scores: list[dict[str, float]] = []
     schema_valid_count = 0
-    for prompt, pred, gold in zip(prompts, outputs, expected):
+    for prompt, pred, gold in zip(prompts, outputs, expected, strict=True):
         trace = _to_trace(prompt, pred)
         traces.append(trace)
-        try:
+        with suppress(ValidationError):
             validate_trace(trace)
             schema_valid_count += 1
-        except Exception:
-            pass
         scores.append(score_trace(trace, gold, answer_mode=answer_mode))
 
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -237,8 +236,10 @@ def main() -> int:
     )
 
     delta = {
-        "delta_final_answer_exact": post["metrics"]["final_answer_exact_avg"] - pre["metrics"]["final_answer_exact_avg"],
-        "delta_step_validity_proxy": post["metrics"]["step_validity_proxy_avg"] - pre["metrics"]["step_validity_proxy_avg"],
+        "delta_final_answer_exact": post["metrics"]["final_answer_exact_avg"]
+        - pre["metrics"]["final_answer_exact_avg"],
+        "delta_step_validity_proxy": post["metrics"]["step_validity_proxy_avg"]
+        - pre["metrics"]["step_validity_proxy_avg"],
         "delta_schema_validity_rate": post["metrics"]["schema_validity_rate"] - pre["metrics"]["schema_validity_rate"],
     }
     summary = {

@@ -26,9 +26,7 @@ def main() -> int:
 
     run_dir = args.run_dir
     files = sorted([p for p in run_dir.rglob("*") if p.is_file()])
-    hashes: dict[str, str] = {
-        str(p.relative_to(run_dir)): sha256(p) for p in files
-    }
+    hashes: dict[str, str] = {str(p.relative_to(run_dir)): sha256(p) for p in files}
     summary: dict[str, Any] = {
         "run_dir": str(run_dir),
         "file_count": len(files),

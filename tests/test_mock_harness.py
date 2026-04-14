@@ -7,8 +7,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from reference.python.agent_loop_runner import run_mock_agent_loop
-from reference.python.validator import validate_trace
+from reference.python.agent_loop_runner import run_mock_agent_loop  # noqa: E402
+from reference.python.validator import validate_trace  # noqa: E402
 
 
 def test_mock_agent_loop_trace_validates() -> None:

@@ -12,18 +12,18 @@ _TOOLS_DIR = Path(__file__).resolve().parent
 if str(_TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(_TOOLS_DIR))
 
-from schema_lib import (
-    RFC_SHORTNAME,
-    STRICT_MARKER_RFC_IDS,
-    REPO_ROOT,
-    SCHEMAS_DIR,
+from schema_lib import (  # noqa: E402
     REGISTRY_PATH,
+    REPO_ROOT,
+    RFC_SHORTNAME,
+    SCHEMAS_DIR,
+    STRICT_MARKER_RFC_IDS,
     annotate_schema,
     duplicate_rfc_ids,
-    extract_marked_brace_object,
-    extract_marked_schema_with_schema_key,
     extract_first_brace_object_after,
     extract_first_json_object_with_schema,
+    extract_marked_brace_object,
+    extract_marked_schema_with_schema_key,
     rfc_markdown_path,
     schema_filename,
     schema_relative_path,
@@ -183,7 +183,7 @@ def main() -> int:
                 if rfc_id in STRICT_MARKER_RFC_IDS:
                     raise RuntimeError(
                         f"RFC {rfc_id} requires explicit schema markers "
-                        f"({rfc_id}-*.md missing {repr('<!-- opencot:schema:start -->')} block)."
+                        f"({rfc_id}-*.md missing {'<!-- opencot:schema:start -->'!r} block)."
                     )
                 data = extract_first_json_object_with_schema(text)
 

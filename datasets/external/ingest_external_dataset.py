@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from reference.python.validator import validate_trace
+from reference.python.validator import validate_trace  # noqa: E402
 
 ALLOWED_LICENSES = {"MIT", "Apache-2.0", "CC-BY-4.0"}
 
@@ -77,9 +77,11 @@ def main() -> int:
     rejected = 0
     pii_rejections = 0
     invalid_rejections = 0
-    with args.input_jsonl.open(encoding="utf-8") as src, traces_path.open("w", encoding="utf-8") as out, invalid_path.open(
-        "w", encoding="utf-8"
-    ) as rej:
+    with (
+        args.input_jsonl.open(encoding="utf-8") as src,
+        traces_path.open("w", encoding="utf-8") as out,
+        invalid_path.open("w", encoding="utf-8") as rej,
+    ):
         for idx, line in enumerate(src, start=1):
             line = line.strip()
             if not line:

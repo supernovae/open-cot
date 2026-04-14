@@ -14,7 +14,7 @@ _REPO_ROOT = _TOOLS_DIR.parent
 if str(_TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(_TOOLS_DIR))
 
-from schema_lib import load_registry, registry_schema_paths
+from schema_lib import load_registry, registry_schema_paths  # noqa: E402
 
 
 class SchemaResolver:
@@ -66,10 +66,7 @@ class SchemaResolver:
         if not rel.is_absolute() and base_uri:
             base_parsed = urlparse(base_uri)
             base_dir = base_parsed.path.rsplit("/", 1)[0]
-            if base_dir.startswith("/"):
-                parent = Path(base_dir)
-            else:
-                parent = self.schemas_dir
+            parent = Path(base_dir) if base_dir.startswith("/") else self.schemas_dir
             cand = (parent / rel).resolve() if rel.parts and rel.parts[0] != ".." else self.schemas_dir / rel
             if cand.is_file():
                 return cand

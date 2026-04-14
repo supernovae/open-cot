@@ -20,5 +20,7 @@ def test_gsm8k_converter_outputs_reasoning_trace(tmp_path: Path) -> None:
     assert rows
     first = rows[0]
     assert first["version"] == "0.1"
-    assert "task" in first and "final_answer" in first
-    assert isinstance(first["steps"], list) and first["steps"]
+    assert "task" in first
+    assert "final_answer" in first
+    assert isinstance(first["steps"], list)
+    assert first["steps"]

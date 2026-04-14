@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from benchmarks.scoring.scorer import score_trace
+from benchmarks.scoring.scorer import score_trace  # noqa: E402
 
 
 def test_benchmark_scorer_exact_match() -> None:
