@@ -1,0 +1,7 @@
+{
+  "final_answer_exact_avg": 1.0,
+  "step_validity_proxy_avg": 1.0,
+  "schema_validity_rate": 1.0,
+  "num_tasks": 1,
+  "final_answer_exact_stddev": 0.0
+}

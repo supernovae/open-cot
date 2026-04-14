@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Contributing Guide
+    url: https://github.com/supernovae/open-cot/blob/main/docs/contributing.md
+    about: Read contributor workflows, schema contracts, and validation steps.

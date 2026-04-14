@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import random
 from pathlib import Path
 from typing import Any
 
@@ -28,6 +29,7 @@ def _write_run_config(path: Path, data: dict[str, Any]) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--config", type=Path, default=None, help="Optional JSON config file of CLI-equivalent fields")
     parser.add_argument("--model-name", default="Qwen/Qwen2.5-1.5B-Instruct")
     parser.add_argument("--train-file", type=Path, required=True)
     parser.add_argument("--val-file", type=Path, required=True)
@@ -41,8 +43,16 @@ def main() -> int:
     parser.add_argument("--lora-alpha", type=int, default=32)
     parser.add_argument("--lora-dropout", type=float, default=0.05)
     parser.add_argument("--use-4bit", action="store_true", help="Enable 4-bit QLoRA loading (GPU + bitsandbytes)")
+    parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--dry-run", action="store_true", help="Write config and exit")
     args = parser.parse_args()
+
+    if args.config is not None:
+        cfg = json.loads(args.config.read_text(encoding="utf-8"))
+        for k, v in cfg.items():
+            attr = k.replace("-", "_")
+            if hasattr(args, attr):
+                setattr(args, attr, v)
 
     args.output_dir.mkdir(parents=True, exist_ok=True)
     run_cfg = {
@@ -58,6 +68,7 @@ def main() -> int:
         "lora_alpha": args.lora_alpha,
         "lora_dropout": args.lora_dropout,
         "use_4bit": args.use_4bit,
+        "seed": args.seed,
         "dry_run": args.dry_run,
     }
     _write_run_config(args.output_dir / "training_config.json", run_cfg)
@@ -68,6 +79,11 @@ def main() -> int:
 
     # Delayed imports keep lightweight tests independent from heavy ML deps.
     import torch
+    random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(args.seed)
+
     from datasets import Dataset
     from peft import LoraConfig, TaskType, get_peft_model
     from transformers import (

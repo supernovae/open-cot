@@ -53,6 +53,9 @@ python experiments/factory/eval_pre_post.py \
   --tasks benchmarks/tasks/task_specs.json \
   --output-dir experiments/runs/qwen2.5-1.5b-peft \
   --base-model Qwen/Qwen2.5-1.5B-Instruct \
+  --split test \
+  --seed 42 \
+  --answer-mode final_answer_friendly \
   --max-new-tokens 128
 ```
 
@@ -62,6 +65,8 @@ For CPU/test-only smoke runs without model downloads:
 python experiments/factory/eval_pre_post.py \
   --tasks benchmarks/tasks/task_specs.json \
   --output-dir experiments/runs/qwen2.5-1.5b-peft \
+  --split test \
+  --seed 42 \
   --use-mock
 ```
 
@@ -71,15 +76,10 @@ Minimal LoRA run:
 
 ```bash
 python experiments/factory/train_qwen_peft.py \
-  --model-name Qwen/Qwen2.5-1.5B-Instruct \
+  --config experiments/configs/qwen2_5_1_5b_peft.json \
   --train-file experiments/data/qwen_cot_sft/train.jsonl \
   --val-file experiments/data/qwen_cot_sft/validation.jsonl \
-  --output-dir experiments/runs/qwen2.5-1.5b-peft \
-  --epochs 1 \
-  --batch-size 1 \
-  --gradient-accumulation-steps 8 \
-  --learning-rate 2e-4 \
-  --max-length 1024
+  --output-dir experiments/runs/qwen2.5-1.5b-peft
 ```
 
 QLoRA mode (GPU + bitsandbytes):
@@ -101,8 +101,13 @@ python experiments/factory/eval_pre_post.py \
   --output-dir experiments/runs/qwen2.5-1.5b-peft \
   --base-model Qwen/Qwen2.5-1.5B-Instruct \
   --adapter-path experiments/runs/qwen2.5-1.5b-peft/adapter \
+  --split test \
+  --seed 42 \
+  --answer-mode final_answer_friendly \
   --max-new-tokens 128
 ```
+
+`--adapter-path` loads a PEFT adapter on top of `--base-model` for post-train comparison.
 
 ## 6) Export reproducibility artifacts
 

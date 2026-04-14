@@ -138,3 +138,5 @@ Current high-priority gaps after the 0.1 execution pass:
 - [Datasets README](../datasets/README.md) — layout for synthetic and converters.
 - [RFC Audit Summary](rfc-audit-summary.md) — cohesion findings and resolved items.
 - [RFC 0046](../rfcs/0046-conformance-interoperability-protocol.md) — conformance and interoperability protocol.
+- [Experiment Cards](experiments/README.md) — high-interest test ideas and prompts.
+- [Public Launch Playbook](public-launch.md) — publish-ready tracks and artifact checklist.

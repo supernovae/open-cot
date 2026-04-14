@@ -21,6 +21,10 @@ def test_eval_pre_post_and_export_artifacts(tmp_path: Path) -> None:
             str(tasks),
             "--output-dir",
             str(run_dir),
+            "--split",
+            "test",
+            "--seed",
+            "42",
             "--use-mock",
         ],
         check=True,
@@ -31,6 +35,7 @@ def test_eval_pre_post_and_export_artifacts(tmp_path: Path) -> None:
     assert summary.is_file()
     data = json.loads(summary.read_text(encoding="utf-8"))
     assert "pre" in data and "post" in data and "delta" in data
+    assert data["pre"]["metrics"]["num_tasks"] == 1
 
     subprocess.run(
         [

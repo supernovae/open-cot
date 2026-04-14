@@ -1,0 +1,22 @@
+name: Docs improvement
+description: Suggest clarification or improvements to docs/runbooks
+title: "[docs] "
+labels: ["documentation"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is unclear or missing?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed improvement
+      description: Share suggested wording or structure.
+    validations:
+      required: true
+  - type: input
+    id: file
+    attributes:
+      label: Affected file path (optional)

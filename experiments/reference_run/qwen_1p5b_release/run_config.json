@@ -1,0 +1,9 @@
+{
+  "run_id": "qwen_1p5b_release_baseline",
+  "base_model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "split": "test",
+  "seed": 42,
+  "answer_mode": "final_answer_friendly",
+  "train_config_path": "experiments/configs/qwen2_5_1_5b_peft.json",
+  "dataset_manifest": "datasets/synthetic/dataset_manifest.json"
+}

@@ -77,6 +77,27 @@ See [`standards/reasoning-patterns.md`](./standards/reasoning-patterns.md) for d
 
 ## Quick start
 
+### Start here in 15 minutes
+
+Run a CPU-friendly smoke experiment end-to-end (prepare -> pre/post eval with mock generation -> validate -> artifact hashes):
+
+```bash
+bash scripts/quickstart_experiment.sh
+```
+
+Success criteria:
+
+- `experiments/runs/quickstart/pre_post_summary.json` exists
+- `experiments/runs/quickstart/artifact_summary.json` exists
+- `tools/validate.py` passes
+
+Next step for real model experimentation:
+
+- [`experiments/local_oss_runbook.md`](./experiments/local_oss_runbook.md) for Qwen PEFT train/eval
+- [`experiments/factory/eval_pre_post.py`](./experiments/factory/eval_pre_post.py) for scripted pre/post checks
+
+### Validation and tooling checks
+
 Validate schemas and example fixtures locally:
 
 ```bash
@@ -106,7 +127,14 @@ python tools/diff_checker.py /path/to/before/schemas ./schemas --strict --min-se
 - Synthetic seed data, converter baseline, deterministic mock harness, tests, benchmark starter slice, and reproducible experiment runbooks are implemented.
 - RFC cohesion hardening is in progress: open-question closures, stronger methodology/provenance/privacy specs, and interoperability guidance.
 
+## Ideas to chew on
+
+To explore high-interest concerns (hidden reasoning, runaway loops, token budgets, policy safety), start with experiment cards:
+
+- [`docs/experiments/`](./docs/experiments/README.md)
+
 See [`docs/roadmap.md`](./docs/roadmap.md) for phased implementation and conformance direction.
+For launch packaging, see [`docs/public-launch.md`](./docs/public-launch.md).
 
 ## Contributing
 

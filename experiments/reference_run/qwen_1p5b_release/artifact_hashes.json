@@ -1,0 +1,9 @@
+{
+  "note": "Run export_artifacts.py against this directory after replacing placeholder metrics.",
+  "required_files": [
+    "run_config.json",
+    "metrics_pre.json",
+    "metrics_post.json",
+    "pre_post_summary.json"
+  ]
+}

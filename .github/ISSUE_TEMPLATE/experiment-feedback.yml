@@ -1,0 +1,31 @@
+name: Experiment feedback
+description: Report experiment findings, regressions, or insights
+title: "[experiment] "
+labels: ["experiment"]
+body:
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Experiment/hypothesis
+      description: What did you try to validate?
+    validations:
+      required: true
+  - type: textarea
+    id: run_details
+    attributes:
+      label: Run details
+      description: Include commands, config, model, dataset, and seed.
+    validations:
+      required: true
+  - type: textarea
+    id: metrics
+    attributes:
+      label: Metrics and artifacts
+      description: Include pre/post metrics and artifact hashes/paths.
+    validations:
+      required: true
+  - type: textarea
+    id: outcomes
+    attributes:
+      label: Outcomes and failure modes
+      description: What worked, what failed, and suggested follow-ups.

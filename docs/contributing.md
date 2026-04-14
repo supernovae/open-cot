@@ -42,6 +42,20 @@ Version taxonomy:
 2. Use small, focused pull requests with a short description of intent and impact.
 3. Add or update **validated** JSON examples under `examples/<registry-shortname>/` (see `schemas/registry.json`) when you change a schema; keep narrative examples under `standards/` when appropriate.
 
+## Contribution paths
+
+Choose the smallest path that matches your goal:
+
+1. **Quick docs fix (novice-friendly)**: improve wording, broken links, examples, or readability in `README.md` / `docs/`.
+2. **Add one example fixture**: add a valid JSON fixture under `examples/<shortname>/` and run `python3 tools/validate.py`.
+3. **Add one experiment card**: add/update docs under `docs/experiments/` with command + metrics + failure modes.
+4. **Advanced schema/RFC change**: update RFC prose + sync schemas + fixtures + migration notes if needed.
+
+Tier context:
+
+- Tier A compatibility scope: RFC 0001-0008.
+- Tier C items should be promoted only with a consumer-backed vertical slice.
+
 ## Project lanes (required artifacts)
 
 | Lane | Purpose | Minimum artifact set |
@@ -67,3 +81,5 @@ Version taxonomy:
 - Pull requests that touch `schemas/` run semantic diff checks (`tools/diff_checker.py` vs PR base branch). Tightening constraints should include migration notes in the RFC or changelog.
 - Major-impact schema changes MUST include migration notes and expected upgrade path.
 - RFC lifecycle guidance is documented in `docs/governance-rfc-lifecycle.md`.
+- Update `CHANGELOG.md` when user-visible behavior, schema semantics, public workflows, or release-facing docs change.
+- See `RELEASE_CHECKLIST.md` and `docs/maintainers.md` for release/maintainer workflow.

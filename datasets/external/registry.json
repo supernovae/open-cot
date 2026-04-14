@@ -1,0 +1,36 @@
+{
+  "version": "0.1.0",
+  "policy": {
+    "allowed_licenses": ["MIT", "Apache-2.0", "CC-BY-4.0"],
+    "blocked_default": ["unknown", "custom", "unverified"]
+  },
+  "datasets": [
+    {
+      "id": "sample_reasoning_dataset_a",
+      "status": "candidate",
+      "license": "Apache-2.0",
+      "owner": "example-org",
+      "url": "https://example.org/reasoning-a",
+      "intended_usage": "SFT bootstrap (reasoning trace conversion)",
+      "risk_notes": "pending manual quality and PII review"
+    },
+    {
+      "id": "sample_reasoning_dataset_b",
+      "status": "license-reviewed",
+      "license": "MIT",
+      "owner": "example-community",
+      "url": "https://example.org/reasoning-b",
+      "intended_usage": "Validation and benchmark augmentation",
+      "risk_notes": "license approved, awaiting ingestion script output validation"
+    },
+    {
+      "id": "sample_unknown_license_dataset",
+      "status": "blocked",
+      "license": "unknown",
+      "owner": "unknown",
+      "url": "https://example.org/unknown",
+      "intended_usage": "none",
+      "risk_notes": "blocked due to unknown redistribution terms"
+    }
+  ]
+}

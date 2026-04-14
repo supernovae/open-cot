@@ -9,6 +9,7 @@ Data for training, distillation, or evaluating chain-of-thought and reasoning tr
 | `synthetic/` | Generated or programmatically constructed traces. |
 | `human-annotated/` | Curated or labeled human reasoning data. |
 | `converters/` | Scripts to transform external formats into `schemas/rfc-0001-reasoning.json`. |
+| `external/` | External dataset registry, policy, and ingestion pipeline outputs. |
 
 ## Format
 
@@ -25,3 +26,18 @@ Each releasable dataset package should declare:
 - `provenance`
 - `safety_release_checks` (PII, unsafe-content, license review)
 - split metadata (`train`/`validation`/`test` counts or IDs)
+
+## External dataset policy
+
+Open CoT accepts external datasets only when licensing and provenance are explicit.
+
+- Allowed: `MIT`, `Apache-2.0`, `CC-BY-4.0`
+- Blocked by default: unknown/custom/ambiguous redistribution terms
+- Required for ingestion:
+  - source URL
+  - owner/org
+  - intended usage
+  - risk notes
+  - deterministic transform and filter details
+
+See `datasets/external/README.md` and `datasets/external/registry.json`.
