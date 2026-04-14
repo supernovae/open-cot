@@ -192,15 +192,10 @@ Contains dataset‑level metadata:
 A dataset MUST pass the following checks:
 
 All traces validate against RFC 0001.
-
 All verifier outputs validate against RFC 0002.
-
 All ensembles validate against RFC 0006.
-
 All reward traces validate against RFC 0005.
-
 All referenced trace IDs exist.
-
 Manifest counts match actual file counts.
 
 ## 12. Example Dataset Package
@@ -225,19 +220,16 @@ dataset/
 
 
 ### 13.1 Should we support:
+
 dataset‑level compression?
-
 streaming formats (e.g., JSONL)?
-
 HF Dataset integration?
-
 Parquet or Arrow formats?
 
 ### 13.2 Should we define:
+
 a canonical naming scheme for trace IDs?
-
 a standard for dataset versioning?
-
 a standard for dataset diffs?
 
 ## 14.  Acceptance Criteria
@@ -245,10 +237,19 @@ a standard for dataset diffs?
 This RFC will be accepted when:
 
 At least 3 maintainers approve it.
-
 A reference dataset passes validation.
-
 At least one training pipeline consumes this format.
-
 At least one evaluation harness consumes this format.
+
+
+## 15. Conclusion
+
+This RFC defines the Dataset Packaging Standard, enabling:
+
+portable reasoning datasets
+reproducible training
+consistent evaluation
+multi‑verifier integration
+RL reward‑augmented datasets
+branching and tool‑augmented traces
 

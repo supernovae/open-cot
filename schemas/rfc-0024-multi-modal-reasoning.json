@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RFC 0024 — Multi Modal Reasoning (stub)",
+  "description": "Placeholder JSON Schema for RFC 0024. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "type": "object",
+  "additionalProperties": true,
+  "x-opencot": {
+    "rfc": "0024",
+    "shortname": "multi_modal_reasoning",
+    "status": "stub",
+    "source_rfc": "rfcs/0024-multi-modal-reasoning-schema.md"
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0024-multi-modal-reasoning.json"
+}

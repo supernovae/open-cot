@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RFC 0044 — Governance Organizational Controls (stub)",
+  "description": "Placeholder JSON Schema for RFC 0044. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "type": "object",
+  "additionalProperties": true,
+  "x-opencot": {
+    "rfc": "0044",
+    "shortname": "governance_organizational_controls",
+    "status": "stub",
+    "source_rfc": "rfcs/0044-governance-organizational-controls.md"
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0044-governance-organizational-controls.json"
+}

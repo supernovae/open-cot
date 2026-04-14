@@ -1,0 +1,20 @@
+# https://pre-commit.com
+# Install: pip install pre-commit && pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  - repo: local
+    hooks:
+      - id: opencot-validate-schemas
+        name: Open CoT — validate schemas & examples
+        language: system
+        entry: bash tools/run_in_repo.sh tools/validate.py
+        pass_filenames: false
+        files: ^(schemas/|examples/|tools/(validate|schema_lib|schema_resolver)\.py|rfcs/.*\.md|requirements-tools\.txt)$
+
+      - id: opencot-schema-sync-check
+        name: Open CoT — RFCs must match committed schemas
+        language: system
+        entry: bash tools/pre-commit-sync-check.sh
+        pass_filenames: false
+        files: ^(rfcs/.*\.md|tools/(sync_schemas_from_rfcs|schema_lib)\.py)$

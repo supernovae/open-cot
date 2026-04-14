@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RFC 0026 — Agent Identity Auth (stub)",
+  "description": "Placeholder JSON Schema for RFC 0026. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "type": "object",
+  "additionalProperties": true,
+  "x-opencot": {
+    "rfc": "0026",
+    "shortname": "agent_identity_auth",
+    "status": "stub",
+    "source_rfc": "rfcs/0026-agent-identity-auth.md"
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0026-agent-identity-auth.json"
+}

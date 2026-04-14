@@ -1,0 +1,13 @@
+{
+  "version": "0.1",
+  "trace_id": "trace_001",
+  "fusion_strategy": "confidence_weighted",
+  "step_fusion": [
+    {
+      "step_id": "s2",
+      "reward": 0.98,
+      "sources": ["symbolic_verifier", "neural_verifier"]
+    }
+  ],
+  "trajectory_reward": 0.98
+}

@@ -1,0 +1,36 @@
+name: Validate schemas
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-tools.txt
+
+      - name: Install tooling dependencies
+        run: pip install -r requirements-tools.txt
+
+      - name: Validate JSON Schemas and examples
+        run: python tools/validate.py
+
+      - name: Ensure committed schemas match RFC extractors
+        run: |
+          set -euo pipefail
+          python tools/sync_schemas_from_rfcs.py
+          if [[ -n "$(git status --porcelain -- schemas/)" ]]; then
+            echo "::error::schemas/ differs from git after sync — run tools/sync_schemas_from_rfcs.py locally and commit."
+            git --no-pager diff -- schemas/ || true
+            git status --porcelain -- schemas/
+            exit 1
+          fi

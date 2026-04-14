@@ -1,0 +1,44 @@
+name: Schema breaking changes
+
+# Heuristic diff of JSON Schemas vs PR base branch (intersecting rfc-*.json only).
+
+on:
+  pull_request:
+    branches: [main, master]
+    paths:
+      - "schemas/**"
+      - "tools/diff_checker.py"
+      - ".github/workflows/schema-breaking-changes.yml"
+
+jobs:
+  diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-tools.txt
+
+      - name: Install tooling dependencies
+        run: pip install -r requirements-tools.txt
+
+      - name: Export base branch schemas
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/base
+          if git cat-file -e "$BASE_SHA:schemas" 2>/dev/null; then
+            git archive "$BASE_SHA" schemas | tar -x -C /tmp/base
+          else
+            mkdir -p /tmp/base/schemas
+          fi
+          test -d /tmp/base/schemas
+
+      - name: Breaking change check (strict)
+        run: python tools/diff_checker.py /tmp/base/schemas "${{ github.workspace }}/schemas" --strict

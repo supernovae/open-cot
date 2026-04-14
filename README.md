@@ -16,7 +16,7 @@
 <img src="https://img.shields.io/badge/Project-Open%20CoT-5c6bc0?style=for-the-badge" alt="Open CoT" />
 <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License: MIT" /></a>
 <a href="./docs/contributing.md"><img src="https://img.shields.io/badge/Contributions-Welcome-4caf50?style=for-the-badge" alt="Contributions welcome" /></a>
-<a href="./standards/cot-schema.json"><img src="https://img.shields.io/badge/Schema-JSON%20Draft-ff9800?style=for-the-badge" alt="JSON Schema" /></a>
+<a href="./schemas/rfc-0001-reasoning.json"><img src="https://img.shields.io/badge/Schema-JSON%20Draft-ff9800?style=for-the-badge" alt="JSON Schema" /></a>
 
 </div>
 
@@ -154,7 +154,9 @@ Pattern docs live under [`standards/reasoning-patterns.md`](./standards/reasonin
 
 | Area | Role |
 |------|------|
-| [`standards/`](./standards/) | Schema, patterns, metrics, examples |
+| [`schemas/`](./schemas/) | Versioned JSON Schemas per RFC (`registry.json`, `rfc-*-*.json`) |
+| [`examples/`](./examples/) | Validated instance fixtures keyed by registry shortname |
+| [`standards/`](./standards/) | Human-readable patterns, metrics, narrative docs |
 | [`datasets/`](./datasets/) | Conventions and converters for training-ready data |
 | [`reference/python/`](./reference/python/) | Reference Python tooling |
 | [`benchmarks/`](./benchmarks/) | Tasks, scoring, leaderboards |

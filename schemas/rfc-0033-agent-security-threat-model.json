@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RFC 0033 — Agent Security Threat Model (stub)",
+  "description": "Placeholder JSON Schema for RFC 0033. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "type": "object",
+  "additionalProperties": true,
+  "x-opencot": {
+    "rfc": "0033",
+    "shortname": "agent_security_threat_model",
+    "status": "stub",
+    "source_rfc": "rfcs/0033-agent-security-threat-model.md"
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0033-agent-security-threat-model.json"
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RFC 0032 — Agent Deployment Manifest (stub)",
+  "description": "Placeholder JSON Schema for RFC 0032. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "type": "object",
+  "additionalProperties": true,
+  "x-opencot": {
+    "rfc": "0032",
+    "shortname": "agent_deployment_manifest",
+    "status": "stub",
+    "source_rfc": "rfcs/0032-agent-deployment-manifest.md"
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0032-agent-deployment-manifest.json"
+}

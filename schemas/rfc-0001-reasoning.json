@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OpenCoT Reasoning Trace v0.1",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": [
+        "0.1"
+      ],
+      "description": "Schema version."
+    },
+    "task": {
+      "type": "string",
+      "description": "Short description of the problem being solved."
+    },
+    "steps": {
+      "type": "array",
+      "description": "Ordered or graph-structured reasoning steps.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for this step."
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of reasoning step.",
+            "enum": [
+              "thought",
+              "action",
+              "observation",
+              "subgoal",
+              "critique",
+              "revision",
+              "calculation",
+              "code",
+              "branch"
+            ]
+          },
+          "content": {
+            "type": "string",
+            "description": "Natural language or code content of the step."
+          },
+          "parent": {
+            "type": "string",
+            "description": "ID of the parent step (for trees/graphs)."
+          },
+          "children": {
+            "type": "array",
+            "description": "IDs of child steps (for trees/graphs).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidence": {
+            "type": "array",
+            "description": "Optional evidence or citations supporting this step.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Model-reported confidence (0–1)."
+          },
+          "verification_status": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "failed",
+              "unknown"
+            ],
+            "description": "Whether this step was verified."
+          },
+          "verifier_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Optional score from a verifier model."
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "content"
+        ]
+      }
+    },
+    "final_answer": {
+      "type": "string",
+      "description": "Model's final answer after reasoning."
+    }
+  },
+  "required": [
+    "version",
+    "task",
+    "steps",
+    "final_answer"
+  ],
+  "$id": "https://opencot.dev/schemas/rfc-0001-reasoning.json",
+  "x-opencot": {
+    "rfc": "0001",
+    "shortname": "reasoning",
+    "source_rfc": "rfcs/0001-initial-schema.md"
+  }
+}

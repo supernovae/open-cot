@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RFC 0013 — Memory Compression (stub)",
+  "description": "Placeholder JSON Schema for RFC 0013. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "type": "object",
+  "additionalProperties": true,
+  "x-opencot": {
+    "rfc": "0013",
+    "shortname": "memory_compression",
+    "status": "stub",
+    "source_rfc": "rfcs/0013-memory-compression-embedding.md"
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0013-memory-compression.json"
+}

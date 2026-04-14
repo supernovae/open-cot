@@ -224,3 +224,44 @@ Termination occurs when:
 
   "final_answer": "The square root of Tokyo's population (~13.96M) is approximately 3736."
 }
+
+## 8. Open Questions
+
+### 8.1 Should the protocol support:
+
+multi‑agent collaboration?
+tool‑initiated actions?
+asynchronous tool calls?
+streaming observations?
+
+### 8.2 Should we define:
+
+a canonical termination condition?
+a standard for agent memory?
+a standard for agent state serialization?
+
+### 8.3 Should the protocol enforce:
+
+step ordering?
+DAG structure?
+maximum recursion depth?
+
+## 9. Acceptance Criteria
+
+This RFC will be accepted when:
+
+At least 3 maintainers approve it.
+A reference agent loop implementation follows the protocol.
+At least one tool‑augmented dataset uses the protocol.
+At least one RL pipeline integrates reward traces using the protocol.
+
+
+## 10. Conclusion
+This RFC defines the Agent Loop Protocol, the execution backbone for:
+
+structured reasoning
+tool use
+branching exploration
+verification
+
+RL reward shaping

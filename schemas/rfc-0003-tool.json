@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OpenCoT Tool Invocation v0.1",
+  "type": "object",
+  "properties": {
+    "tool_name": {
+      "type": "string",
+      "description": "Name of the tool being invoked."
+    },
+    "arguments": {
+      "type": "object",
+      "description": "JSON arguments passed to the tool."
+    },
+    "result": {
+      "type": "object",
+      "description": "Structured output returned by the tool.",
+      "properties": {
+        "output": {
+          "description": "Primary tool output (string or structured)."
+        },
+        "error": {
+          "type": "string",
+          "description": "Optional error message if the tool failed."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Optional tool-specific metadata."
+        }
+      }
+    },
+    "triggered_by_step": {
+      "type": "string",
+      "description": "ID of the reasoning step that triggered this tool call."
+    },
+    "observation_step": {
+      "type": "string",
+      "description": "ID of the observation step that records the tool output."
+    }
+  },
+  "required": [
+    "tool_name",
+    "arguments",
+    "triggered_by_step"
+  ],
+  "$id": "https://opencot.dev/schemas/rfc-0003-tool.json",
+  "x-opencot": {
+    "rfc": "0003",
+    "shortname": "tool_invocation",
+    "source_rfc": "rfcs/0003-tool-invocation-schema.md"
+  }
+}

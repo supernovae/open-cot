@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RFC 0025 — Tool Marketplace Registry (stub)",
+  "description": "Placeholder JSON Schema for RFC 0025. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "type": "object",
+  "additionalProperties": true,
+  "x-opencot": {
+    "rfc": "0025",
+    "shortname": "tool_marketplace_registry",
+    "status": "stub",
+    "source_rfc": "rfcs/0025-tool-marketplace-registry-format.md"
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0025-tool-marketplace-registry.json"
+}

@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RFC 0035 — Data Provenance Tracking (stub)",
+  "description": "Placeholder JSON Schema for RFC 0035. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "type": "object",
+  "additionalProperties": true,
+  "x-opencot": {
+    "rfc": "0035",
+    "shortname": "data_provenance_tracking",
+    "status": "stub",
+    "source_rfc": "rfcs/0035-data-provenance-tracking.md"
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0035-data-provenance-tracking.json"
+}

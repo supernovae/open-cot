@@ -12,11 +12,11 @@ except ImportError:  # pragma: no cover - optional dependency at runtime
     jsonschema = None  # type: ignore[assignment]
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-_DEFAULT_SCHEMA = _REPO_ROOT / "standards" / "cot-schema.json"
+_DEFAULT_SCHEMA = _REPO_ROOT / "schemas" / "rfc-0001-reasoning.json"
 
 
 def load_schema(schema_path: Path | None = None) -> dict[str, Any]:
-    """Load cot-schema.json from ``standards/`` unless an explicit path is given."""
+    """Load the canonical reasoning schema (RFC 0001) unless an explicit path is given."""
     path = schema_path or _DEFAULT_SCHEMA
     with path.open(encoding="utf-8") as f:
         return json.load(f)

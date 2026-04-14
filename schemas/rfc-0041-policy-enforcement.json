@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RFC 0041 — Policy Enforcement (stub)",
+  "description": "Placeholder JSON Schema for RFC 0041. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "type": "object",
+  "additionalProperties": true,
+  "x-opencot": {
+    "rfc": "0041",
+    "shortname": "policy_enforcement",
+    "status": "stub",
+    "source_rfc": "rfcs/0041-policy-enforcement-schema.md"
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0041-policy-enforcement.json"
+}

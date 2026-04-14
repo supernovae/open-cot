@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RFC 0037 — Token Economy Cost Modeling (stub)",
+  "description": "Placeholder JSON Schema for RFC 0037. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "type": "object",
+  "additionalProperties": true,
+  "x-opencot": {
+    "rfc": "0037",
+    "shortname": "token_economy_cost_modeling",
+    "status": "stub",
+    "source_rfc": "rfcs/0037-token-economy-cost-modeling.md"
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0037-token-economy-cost-modeling.json"
+}

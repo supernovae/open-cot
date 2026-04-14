@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RFC 0018 — Tool Error Taxonomy (stub)",
+  "description": "Placeholder JSON Schema for RFC 0018. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "type": "object",
+  "additionalProperties": true,
+  "x-opencot": {
+    "rfc": "0018",
+    "shortname": "tool_error_taxonomy",
+    "status": "stub",
+    "source_rfc": "rfcs/0018-tool-error-taxonomy.md"
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0018-tool-error-taxonomy.json"
+}

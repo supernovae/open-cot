@@ -196,3 +196,84 @@ Supported fusion strategies include:
 
   "required": ["version", "verifier_outputs", "fusion_strategy"]
 }
+
+## 6. Example: Majority Vote Ensemble
+
+```json
+{
+  "version": "0.1",
+  "trace_id": "trace_001",
+  "fusion_strategy": "majority_vote",
+
+  "verifier_outputs": [
+    { "verifier": "symbolic_math", "results": [...] },
+    { "verifier": "neural_verifier", "results": [...] },
+    { "verifier": "heuristic_checker", "results": [...] }
+  ],
+
+  "fused_step_results": [
+    { "step_id": "s2", "correct": "true", "confidence": 0.67 },
+    { "step_id": "s3", "correct": "true", "confidence": 1.0 },
+    { "step_id": "s4", "correct": "true", "confidence": 0.67 }
+  ],
+
+  "fused_rewards": [
+    { "step_id": "s2", "reward": 1.0 },
+    { "step_id": "s3", "reward": 1.0 },
+    { "step_id": "s4", "reward": 1.0 }
+  ]
+}
+
+
+## 7. Example: Confidence-Weighted Fusion
+
+```json
+{
+  "fusion_strategy": "confidence_weighted",
+  "weights": {
+    "symbolic_math": 1.0,
+    "neural_verifier": 0.5
+  }
+}
+
+## 8. Open Questions
+
+### 8.1 Should we support:
+per‑verifier reward scaling?
+
+per‑verifier error taxonomies?
+
+hierarchical ensembles?
+
+verifier reliability tracking?
+
+### 8.2 Should we define:
+a canonical disagreement metric?
+
+a standard for reward normalization?
+
+a standard for conflict resolution?
+
+### 8.3 Should ensembles:
+be embedded inside reward traces?
+
+be stored separately (current design)?
+
+## 9. Acceptance Criteria
+
+This RFC will be accepted when:
+
+At least 3 maintainers approve it.
+A reference implementation can fuse multiple verifier outputs.
+At least one RL pipeline uses ensemble rewards.
+At least one dataset includes ensemble‑annotated traces.
+
+
+## 10. Conclusion
+This RFC introduces the Multi‑Verifier Ensemble Schema, enabling:
+
+robust correctness judgments
+stable RL reward signals
+multi‑source verification
+disagreement analysis
+cross‑framework interoperability
