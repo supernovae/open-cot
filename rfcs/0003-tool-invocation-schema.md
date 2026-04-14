@@ -3,7 +3,7 @@
 **Author:** Byron / Open CoT Community  
 **Created:** 2026‑04‑14  
 **Target Version:** Schema v0.1  
-**Discussion:** https://github.com/<your-org>/<your-repo>/issues/3
+**Discussion:** https://github.com/supernovae/open-cot/issues/3
 
 ---
 
@@ -235,27 +235,28 @@ Observation steps should reflect the failure:
   "parent": "s2"
 }
 
-##9. Open Questions
-###9.1 Should we support:
-streaming tool outputs?
+## 9. Open Questions Resolution (normative closure)
 
-multi‑tool parallel execution?
+### 9.1 Runtime behavior features
 
-tool cancellation events?
+- **Decision:** Streaming, async parallel execution, cancellation, and tool version metadata are supported as optional capabilities.
+- **Rationale:** These features are runtime-dependent and should not block minimal implementations.
+- **Normative requirement:** Implementations **MUST** support non-streaming single-call invocations. Advanced behaviors **MAY** be advertised through capability metadata.
+- **Migration note:** Systems adding async/streaming should maintain compatibility with non-streaming readers.
 
-tool versioning?
+### 9.2 Tool typing and metadata
 
-### 9.2 Should we define:
-a canonical set of tool types?
+- **Decision:** Tool families remain extensible, with recommended normalized metadata fields.
+- **Rationale:** Tool ecosystems evolve rapidly; strict global enums would churn excessively.
+- **Normative requirement:** Tool identifiers **MUST** be stable strings; metadata **SHOULD** include version and provider/source; structured error categories **SHOULD** align with RFC 0018.
+- **Migration note:** Existing ad hoc tool names should be aliased and documented before deprecating legacy forms.
 
-a standard for tool metadata?
+### 9.3 Embedded vs detached storage
 
-a standard for tool error taxonomies?
-
-### 9.3 Should tool invocations be:
-embedded inside steps (current design)?
-
-stored separately and referenced by ID?
+- **Decision:** Canonical form remains embedded invocation records; detached storage is allowed with stable references.
+- **Rationale:** Embedded form simplifies replay and fixture validation.
+- **Normative requirement:** Embedded invocation objects **MUST** be sufficient for local replay. Detached artifacts **MAY** be used, but references **MUST** be resolvable.
+- **Migration note:** If migrating to detached logs, maintain dual-write until all consumers resolve references.
 
 ## 10. Acceptance Criteria
 

@@ -1,0 +1,21 @@
+{
+  "name": "open-cot-synthetic-seed-v0",
+  "version": "0.1.0",
+  "schema_target": "schemas/rfc-0001-reasoning.json",
+  "registry_shortname": "reasoning",
+  "created_by": "datasets/synthetic/generate_seed.py",
+  "license": "MIT",
+  "provenance": [
+    "Hand-authored deterministic seed traces by Open CoT maintainers"
+  ],
+  "safety_release_checks": {
+    "pii_scan": "required",
+    "unsafe_content_review": "required",
+    "license_review": "required"
+  },
+  "splits": {
+    "train": 3,
+    "validation": 1,
+    "test": 1
+  }
+}

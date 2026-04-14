@@ -3,7 +3,7 @@
 **Author:** Byron / Open CoT Community  
 **Created:** 2026‑04‑14  
 **Target Version:** Schema v0.1  
-**Discussion:** https://github.com/<your-org>/<your-repo>/issues/2
+**Discussion:** https://github.com/supernovae/open-cot/issues/2
 
 ---
 
@@ -211,31 +211,28 @@ Each verification result includes:
 }
 
 
-## 7. Open Questions
+## 7. Open Questions Resolution (normative closure)
 
-### 7.1 Should we support:
+### 7.1 Ensemble and proof support
 
-multi‑verifier ensembles?
+- **Decision:** Multi-verifier composition is supported through RFC 0006, and proof payloads remain optional extensions.
+- **Rationale:** Keeps verifier output interoperable while allowing richer verifier ecosystems.
+- **Normative requirement:** Single-verifier payloads **MUST** validate standalone; ensemble workflows **SHOULD** emit RFC 0006 artifacts when multiple verifier streams are fused.
+- **Migration note:** Adding mandatory proof objects would be a breaking change and requires a major migration note.
 
-verifier disagreement resolution?
+### 7.2 Reward semantics
 
-symbolic proof objects?
+- **Decision:** Rewards are optional by default and expected to be normalized when present.
+- **Rationale:** Not every verifier output is used for RL, but cross-pipeline comparability still benefits from common scaling.
+- **Normative requirement:** Verifier rewards **MAY** be omitted. If emitted, reward values **SHOULD** be in [-1, 1], and RL-focused traces **MUST** document normalization policy.
+- **Migration note:** Teams moving from unbounded rewards should add explicit normalization config in dataset metadata.
 
-tool‑specific verification schemas?
+### 7.3 Error taxonomy and calibration
 
-### 7.2 Should reward be:
-
-bounded (e.g., −1 to +1)?
-
-normalized?
-
-optional or required for RL traces?
-
-### 7.3 Should we define:
-
-a standard taxonomy of error types?
-
-a standard for verifier confidence calibration?
+- **Decision:** Reuse RFC 0018 taxonomy patterns and keep confidence calibration explicit but non-prescriptive.
+- **Rationale:** Avoids duplicate taxonomies while preserving portability.
+- **Normative requirement:** Verifier outputs **SHOULD** include machine-readable error categories when failures occur, and confidence fields **MUST** remain numeric probabilities in [0,1].
+- **Migration note:** Existing free-form error text should be mapped to structured categories during migration.
 
 
 ## 8. Acceptance Criteria

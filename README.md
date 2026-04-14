@@ -1,7 +1,6 @@
 <div align="center">
 
 <pre>
-
  ██████╗    ▄████▄    ████████╗
 ██╔════╝   ██    ██   ╚══██╔══╝
 ██║        ██    ██      ██║
@@ -9,7 +8,6 @@
 ██║        ██    ██      ██║
 ╚██████╗   ██    ██      ██║
  ╚═════╝    ▀████▀       ╚═╝
- 
 </pre>
 
 ### Chain of Thought Reasoning Framework
@@ -86,6 +84,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements-tools.txt
 python tools/validate.py
+pytest -q
 ```
 
 Regenerate schema artifacts from RFCs:
@@ -103,8 +102,9 @@ python tools/diff_checker.py /path/to/before/schemas ./schemas --strict --min-se
 ## Current status
 
 - RFC-backed schema registry and CI validation are in place.
-- Examples exist for key shortnames (`reasoning`, `verifier_output`, `reward_fusion`, `agent_loop`, `dataset_packaging`).
-- Dataset generators, converters, benchmark tasks, and richer harness code are active roadmap items.
+- Tier A examples are in place across core shortnames, including sidecars.
+- Synthetic seed data, converter baseline, deterministic mock harness, tests, benchmark starter slice, and reproducible experiment runbooks are implemented.
+- RFC cohesion hardening is in progress: open-question closures, stronger methodology/provenance/privacy specs, and interoperability guidance.
 
 See [`docs/roadmap.md`](./docs/roadmap.md) for phased implementation and conformance direction.
 

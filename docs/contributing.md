@@ -20,7 +20,7 @@ Rules:
 
 - `examples/<folder>/` MUST use the exact registry shortname from `schemas/registry.json`.
 - Additions or renames should update `tools/schema_lib.py` (`RFC_SHORTNAME` and, if needed, `RFC_FILE_SLUG`).
-- Tier A RFCs (0001-0006) require explicit schema markers in RFC prose:
+- Tier A compatibility scope is RFC 0001-0008. A stricter extraction subset currently applies to RFC 0001-0006, which require explicit schema markers in RFC prose:
   - `<!-- opencot:schema:start -->`
   - `<!-- opencot:schema:end -->`
 
@@ -29,6 +29,12 @@ Registry semver policy:
 - **major**: backward-incompatible schema semantics.
 - **minor**: new optional schema/features.
 - **patch**: docs/examples/tooling-only or non-semantic changes.
+
+Version taxonomy:
+
+- **Registry version** (`schemas/registry.json`): version of the published schema set.
+- **Schema instance version** (for example, trace `version: "0.1"`): version of individual documents validated by a schema.
+- **Dataset/benchmark manifest versions**: package/spec versions for data and task bundles.
 
 ## Suggested workflow
 
@@ -56,5 +62,8 @@ Registry semver policy:
   - Profile A/B/C conformance checks.
 - For schema evolution review, run:
   - `python3 tools/diff_checker.py <before_schemas_dir> <after_schemas_dir> --strict --min-severity major`
+- `tools/diff_checker.py` severities (`major`/`minor`/`patch`) indicate schema-diff impact, and should inform (but are not identical to) registry semver decisions.
 - Optional: install [pre-commit](https://pre-commit.com) and run `pre-commit install`. Hooks run `tools/validate.py` and ensure `schemas/` stays in sync with the RFC extractors.
 - Pull requests that touch `schemas/` run semantic diff checks (`tools/diff_checker.py` vs PR base branch). Tightening constraints should include migration notes in the RFC or changelog.
+- Major-impact schema changes MUST include migration notes and expected upgrade path.
+- RFC lifecycle guidance is documented in `docs/governance-rfc-lifecycle.md`.

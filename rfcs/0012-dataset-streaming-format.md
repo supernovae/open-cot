@@ -1,164 +1,99 @@
-# RFC 0011 — Multi‑Agent Protocol (v0.1)
+# RFC 0012 — Dataset Streaming Format (v0.1)
 **Status:** Draft  
 **Author:** Byron / Open CoT Community  
-**Created:** 2026‑04‑14  
+**Created:** 2026-04-14  
 **Target Version:** Schema v0.4  
-**Discussion:** https://github.com/<your-org>/<your-repo>/issues/11
+**Discussion:** https://github.com/supernovae/open-cot/issues/12
 
 ---
 
 ## 1. Summary
 
-This RFC defines the **Multi‑Agent Protocol**, a standardized framework for coordinating multiple LLM‑based agents that collaborate, compete, or specialize across tasks.
+This RFC defines a streaming profile for Open CoT datasets to support large-scale training and evaluation workloads.
 
 It extends:
 
-- RFC 0001 — Reasoning Schema  
-- RFC 0003 — Tool Invocation Schema  
-- RFC 0004 — Branching Reasoning Extensions  
-- RFC 0007 — Agent Loop Protocol  
-- RFC 0010 — Agent Memory Schema  
-
-The goal is to define a **clean, interoperable protocol** for multi‑agent systems that exchange structured messages, share memory selectively, and coordinate reasoning.
+- RFC 0001 — Reasoning Schema
+- RFC 0008 — Dataset Packaging Standard
+- RFC 0035 — Data Provenance Tracking
 
 ---
 
 ## 2. Motivation
 
-Multi‑agent systems are increasingly important for:
+Archive-based dataset packaging is portable, but large datasets often require:
 
-- decomposition of complex tasks  
-- specialization (planner, coder, verifier, critic, executor)  
-- adversarial reasoning  
-- self‑play  
-- distributed tool use  
-- multi‑step planning  
-- multi‑modal collaboration  
+- incremental consumption
+- append-only ingestion
+- deterministic sharding
+- resumable processing
 
-Today, multi‑agent frameworks are:
-
-- inconsistent  
-- unstructured  
-- incompatible  
-- difficult to serialize or replay  
-
-This RFC defines a **unified multi‑agent protocol** for structured reasoning ecosystems.
+This RFC defines a JSONL-first streaming contract with explicit manifest linkage.
 
 ---
 
-## 3. Design Goals
+## 3. Streaming model
 
-### 3.1 Must‑Have Goals
-- Support structured agent‑to‑agent messages  
-- Support shared and private memory (RFC 0010)  
-- Support agent roles and capabilities  
-- Support deterministic replay  
-- Support multi‑agent reasoning graphs  
-- Support tool‑augmented multi‑agent workflows  
+A streaming dataset contains:
 
-### 3.2 Non‑Goals
-- Defining a universal agent architecture  
-- Defining a universal communication algorithm  
-- Encoding model weights or training logs  
+- `stream_manifest.json`: stream metadata and source package reference
+- `traces.jsonl`: line-delimited RFC 0001 records
+- optional sidecar streams (`verifier.jsonl`, `reward.jsonl`)
+
+Each stream record must include stable IDs for trace-level joins.
 
 ---
 
-## 4. Multi‑Agent Model
+## 4. Stream manifest (JSON)
 
-A multi‑agent system consists of:
-
-- **agents[]** — each with identity, role, capabilities  
-- **messages[]** — structured communication events  
-- **shared_memory** — optional global memory  
-- **private_memory** — per‑agent memory (RFC 0010)  
-- **coordination_strategy** — optional (planner, auction, voting, etc.)  
-
----
-
-## 5. Full Schema (JSON)
-
-    {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "OpenCoT Multi-Agent Protocol v0.1",
-      "type": "object",
-
-      "properties": {
-        "version": { "type": "string", "enum": ["0.1"] },
-
-        "agents": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "agent_id": { "type": "string" },
-              "role": { "type": "string" },
-              "capabilities": { "type": "array", "items": { "type": "string" } }
-            },
-            "required": ["agent_id", "role"]
-          }
-        },
-
-        "messages": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "message_id": { "type": "string" },
-              "sender": { "type": "string" },
-              "receiver": { "type": "string" },
-              "timestamp": { "type": "string" },
-              "content": { "type": "string" },
-              "metadata": { "type": "object" }
-            },
-            "required": ["message_id", "sender", "receiver", "content"]
-          }
-        },
-
-        "shared_memory": { "type": "object" },
-
-        "coordination_strategy": { "type": "string" }
-      },
-
-      "required": ["version", "agents", "messages"]
-    }
+```json
+{
+  "stream_version": "0.1",
+  "source_dataset": "open-cot-synthetic-seed-v0",
+  "schema_target": "schemas/rfc-0001-reasoning.json",
+  "record_format": "jsonl",
+  "compression": "none",
+  "shards": ["traces-00001.jsonl", "traces-00002.jsonl"],
+  "ordering": "append_only",
+  "id_field": "trace_id"
+}
+```
 
 ---
 
-## 6. Example
+## 5. Open Questions Resolution (normative closure)
 
-    {
-      "agents": [
-        { "agent_id": "planner", "role": "planner" },
-        { "agent_id": "coder", "role": "executor" }
-      ],
-      "messages": [
-        {
-          "message_id": "m1",
-          "sender": "planner",
-          "receiver": "coder",
-          "content": "Implement function f(x)."
-        }
-      ]
-    }
+### 5.1 Compression and transport
 
----
+- **Decision:** Compression is optional but declared (`none`, `gzip`, `zstd`).
+- **Rationale:** Throughput requirements differ by environment.
+- **Normative requirement:** Producers **MUST** declare compression and record format in the stream manifest.
+- **Migration note:** Legacy streams without compression metadata should add a manifest patch.
 
-## 7. Open Questions
+### 5.2 Ordering and replay
 
-- Should we support broadcast messages?  
-- Should we support agent groups?  
-- Should we define a standard coordination strategy?  
+- **Decision:** Append-only ordering is canonical for deterministic replay.
+- **Rationale:** Deterministic shard and offset semantics are required for reproducible training/eval.
+- **Normative requirement:** Stream producers **MUST** preserve record order within shard and **SHOULD** expose shard-level checksums.
+- **Migration note:** Unordered historical streams should be republished with stable shard ordering.
+
+### 5.3 Sidecar linkage
+
+- **Decision:** Sidecar streams are allowed and joined by stable trace IDs.
+- **Rationale:** Sidecars evolve independently while preserving core trace compatibility.
+- **Normative requirement:** Sidecar records **MUST** include trace ID and schema identifier references.
+- **Migration note:** Sidecar files with implicit join keys should be backfilled with explicit IDs.
 
 ---
 
-## 8. Acceptance Criteria
+## 6. Acceptance criteria
 
-- Reference implementation  
-- Multi‑agent dataset  
-- Multi‑agent agent loop  
+- At least one stream producer emits schema-valid JSONL traces.
+- At least one consumer replays a streamed dataset deterministically.
+- Manifest fields are validated in CI for required metadata.
 
 ---
 
-## 9. Conclusion
+## 7. Conclusion
 
-This RFC defines the **Multi‑Agent Protocol**, enabling structured multi‑agent collaboration.
+RFC 0012 establishes a practical, reproducible streaming contract for Open CoT datasets while preserving compatibility with package-based workflows.

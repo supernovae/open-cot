@@ -3,7 +3,7 @@
 **Author:** Byron / Open CoT Community  
 **Created:** 2026‑04‑14  
 **Target Version:** Schema v0.3  
-**Discussion:** https://github.com/<your-org>/<your-repo>/issues/8
+**Discussion:** https://github.com/supernovae/open-cot/issues/8
 
 ---
 
@@ -216,21 +216,21 @@ dataset/
     license.txt
 
 
-## 13. Open Questions
+## 13. Open Questions Resolution (normative closure)
 
+### 13.1 Packaging profiles
 
-### 13.1 Should we support:
+- **Decision:** JSON manifest + JSON traces remain the baseline profile, with optional extension profiles for JSONL stream and columnar formats.
+- **Rationale:** Baseline portability is critical; advanced storage should be opt-in.
+- **Normative requirement:** Packaged datasets **MUST** include canonical manifest metadata. Non-baseline formats **MAY** be used but **MUST** declare profile type and conversion path.
+- **Migration note:** Existing custom archives should add profile declarations in manifest before publication.
 
-dataset‑level compression?
-streaming formats (e.g., JSONL)?
-HF Dataset integration?
-Parquet or Arrow formats?
+### 13.2 IDs and versioning
 
-### 13.2 Should we define:
-
-a canonical naming scheme for trace IDs?
-a standard for dataset versioning?
-a standard for dataset diffs?
+- **Decision:** Trace IDs and dataset versions are standardized at manifest level.
+- **Rationale:** Stable identifiers are required for replay, provenance, and diffability.
+- **Normative requirement:** Trace IDs **MUST** be stable, unique strings within a package; dataset versions **SHOULD** follow semver; dataset diffs **MAY** be emitted as optional changelog artifacts.
+- **Migration note:** Datasets lacking stable IDs should regenerate IDs once and retain a legacy mapping table.
 
 ## 14.  Acceptance Criteria
 

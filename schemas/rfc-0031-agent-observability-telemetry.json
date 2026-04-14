@@ -1,14 +1,58 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "RFC 0031 — Agent Observability Telemetry (stub)",
-  "description": "Placeholder JSON Schema for RFC 0031. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "title": "Open CoT RFC 0031 — Agent Observability and Telemetry",
   "type": "object",
-  "additionalProperties": true,
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": [
+        "0.1"
+      ]
+    },
+    "agent_id": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "steps": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "tool_calls": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "latency_ms": {
+          "type": "number",
+          "minimum": 0
+        },
+        "memory_reads": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "safety_violations": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "required": [
+    "version",
+    "agent_id",
+    "timestamp",
+    "metrics"
+  ],
+  "$id": "https://opencot.dev/schemas/rfc-0031-agent-observability-telemetry.json",
   "x-opencot": {
     "rfc": "0031",
     "shortname": "agent_observability_telemetry",
-    "status": "stub",
     "source_rfc": "rfcs/0031-agent-observability-telemtry.md"
-  },
-  "$id": "https://opencot.dev/schemas/rfc-0031-agent-observability-telemetry.json"
+  }
 }

@@ -1,0 +1,31 @@
+name: Benchmark submission
+description: Submit benchmark run results and metadata
+title: "[benchmark] "
+labels: ["benchmark"]
+body:
+  - type: input
+    id: model
+    attributes:
+      label: Model id
+      placeholder: org/model-name
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: Run configuration
+      description: Include decoding params, seed, and harness details.
+    validations:
+      required: true
+  - type: textarea
+    id: scores
+    attributes:
+      label: Scores
+      description: Include final_answer_exact, step_validity_proxy, schema_valid, and aggregate.
+    validations:
+      required: true
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Artifact links
+      description: Raw outputs, config file, and any reproducibility references.

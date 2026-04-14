@@ -3,7 +3,7 @@
 **Author:** Byron / Open CoT Community  
 **Created:** 2026‑04‑14  
 **Target Version:** Schema v0.2  
-**Discussion:** https://github.com/<your-org>/<your-repo>/issues/4
+**Discussion:** https://github.com/supernovae/open-cot/issues/4
 
 ---
 
@@ -193,26 +193,28 @@ Below are **additions** to the RFC 0001 schema.
 
 This supports DAG-style reasoning
 
-## 8. Open Qeustions
+## 8. Open Questions Resolution (normative closure)
 
-### 8.1 Should we support:
-weighted edges?
+### 8.1 Branch metadata richness
 
-probabilistic branching?
+- **Decision:** Weighted/probabilistic branches and branch metadata are allowed as optional fields.
+- **Rationale:** Search-heavy systems need richer annotations, but minimal traces should remain simple.
+- **Normative requirement:** Core branching fields **MUST** remain valid without weights; weighted extensions **MAY** be attached with numeric values in [0,1] where probabilities are used.
+- **Migration note:** Pipelines that previously used free-form branch scores should normalize into explicit numeric fields.
 
-branch‑level metadata?
+### 8.2 Pruning semantics
 
-full search tree serialization?
+- **Decision:** Pruning uses multi-valued status labels rather than a binary-only flag.
+- **Rationale:** Multi-valued labels preserve decision provenance for benchmarking and debugging.
+- **Normative requirement:** Pruning annotations **SHOULD** use explicit categorical labels (`none`, `beam_pruned`, `depth_pruned`, `score_pruned`, `other`).
+- **Migration note:** Boolean pruning fields should be upgraded to categorical labels in conversion scripts.
 
-### 8.2 Should pruning be:
-binary (true/false)?
+### 8.3 Scoring and ranking
 
-multi‑valued (e.g., beam_pruned, depth_pruned)?
-
-### 8.3 Should we define:
-a canonical branch scoring function?
-
-a standard for path ranking?
+- **Decision:** No single mandatory branch scorer is defined in this RFC; ranking policy is implementation-defined but must be declared.
+- **Rationale:** Different tasks require different score models.
+- **Normative requirement:** If path ranking is emitted, ranking method metadata **MUST** be present and reproducible.
+- **Migration note:** Existing implicit ranking logic should be surfaced in benchmark run cards.
 
 ## 9. Acceptance Criteria
 

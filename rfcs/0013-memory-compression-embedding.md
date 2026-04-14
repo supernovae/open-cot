@@ -3,7 +3,7 @@
 **Author:** Byron / Open CoT Community  
 **Created:** 2026‑04‑14  
 **Target Version:** Schema v0.4  
-**Discussion:** https://github.com/<your-org>/<your-repo>/issues/13
+**Discussion:** https://github.com/supernovae/open-cot/issues/13
 
 ---
 
@@ -86,11 +86,28 @@ Memory entries may include:
 
 ---
 
-## 7. Open Questions
+## 7. Open Questions Resolution (normative closure)
 
-- Should embeddings be normalized?  
-- Should compression be pluggable?  
-- Should we define a canonical summarization chain?  
+### 7.1 Embedding normalization
+
+- **Decision:** Embedding normalization is recommended, with metric declaration required.
+- **Rationale:** Retrieval comparability depends on known similarity semantics.
+- **Normative requirement:** Embedding records **SHOULD** include normalization status and distance metric metadata.
+- **Migration note:** Existing vectors without metric metadata should be backfilled in index manifests.
+
+### 7.2 Compression pluggability
+
+- **Decision:** Compression strategies are pluggable via named strategy identifiers.
+- **Rationale:** Different memory workloads require different compression trade-offs.
+- **Normative requirement:** Compression pipelines **MUST** declare compressor name and version in output metadata.
+- **Migration note:** Custom compressors should define stable IDs before being used in shared datasets.
+
+### 7.3 Summarization chain
+
+- **Decision:** Canonical summarization output interface is standardized; algorithm remains implementation-defined.
+- **Rationale:** Standardized outputs preserve interoperability while leaving room for innovation.
+- **Normative requirement:** Summaries **MUST** preserve source linkage and confidence metadata when source evidence is condensed.
+- **Migration note:** Existing summaries without source linkage should add provenance references.
 
 ---
 

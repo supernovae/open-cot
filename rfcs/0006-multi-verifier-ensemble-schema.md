@@ -3,7 +3,7 @@
 **Author:** Byron / Open CoT Community  
 **Created:** 2026‑04‑14  
 **Target Version:** Schema v0.3  
-**Discussion:** https://github.com/<your-org>/<your-repo>/issues/6
+**Discussion:** https://github.com/supernovae/open-cot/issues/6
 
 ---
 
@@ -238,28 +238,28 @@ Supported fusion strategies include:
   }
 }
 
-## 8. Open Questions
+## 8. Open Questions Resolution (normative closure)
 
-### 8.1 Should we support:
-per‑verifier reward scaling?
+### 8.1 Ensemble structure and reliability
 
-per‑verifier error taxonomies?
+- **Decision:** Per-verifier scaling, hierarchical ensembles, and reliability tracking are supported.
+- **Rationale:** Ensemble quality depends on calibrated member weighting and historical verifier behavior.
+- **Normative requirement:** Ensemble entries **SHOULD** include per-member identifiers and optional reliability metrics; hierarchical ensembles **MAY** be represented recursively.
+- **Migration note:** Flat ensembles can be upgraded incrementally by adding optional nested group fields.
 
-hierarchical ensembles?
+### 8.2 Disagreement and normalization policy
 
-verifier reliability tracking?
+- **Decision:** Disagreement metric and conflict-resolution strategy must be declared when fused outputs are emitted.
+- **Rationale:** Reproducibility requires explicit strategy metadata.
+- **Normative requirement:** Fused ensemble outputs **MUST** include named strategies for disagreement scoring and conflict handling; reward normalization **SHOULD** follow RFC 0005 defaults.
+- **Migration note:** Existing unnamed fusion heuristics should be converted into explicit strategy labels.
 
-### 8.2 Should we define:
-a canonical disagreement metric?
+### 8.3 Storage form
 
-a standard for reward normalization?
-
-a standard for conflict resolution?
-
-### 8.3 Should ensembles:
-be embedded inside reward traces?
-
-be stored separately (current design)?
+- **Decision:** Ensembles are stored as detached sidecars by default.
+- **Rationale:** Detached artifacts improve composability and independent auditing.
+- **Normative requirement:** Ensemble records **MUST** reference source verifier outputs by stable IDs. Embedded mirrors **MAY** be emitted for convenience.
+- **Migration note:** Embedded-only systems should emit detached sidecars before deprecating legacy readers.
 
 ## 9. Acceptance Criteria
 

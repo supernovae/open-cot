@@ -3,7 +3,7 @@
 **Author:** Byron / Open CoT Community  
 **Created:** 2026‑04‑14  
 **Target Version:** Schema v0.2  
-**Discussion:** https://github.com/<your-org>/<your-repo>/issues/5
+**Discussion:** https://github.com/supernovae/open-cot/issues/5
 
 ---
 
@@ -215,28 +215,28 @@ This schema supports:
   ]
 }
 
-## 8. Open Questions
+## 8. Open Questions Resolution (normative closure)
 
-### 8.1 Should we support:
-negative rewards?
+### 8.1 Reward shape and uncertainty
 
-reward normalization?
+- **Decision:** Negative rewards, normalization, trajectory aggregation, and uncertainty estimates are all supported.
+- **Rationale:** RL-style learning requires penalties and confidence-aware reward interpretation.
+- **Normative requirement:** Reward values **SHOULD** be normalized to [-1,1]; uncertainty **MAY** be included as optional fields (`stddev`, `confidence_interval`).
+- **Migration note:** Unbounded historical rewards should be transformed via documented normalization policy.
 
-multi‑trajectory reward aggregation?
+### 8.2 Source harmonization
 
-reward uncertainty estimates?
+- **Decision:** RLHF and RLAIF remain provenance distinctions, not schema forks.
+- **Rationale:** A common reward envelope keeps datasets interoperable.
+- **Normative requirement:** Multi-source reward traces **MUST** include source identifiers and fusion policy metadata when combined.
+- **Migration note:** Pipelines with source-specific structures should map into shared reward objects with explicit source tags.
 
-### 8.2 Should we define:
-a canonical reward scale?
+### 8.3 Storage model
 
-a standard for combining multiple reward sources?
-
-a standard for RLHF vs RLAIF reward formats?
-
-### 8.3 Should reward traces:
-be embedded inside reasoning traces?
-
-be stored separately (current design)?
+- **Decision:** Detached reward traces remain canonical for reproducibility and modularity.
+- **Rationale:** Sidecar storage supports independent recomputation and audit.
+- **Normative requirement:** Reward traces **MUST** reference stable trace/step IDs from RFC 0001 artifacts. Embedded rewards **MAY** be emitted as convenience copies only.
+- **Migration note:** Embedded-only workflows should adopt sidecar emission to satisfy long-term interoperability requirements.
 
 ## 9. Acceptance Criteria
 This RFC will be accepted when:

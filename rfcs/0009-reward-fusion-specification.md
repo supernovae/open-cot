@@ -3,7 +3,7 @@
 **Author:** Byron / Open CoT Community  
 **Created:** 2026‑04‑14  
 **Target Version:** Schema v0.3  
-**Discussion:** https://github.com/<your-org>/<your-repo>/issues/9
+**Discussion:** https://github.com/supernovae/open-cot/issues/9
 
 ---
 
@@ -249,22 +249,28 @@ User‑defined fusion logic (metadata required).
 
 ---
 
-## 9. Open Questions
+## 9. Open Questions Resolution (normative closure)
 
-### 9.1 Should we support:
-- reward clipping?  
-- reward normalization?  
-- reward smoothing across steps?  
-- reward discounting (γ)?  
+### 9.1 Fusion-time transforms
 
-### 9.2 Should we define:
-- a canonical reward scale (e.g., −1 to +1)?  
-- a standard for multi‑trajectory reward aggregation?  
-- a standard for reward uncertainty?  
+- **Decision:** Clipping, normalization, smoothing, and discounting are supported through explicit `fusion_config` metadata.
+- **Rationale:** Reward fusion must be reproducible across pipelines.
+- **Normative requirement:** If any transform is applied, the transform parameters **MUST** be serialized in the fusion artifact.
+- **Migration note:** Pipelines that used implicit transforms should backfill config metadata for historical runs.
 
-### 9.3 Should fusion:
-- be embedded inside reward traces?  
-- be stored separately (current design)?  
+### 9.2 Scale and uncertainty
+
+- **Decision:** Canonical fused reward scale is normalized to [-1,1], with optional uncertainty metadata.
+- **Rationale:** Comparable fused outputs need a common numeric envelope.
+- **Normative requirement:** Fused reward outputs **SHOULD** be normalized to [-1,1]; uncertainty **MAY** include interval or variance fields.
+- **Migration note:** Non-normalized fused values should include a one-time conversion note in release documentation.
+
+### 9.3 Storage model
+
+- **Decision:** Fusion artifacts remain detached sidecars.
+- **Rationale:** Detached form supports independent recomputation and auditability.
+- **Normative requirement:** Fusion outputs **MUST** reference source trace and reward IDs. Embedded summaries **MAY** exist but are non-authoritative.
+- **Migration note:** Embedded-only fusion output should transition to detached canonical files before deprecating old readers.
 
 ---
 

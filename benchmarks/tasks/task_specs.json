@@ -1,0 +1,39 @@
+{
+  "version": "0.1.0",
+  "schema_target": "schemas/rfc-0001-reasoning.json",
+  "split_policy": {
+    "train": ["math_addition_001", "code_reverse_001"],
+    "validation": ["planning_tea_001"],
+    "test": ["math_multiply_001"]
+  },
+  "tasks": [
+    {
+      "id": "math_addition_001",
+      "split": "train",
+      "prompt": "What is 27 + 15?",
+      "expected_final_answer": "42",
+      "rubric": "Exact numeric match."
+    },
+    {
+      "id": "code_reverse_001",
+      "split": "train",
+      "prompt": "Reverse the string 'open-cot'.",
+      "expected_final_answer": "toc-nepo",
+      "rubric": "Exact string match."
+    },
+    {
+      "id": "planning_tea_001",
+      "split": "validation",
+      "prompt": "Plan three steps to prepare tea.",
+      "expected_final_answer": "1) Boil water 2) Steep leaves 3) Pour and serve",
+      "rubric": "Contains three ordered steps with clear actions."
+    },
+    {
+      "id": "math_multiply_001",
+      "split": "test",
+      "prompt": "Compute 9 * 8.",
+      "expected_final_answer": "72",
+      "rubric": "Exact numeric match."
+    }
+  ]
+}

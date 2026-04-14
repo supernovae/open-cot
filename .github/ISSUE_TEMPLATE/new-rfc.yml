@@ -1,0 +1,28 @@
+name: New RFC proposal
+description: Propose a new RFC for Open CoT
+title: "[rfc] "
+labels: ["rfc"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What problem does this RFC solve?
+    validations:
+      required: true
+  - type: input
+    id: tier
+    attributes:
+      label: Target tier
+      description: Tier A, B, or C
+      placeholder: Tier C
+    validations:
+      required: true
+  - type: textarea
+    id: artifacts
+    attributes:
+      label: Planned artifacts
+      description: RFC markdown, schema file, examples, consumer path.
+      placeholder: rfcs/NNNN-...md, schemas/rfc-NNNN-..., examples/<shortname>/...
+    validations:
+      required: true

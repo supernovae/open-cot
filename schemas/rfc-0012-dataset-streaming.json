@@ -1,86 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "OpenCoT Multi-Agent Protocol v0.1",
+  "title": "RFC 0012 — Dataset Streaming (stub)",
+  "description": "Placeholder JSON Schema for RFC 0012. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
   "type": "object",
-  "properties": {
-    "version": {
-      "type": "string",
-      "enum": [
-        "0.1"
-      ]
-    },
-    "agents": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "agent_id": {
-            "type": "string"
-          },
-          "role": {
-            "type": "string"
-          },
-          "capabilities": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        },
-        "required": [
-          "agent_id",
-          "role"
-        ]
-      }
-    },
-    "messages": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "message_id": {
-            "type": "string"
-          },
-          "sender": {
-            "type": "string"
-          },
-          "receiver": {
-            "type": "string"
-          },
-          "timestamp": {
-            "type": "string"
-          },
-          "content": {
-            "type": "string"
-          },
-          "metadata": {
-            "type": "object"
-          }
-        },
-        "required": [
-          "message_id",
-          "sender",
-          "receiver",
-          "content"
-        ]
-      }
-    },
-    "shared_memory": {
-      "type": "object"
-    },
-    "coordination_strategy": {
-      "type": "string"
-    }
-  },
-  "required": [
-    "version",
-    "agents",
-    "messages"
-  ],
-  "$id": "https://opencot.dev/schemas/rfc-0012-dataset-streaming.json",
+  "additionalProperties": true,
   "x-opencot": {
     "rfc": "0012",
     "shortname": "dataset_streaming",
+    "status": "stub",
     "source_rfc": "rfcs/0012-dataset-streaming-format.md"
-  }
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0012-dataset-streaming.json"
 }

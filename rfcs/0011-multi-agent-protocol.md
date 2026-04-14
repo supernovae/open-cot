@@ -3,7 +3,7 @@
 **Author:** Byron / Open CoT Community  
 **Created:** 2026‑04‑14  
 **Target Version:** Schema v0.4  
-**Discussion:** https://github.com/<your-org>/<your-repo>/issues/11
+**Discussion:** https://github.com/supernovae/open-cot/issues/11
 
 ---
 
@@ -143,11 +143,28 @@ A multi‑agent system consists of:
 
 ---
 
-## 7. Open Questions
+## 7. Open Questions Resolution (normative closure)
 
-- Should we support broadcast messages?  
-- Should we support agent groups?  
-- Should we define a standard coordination strategy?  
+### 7.1 Messaging mode
+
+- **Decision:** Broadcast is supported as an explicit delivery mode in message metadata.
+- **Rationale:** Multi-agent collaboration often requires fan-out coordination.
+- **Normative requirement:** Messages **MUST** support unicast delivery; broadcast **MAY** be used with explicit recipient semantics.
+- **Migration note:** Existing ad hoc broadcast conventions should be normalized through a delivery-mode field.
+
+### 7.2 Agent groups
+
+- **Decision:** Agent grouping is supported through optional `group_id` metadata.
+- **Rationale:** Group semantics improve role orchestration without requiring topology hard-coding.
+- **Normative requirement:** Group membership **MAY** be declared; when declared, group IDs **MUST** be stable within a session.
+- **Migration note:** Role-only systems can incrementally adopt groups without breaking existing agent identifiers.
+
+### 7.3 Coordination strategy
+
+- **Decision:** No single mandatory strategy is imposed, but strategy declaration is required when non-default coordination is used.
+- **Rationale:** Different workloads need planner-worker, voting, or auction-based coordination.
+- **Normative requirement:** If coordination_strategy is set, implementations **MUST** include strategy name and deterministic parameters.
+- **Migration note:** Implicit coordinator behavior should be surfaced in run metadata for reproducibility.
 
 ---
 

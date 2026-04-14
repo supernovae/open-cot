@@ -10,10 +10,12 @@ Detections include:
   - additionalProperties permissive -> strict
   - new/changed pattern or format constraints
 
-Each finding is tagged with a semver-like severity:
+Each finding is tagged with a schema-diff severity:
   - major (likely breaking)
   - minor (new optional capability)
   - patch (non-semantic or informational)
+
+These severities inform, but do not automatically decide, registry semver bumps.
 """
 
 from __future__ import annotations

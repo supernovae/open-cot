@@ -1,0 +1,35 @@
+name: Schema change proposal
+description: Propose updates to an Open CoT schema
+title: "[schema] "
+labels: ["schema"]
+body:
+  - type: input
+    id: shortname
+    attributes:
+      label: Registry shortname
+      description: Key in schemas/registry.json
+      placeholder: reasoning
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: Proposed change
+      description: Describe the schema change and intent.
+    validations:
+      required: true
+  - type: dropdown
+    id: impact
+    attributes:
+      label: Compatibility impact
+      options:
+        - patch
+        - minor
+        - major
+    validations:
+      required: true
+  - type: textarea
+    id: migration
+    attributes:
+      label: Migration notes
+      description: Required for major-impact changes.

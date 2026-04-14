@@ -3,7 +3,7 @@
 **Author:** Byron / Open CoT Community  
 **Created:** 2026‑04‑14  
 **Target Version:** Schema v0.3  
-**Discussion:** https://github.com/<your-org>/<your-repo>/issues/10
+**Discussion:** https://github.com/supernovae/open-cot/issues/10
 
 ---
 
@@ -245,22 +245,28 @@ Examples:
 
 ---
 
-## 9. Open Questions
+## 9. Open Questions Resolution (normative closure)
 
-### 9.1 Should we support:
-- memory expiration policies?  
-- memory compression?  
-- memory embeddings?  
-- encrypted memory fields?  
+### 9.1 Memory policy features
 
-### 9.2 Should we define:
-- a canonical memory retrieval API?  
-- a standard for memory conflict resolution?  
-- a standard for memory provenance?  
+- **Decision:** Expiration, compression, embeddings, and encryption tags are all supported as optional policy fields.
+- **Rationale:** Memory systems vary by runtime and compliance context.
+- **Normative requirement:** Base memory entries **MUST** remain valid without optional policy fields; when encryption is used, entries **MUST** include key/reference metadata rather than raw key material.
+- **Migration note:** Legacy encrypted payloads should add key-reference fields for portability.
 
-### 9.3 Should memory:
-- be embedded inside reasoning traces?  
-- be stored separately (current design)?  
+### 9.2 Retrieval, conflict, and provenance
+
+- **Decision:** Retrieval remains implementation-defined; conflict semantics defer to RFC 0014; provenance aligns with RFC 0035.
+- **Rationale:** Avoids duplicating authority across memory-related RFCs.
+- **Normative requirement:** Implementations **SHOULD** expose deterministic retrieval behavior, and memory conflict resolution **MUST** follow RFC 0014 strategy declarations.
+- **Migration note:** Existing memory stores with implicit overwrite behavior should declare explicit conflict strategy.
+
+### 9.3 Storage topology
+
+- **Decision:** Detached memory snapshots are canonical, with optional trace-level references.
+- **Rationale:** Detached storage scales better and supports replay/audits.
+- **Normative requirement:** Memory snapshots **MUST** carry stable IDs and trace linkage when used in loop execution.
+- **Migration note:** Embedded-memory-only traces should migrate to referenced sidecar snapshots in staged releases.
 
 ---
 

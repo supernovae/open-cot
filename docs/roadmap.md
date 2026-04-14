@@ -48,10 +48,10 @@ Track progress with checkboxes; dates are optional—adjust as maintainers commi
 
 ### Phase 0 — Spec stability (now → next)
 
-- [ ] Clarify RFC 0001 acceptance criteria in the RFC (what MUST validate, what is extension-only).
-- [ ] Treat **registry + examples + CI** as the release gate: every normative schema change ships or updates fixtures under [`examples/`](../examples/) keyed by shortname in [`schemas/registry.json`](../schemas/registry.json).
-- [ ] Keep the pipeline authoritative: edit [`rfcs/`](../rfcs/) → [`tools/sync_schemas_from_rfcs.py`](../tools/sync_schemas_from_rfcs.py) → commit `schemas/` → [`tools/validate.py`](../tools/validate.py) → [validate-schemas workflow](../.github/workflows/validate-schemas.yml).
-- [ ] Define and publish conformance profiles (A/B/C above) and a minimal conformance fixture set in `examples/` + CI checks.
+- [x] Clarify RFC 0001 acceptance criteria in the RFC (what MUST validate, what is extension-only).
+- [x] Treat **registry + examples + CI** as the release gate: every normative schema change ships or updates fixtures under [`examples/`](../examples/) keyed by shortname in [`schemas/registry.json`](../schemas/registry.json).
+- [x] Keep the pipeline authoritative: edit [`rfcs/`](../rfcs/) → [`tools/sync_schemas_from_rfcs.py`](../tools/sync_schemas_from_rfcs.py) → commit `schemas/` → [`tools/validate.py`](../tools/validate.py) → [validate-schemas workflow](../.github/workflows/validate-schemas.yml).
+- [x] Define and publish conformance profiles (A/B/C above) and a minimal conformance fixture set in `examples/` + CI checks.
 
 ```mermaid
 flowchart LR
@@ -66,62 +66,57 @@ flowchart LR
 
 ### Phase 1 — Gold samples and synthetic v0
 
-- [ ] **Task bank**: small curated set (math, code, planning) as JSONL under `datasets/synthetic/` with a README manifest (sources, license, schema version).
-- [ ] **One converter**: e.g. minimal GSM8K-style (question / answer / optional rationale) → [`schemas/rfc-0001-reasoning.json`](../schemas/rfc-0001-reasoning.json) in `datasets/converters/`.
-- [ ] **Expand `examples/`** for Tier A shortnames still thin today: `tool_invocation`, `branching`, `reward`, `ensemble` (and packaging sidecars as needed).
-- [ ] Add **dataset safety gates** for release candidates: PII scan pass, license/provenance declaration, and unsafe-content review checklist documented in dataset manifests.
+- [x] **Task bank**: small curated set (math, code, planning) as JSONL under `datasets/synthetic/` with a README manifest (sources, license, schema version).
+- [x] **One converter**: e.g. minimal GSM8K-style (question / answer / optional rationale) → [`schemas/rfc-0001-reasoning.json`](../schemas/rfc-0001-reasoning.json) in `datasets/converters/`.
+- [x] **Expand `examples/`** for Tier A shortnames still thin today: `tool_invocation`, `branching`, `reward`, `ensemble` (and packaging sidecars as needed).
+- [x] Add **dataset safety gates** for release candidates: PII scan pass, license/provenance declaration, and unsafe-content review checklist documented in dataset manifests.
 
 Validated JSON fixtures live only under **`examples/<registry-shortname>/`** (not under `standards/`). Narrative pattern docs stay under [`standards/`](../standards/).
 
 ### Phase 2 — Mock harness and tests (“showcase code”)
 
-- [ ] **Deterministic harness** in [`reference/python/`](../reference/python/) (or a future `playground/`): mock **LLM** (fixed step stream), **tool** (recorded I/O), **verifier** (rule-based or fixture), aligned with [`schemas/rfc-0007-agent-loop.json`](../schemas/rfc-0007-agent-loop.json) and Tier A traces.
-- [ ] **pytest** (follow-up): validate all `examples/**/*.json`, run harness on canned transcripts; optional extra CI job once tests exist.
+- [x] **Deterministic harness** in [`reference/python/`](../reference/python/) (or a future `playground/`): mock **LLM** (fixed step stream), **tool** (recorded I/O), **verifier** (rule-based or fixture), aligned with [`schemas/rfc-0007-agent-loop.json`](../schemas/rfc-0007-agent-loop.json) and Tier A traces.
+- [x] **pytest** validates examples and harness behavior, and runs in the default validation workflow.
 
 Goal: newcomers can **mock, test, validate, and experiment** without API keys or GPUs.
 
 ### Phase 3 — Benchmark slice
 
-- [ ] **`benchmarks/tasks/`**: small task spec format (JSON or YAML): prompt, reference answer, optional step rubric.
-- [ ] **`benchmarks/scoring/`**: step-level and final-answer checks; tie metrics to [standards/evaluation-metrics.md](../standards/evaluation-metrics.md).
-- [ ] **`benchmarks/leaderboards/`**: one documented stub (columns, how to submit runs)—not a live service required for v0.
-- [ ] Add benchmark governance: fixed split policy, hidden test holdout policy, run card template (model, seed, decoding config), and anti-gaming rules.
+- [x] **`benchmarks/tasks/`**: small task spec format (JSON or YAML): prompt, reference answer, optional step rubric.
+- [x] **`benchmarks/scoring/`**: step-level and final-answer checks; tie metrics to [standards/evaluation-metrics.md](../standards/evaluation-metrics.md).
+- [x] **`benchmarks/leaderboards/`**: one documented stub (columns, how to submit runs)—not a live service required for v0.
+- [x] Add benchmark governance: fixed split policy, hidden test holdout policy, run card template (model, seed, decoding config), and anti-gaming rules.
 
 ### Phase 4 — Community feedback loop
 
-- [ ] **RFC lifecycle labels** (in repo policy): *Draft* → *Implementation-required* (schema + `examples/` path) → *Stable* for Tier A.
-- [ ] **RFC companion PRs**: prose RFC + generated schema + examples in one reviewable unit where possible.
-- [ ] **Registry semver**: bump [`schemas/registry.json`](../schemas/registry.json) `version` when the schema set meaningfully changes; note in a changelog (add `CHANGELOG.md` when ready).
-- [ ] **Optional**: issue/PR templates describing affected tier, affected shortnames, and whether `tools/diff_checker.py` / [schema-breaking-changes workflow](../.github/workflows/schema-breaking-changes.yml) applies.
-- [ ] Add lifecycle policy for stale RFCs: *Superseded* / *Archived* labels with deprecation notes and replacement links.
+- [x] **RFC lifecycle labels** (in repo policy): *Draft* → *Implementation-required* (schema + `examples/` path) → *Stable* for Tier A.
+- [x] **RFC companion PRs**: prose RFC + generated schema + examples in one reviewable unit where possible.
+- [x] **Registry semver**: bump [`schemas/registry.json`](../schemas/registry.json) `version` when the schema set meaningfully changes; note in a changelog (add `CHANGELOG.md` when ready).
+- [x] **Optional**: issue/PR templates describing affected tier, affected shortnames, and whether `tools/diff_checker.py` / [schema-breaking-changes workflow](../.github/workflows/schema-breaking-changes.yml) applies.
+- [x] Add lifecycle policy for stale RFCs: *Superseded* / *Archived* labels with deprecation notes and replacement links.
 
 **Time-box suggestion:** cap how many Tier C RFCs move to *Implementation-required* per quarter unless each ships schema + example + consumer.
 
 ### Phase 5 — Small model prove-out (required for v1.0 usability)
 
-- [ ] **`experiments/`** (new, lightweight): README + one script or notebook recipe: tiny open LM or small API model, SFT or distillation on Tier A synthetic slice.
-- [ ] **Success criteria** (document, not leaderboard hype): e.g. high **schema-valid** rate on held-out prompts from the task bank + simple task accuracy; publish configs and data hash for reproducibility.
-- [ ] Require one reproducible reference run (config + outputs + validation report) before declaring v1.0 "usable toolkit."
+- [x] **`experiments/`** (new, lightweight): README + one script or notebook recipe: tiny open LM or small API model, SFT or distillation on Tier A synthetic slice.
+- [x] **Success criteria** (document, not leaderboard hype): e.g. high **schema-valid** rate on held-out prompts from the task bank + simple task accuracy; publish configs and data hash for reproducibility.
+- [x] Require one reproducible reference run (config + outputs + validation report) before declaring v1.0 "usable toolkit."
 
 Training stacks stay **out of the core tree** until the project explicitly wants them—avoid bloating the reference repo before Phase 0–2 are healthy.
 
 ---
 
-## What is missing today
+## What is missing next
 
-Honest gaps relative to the vision above:
+Current high-priority gaps after the 0.1 execution pass:
 
-- No **synthetic generators** or versioned JSONL task bank under `datasets/synthetic/`.
-- No **converters** from external formats under `datasets/converters/`.
-- No **pytest** (or other) automated test suite for harness + examples—only [tools/validate.py](../tools/validate.py).
-- **`benchmarks/`** is still placeholders (`.gitkeep` only).
-- **`reference/python/`** is minimal (parse / validate / generate stubs)—no mock agent loop.
-- Many **Tier C** RFCs rely on **stub** schemas; that is intentional until slices land—see tiers.
-- No explicit conformance suite/profiles yet (hard to assert interoperability claims).
-- No documented dataset safety/privacy release gate for reasoning traces.
-- No benchmark anti-gaming / run-card policy yet.
-
-There is not yet a single **quickstart** narrative tying README → `tools/validate.py` → `examples/`; improving README “Getting started” is a natural follow-up after Phase 1–2 land.
+- Formalized interoperability suite publication (profile fixture packs + expected outputs for external implementers).
+- Wider Tier C RFC maturation (many remain intentionally stubbed until consumer-backed promotion).
+- Expanded negative-case fixture depth for all active sidecar schemas.
+- Additional benchmark families beyond the starter slice.
+- More than one published reproducible reference run across independent model stacks.
+- Governance automation for RFC quality checks (ID/header consistency and unresolved-section lints).
 
 ---
 
@@ -141,3 +136,5 @@ There is not yet a single **quickstart** narrative tying README → `tools/valid
 - [Philosophy](philosophy.md) — why open reasoning traces matter.
 - [Contributing](contributing.md) — hooks, sync, and PR expectations.
 - [Datasets README](../datasets/README.md) — layout for synthetic and converters.
+- [RFC Audit Summary](rfc-audit-summary.md) — cohesion findings and resolved items.
+- [RFC 0046](../rfcs/0046-conformance-interoperability-protocol.md) — conformance and interoperability protocol.

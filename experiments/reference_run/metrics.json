@@ -1,0 +1,10 @@
+{
+  "run_id": "reference_run_v0_1",
+  "schema_validity_rate": 1.0,
+  "benchmark": {
+    "final_answer_exact_avg": 1.0,
+    "step_validity_proxy_avg": 1.0,
+    "num_tasks": 4
+  },
+  "notes": "Reference illustrative run using deterministic traces."
+}

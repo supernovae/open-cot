@@ -1,14 +1,96 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "RFC 0045 — Ethics (stub)",
-  "description": "Placeholder JSON Schema for RFC 0045. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "title": "Open CoT RFC 0045 — Ethical and Risk Constraints",
   "type": "object",
-  "additionalProperties": true,
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": [
+        "0.1"
+      ]
+    },
+    "constraint_id": {
+      "type": "string"
+    },
+    "risk_rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "risk": {
+            "type": "string",
+            "enum": [
+              "safety",
+              "privacy",
+              "fairness",
+              "compliance",
+              "operational"
+            ]
+          },
+          "max_level": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "action_on_violation": {
+            "type": "string",
+            "enum": [
+              "block",
+              "review",
+              "log_only"
+            ]
+          }
+        },
+        "required": [
+          "risk",
+          "max_level",
+          "action_on_violation"
+        ]
+      }
+    },
+    "privacy_policy": {
+      "type": "object",
+      "properties": {
+        "redaction_actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "drop",
+              "mask",
+              "hash",
+              "encrypt_ref"
+            ]
+          }
+        },
+        "retention_days": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "public_release_allows_pii": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "redaction_actions",
+        "retention_days",
+        "public_release_allows_pii"
+      ]
+    }
+  },
+  "required": [
+    "version",
+    "constraint_id",
+    "risk_rules",
+    "privacy_policy"
+  ],
+  "$id": "https://opencot.dev/schemas/rfc-0045-ethics.json",
   "x-opencot": {
     "rfc": "0045",
     "shortname": "ethics",
-    "status": "stub",
     "source_rfc": "rfcs/0045-ethical-risk-contraints-reasoning-agents.md"
-  },
-  "$id": "https://opencot.dev/schemas/rfc-0045-ethics.json"
+  }
 }

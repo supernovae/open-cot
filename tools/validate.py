@@ -151,8 +151,25 @@ def _check_conformance_profiles() -> list[str]:
         errors.append("ProfileB failed: examples/verifier_output/ must contain at least one fixture")
 
     # Profile C: dataset packaging
-    if not (examples_root / "dataset_packaging" / "manifest.json").is_file():
+    manifest_path = examples_root / "dataset_packaging" / "manifest.json"
+    if not manifest_path.is_file():
         errors.append("ProfileC failed: examples/dataset_packaging/manifest.json is required")
+    else:
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as e:
+            errors.append(f"ProfileC failed: manifest.json is not valid JSON: {e}")
+        else:
+            splits = manifest.get("splits")
+            if not isinstance(splits, list) or not all(isinstance(s, str) for s in splits):
+                errors.append("ProfileC failed: manifest.splits must be a list of strings")
+            else:
+                required = {"train", "validation", "test"}
+                missing = sorted(required - set(splits))
+                if missing:
+                    errors.append(f"ProfileC failed: manifest.splits missing required entries: {', '.join(missing)}")
+                if len(splits) != len(set(splits)):
+                    errors.append("ProfileC failed: manifest.splits contains duplicate values")
 
     return errors
 
@@ -199,6 +216,8 @@ def main() -> int:
         for e in errs:
             print(e, file=sys.stderr)
         return 1
+    if not args.skip_conformance:
+        print("Conformance profiles: A/B/C checks passed.", file=sys.stderr)
     print(f"OK: {len(loaded)} schemas, registry loaded, validation passed.", file=sys.stderr)
     return 0
 

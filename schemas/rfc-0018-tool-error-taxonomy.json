@@ -1,14 +1,51 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "RFC 0018 — Tool Error Taxonomy (stub)",
-  "description": "Placeholder JSON Schema for RFC 0018. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "title": "Open CoT RFC 0018 — Tool Error Taxonomy",
   "type": "object",
-  "additionalProperties": true,
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": [
+        "0.1"
+      ]
+    },
+    "tool_name": {
+      "type": "string"
+    },
+    "error_code": {
+      "type": "string",
+      "enum": [
+        "auth_error",
+        "permission_error",
+        "timeout_error",
+        "input_validation_error",
+        "tool_unavailable",
+        "execution_error",
+        "rate_limited",
+        "unknown_error"
+      ]
+    },
+    "message": {
+      "type": "string"
+    },
+    "retryable": {
+      "type": "boolean"
+    },
+    "metadata": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "version",
+    "tool_name",
+    "error_code",
+    "message",
+    "retryable"
+  ],
+  "$id": "https://opencot.dev/schemas/rfc-0018-tool-error-taxonomy.json",
   "x-opencot": {
     "rfc": "0018",
     "shortname": "tool_error_taxonomy",
-    "status": "stub",
     "source_rfc": "rfcs/0018-tool-error-taxonomy.md"
-  },
-  "$id": "https://opencot.dev/schemas/rfc-0018-tool-error-taxonomy.json"
+  }
 }

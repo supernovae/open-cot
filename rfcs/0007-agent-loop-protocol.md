@@ -3,7 +3,7 @@
 **Author:** Byron / Open CoT Community  
 **Created:** 2026‑04‑14  
 **Target Version:** Schema v0.3  
-**Discussion:** https://github.com/<your-org>/<your-repo>/issues/7
+**Discussion:** https://github.com/supernovae/open-cot/issues/7
 
 ---
 
@@ -225,26 +225,28 @@ Termination occurs when:
   "final_answer": "The square root of Tokyo's population (~13.96M) is approximately 3736."
 }
 
-## 8. Open Questions
+## 8. Open Questions Resolution (normative closure)
 
-### 8.1 Should the protocol support:
+### 8.1 Protocol capability scope
 
-multi‑agent collaboration?
-tool‑initiated actions?
-asynchronous tool calls?
-streaming observations?
+- **Decision:** Multi-agent collaboration, async tool calls, tool-initiated follow-ups, and streaming observations are extension capabilities.
+- **Rationale:** Core loop interoperability should not depend on advanced runtime orchestration.
+- **Normative requirement:** Every compliant loop **MUST** support deterministic single-agent synchronous execution; advanced capabilities **MAY** be added with explicit capability flags.
+- **Migration note:** Async-enabled runtimes should keep a compatibility mode that emits synchronous-equivalent transcripts.
 
-### 8.2 Should we define:
+### 8.2 Termination and state contracts
 
-a canonical termination condition?
-a standard for agent memory?
-a standard for agent state serialization?
+- **Decision:** Canonical termination reasons are standardized, memory references defer to RFC 0010, and state serialization uses versioned envelopes.
+- **Rationale:** Deterministic replay requires explicit end states and stable serialization boundaries.
+- **Normative requirement:** Loop transcripts **MUST** include a terminal state (`answer`, `budget_exhausted`, `error`, `external_stop`) and **SHOULD** include serializable state metadata.
+- **Migration note:** Existing loops with implicit stopping should emit explicit termination reason fields.
 
-### 8.3 Should the protocol enforce:
+### 8.3 Structural enforcement
 
-step ordering?
-DAG structure?
-maximum recursion depth?
+- **Decision:** Enforcement follows staged strictness (L0 schema, L1 linkage, L2 graph policy).
+- **Rationale:** Enables broad adoption while preserving upgrade path to stronger guarantees.
+- **Normative requirement:** Implementations **MUST** pass L0 validation; L1 checks **SHOULD** be enabled in CI; L2 checks **MAY** be profile-specific.
+- **Migration note:** New strictness defaults should be announced with fixture updates and migration guidance.
 
 ## 9. Acceptance Criteria
 

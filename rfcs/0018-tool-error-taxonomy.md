@@ -1,73 +1,84 @@
-# RFC 0017 — Agent Safety & Sandboxing (v0.1)
+# RFC 0018 — Tool Error Taxonomy (v0.1)
 **Status:** Draft  
 **Author:** Byron / Open CoT Community  
-**Created:** 2026‑04‑14  
+**Created:** 2026-04-14  
 **Target Version:** Schema v0.4  
-**Discussion:** https://github.com/<your-org>/<your-repo>/issues/17
+**Discussion:** https://github.com/supernovae/open-cot/issues/18
 
 ---
 
 ## 1. Summary
 
-This RFC defines the **Agent Safety & Sandboxing Standard**, a unified mechanism for restricting, monitoring, and validating agent actions, tool calls, and memory access.
+This RFC defines a structured error taxonomy for tool invocation failures and degraded responses.
 
 It extends:
 
-- RFC 0003 — Tool Invocation Schema  
-- RFC 0007 — Agent Loop Protocol  
-- RFC 0010 — Agent Memory Schema  
+- RFC 0003 — Tool Invocation Schema
+- RFC 0007 — Agent Loop Protocol
 
 ---
 
-## 2. Motivation
+## 2. Error classes
 
-Agents require safety boundaries to prevent:
-
-- unsafe tool calls  
-- unauthorized memory access  
-- infinite loops  
-- excessive branching  
-- unsafe multi‑agent interactions  
-- unbounded resource usage  
-
-This RFC defines a **sandbox layer** that enforces constraints.
+- `auth_error`: credential or identity failure
+- `permission_error`: policy or ACL denial
+- `timeout_error`: request exceeded deadline
+- `input_validation_error`: malformed arguments
+- `tool_unavailable`: service dependency unavailable
+- `execution_error`: runtime failure in tool execution
+- `rate_limited`: quota/rate limit triggered
+- `unknown_error`: uncategorized failure
 
 ---
 
-## 3. Safety Domains
+## 3. Full Schema (JSON)
 
-- **Tool Safety** — allowed tools, rate limits, argument validation  
-- **Memory Safety** — read/write permissions, key‑level ACLs  
-- **Execution Safety** — step limits, recursion limits  
-- **Branching Safety** — max branches, pruning rules  
-- **Multi‑Agent Safety** — message filtering, role isolation  
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Open CoT RFC 0018 — Tool Error Taxonomy",
+  "type": "object",
+  "properties": {
+    "version": { "type": "string", "enum": ["0.1"] },
+    "tool_name": { "type": "string" },
+    "error_code": {
+      "type": "string",
+      "enum": [
+        "auth_error",
+        "permission_error",
+        "timeout_error",
+        "input_validation_error",
+        "tool_unavailable",
+        "execution_error",
+        "rate_limited",
+        "unknown_error"
+      ]
+    },
+    "message": { "type": "string" },
+    "retryable": { "type": "boolean" },
+    "metadata": { "type": "object" }
+  },
+  "required": ["version", "tool_name", "error_code", "message", "retryable"]
+}
+```
 
 ---
 
-## 4. Sandbox Configuration Schema
+## 4. Example
 
-    {
-      "allowed_tools": ["search", "calculator"],
-      "blocked_tools": ["shell", "network_raw"],
-      "max_steps": 128,
-      "max_branches": 16,
-      "memory_acl": {
-        "planner": ["read"],
-        "executor": ["read", "write"]
-      }
-    }
-
----
-
-## 5. Example
-
-    {
-      "allowed_tools": ["weather_api"],
-      "max_steps": 32
-    }
+```json
+{
+  "version": "0.1",
+  "tool_name": "weather_api",
+  "error_code": "timeout_error",
+  "message": "Request timed out after 5s.",
+  "retryable": true,
+  "metadata": { "timeout_seconds": 5 }
+}
+```
 
 ---
 
-## 6. Conclusion
+## 5. Conclusion
 
-This RFC defines a unified safety and sandboxing layer for agent execution.
+RFC 0018 provides a shared, machine-readable error vocabulary for tool-augmented reasoning systems.

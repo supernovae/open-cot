@@ -24,6 +24,9 @@ jobs:
       - name: Validate schemas, examples, Tier A coverage, and conformance profiles
         run: python tools/validate.py
 
+      - name: Run test suite
+        run: pytest -q
+
       - name: Ensure committed schemas match RFC extractors
         run: |
           set -euo pipefail
