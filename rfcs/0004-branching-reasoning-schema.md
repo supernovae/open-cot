@@ -94,6 +94,7 @@ These fields extend the existing step structure.
 
 Below are **additions** to the RFC 0001 schema.
 
+<!-- opencot:schema:start -->
 ```json
 {
   "branch_group": {
@@ -124,6 +125,7 @@ Below are **additions** to the RFC 0001 schema.
     "description": "Identifier for a complete reasoning path from root to leaf."
   }
 }
+<!-- opencot:schema:end -->
 
 
 ## 6. Example: Tree-of-Thoughts (ToT)

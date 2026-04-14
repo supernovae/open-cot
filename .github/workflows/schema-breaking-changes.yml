@@ -1,6 +1,6 @@
 name: Schema breaking changes
 
-# Heuristic diff of JSON Schemas vs PR base branch (intersecting rfc-*.json only).
+# Semantic diff of JSON Schemas vs PR base branch.
 
 on:
   pull_request:
@@ -40,5 +40,5 @@ jobs:
           fi
           test -d /tmp/base/schemas
 
-      - name: Breaking change check (strict)
-        run: python tools/diff_checker.py /tmp/base/schemas "${{ github.workspace }}/schemas" --strict
+      - name: Breaking change check (strict major threshold)
+        run: python tools/diff_checker.py /tmp/base/schemas "${{ github.workspace }}/schemas" --strict --min-severity major

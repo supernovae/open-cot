@@ -90,6 +90,7 @@ This schema supports:
 
 ## 5. Full Schema (JSON)
 
+<!-- opencot:schema:start -->
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -174,6 +175,7 @@ This schema supports:
 
   "required": ["version"]
 }
+<!-- opencot:schema:end -->
 
 
 ## 6. Example: R1-Style Reward Trace

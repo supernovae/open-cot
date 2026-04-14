@@ -91,6 +91,12 @@ Regenerate schema artifacts from RFCs:
 python tools/sync_schemas_from_rfcs.py
 ```
 
+Run semantic schema diff checks (for PR review):
+
+```bash
+python tools/diff_checker.py /path/to/before/schemas ./schemas --strict --min-severity major
+```
+
 ## Current status
 
 - RFC-backed schema registry and CI validation are in place.

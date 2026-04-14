@@ -102,6 +102,7 @@ Supported fusion strategies include:
 
 ## 5. Full Schema (JSON)
 
+<!-- opencot:schema:start -->
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -196,6 +197,7 @@ Supported fusion strategies include:
 
   "required": ["version", "verifier_outputs", "fusion_strategy"]
 }
+<!-- opencot:schema:end -->
 
 ## 6. Example: Majority Vote Ensemble
 

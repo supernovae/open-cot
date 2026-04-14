@@ -91,6 +91,7 @@ Each verification result includes:
 
 ## 5. Full Schema (JSON)
 
+<!-- opencot:schema:start -->
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -175,6 +176,7 @@ Each verification result includes:
 
   "required": ["version", "results"]
 }
+<!-- opencot:schema:end -->
 
 ## 6. Example
 

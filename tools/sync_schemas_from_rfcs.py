@@ -14,10 +14,14 @@ if str(_TOOLS_DIR) not in sys.path:
 
 from schema_lib import (
     RFC_SHORTNAME,
+    STRICT_MARKER_RFC_IDS,
     REPO_ROOT,
     SCHEMAS_DIR,
     REGISTRY_PATH,
     annotate_schema,
+    duplicate_rfc_ids,
+    extract_marked_brace_object,
+    extract_marked_schema_with_schema_key,
     extract_first_brace_object_after,
     extract_first_json_object_with_schema,
     rfc_markdown_path,
@@ -35,7 +39,9 @@ def _write_json(path: Path, data: Any) -> None:
 
 def build_branching_schema(rfc_id: str) -> dict[str, Any]:
     text = rfc_markdown_path(rfc_id).read_text(encoding="utf-8")
-    frag = extract_first_brace_object_after(text, "```json")
+    frag = extract_marked_brace_object(text)
+    if not isinstance(frag, dict):
+        frag = extract_first_brace_object_after(text, "```json")
     if not isinstance(frag, dict):
         raise RuntimeError("RFC 0004: could not parse branching fragment")
     return {
@@ -147,6 +153,11 @@ def stub_schema(rfc_id: str, shortname: str, title: str) -> dict[str, Any]:
 
 
 def main() -> int:
+    dups = duplicate_rfc_ids()
+    if dups:
+        rendered = ", ".join(f"{rfc_id}({len(paths)})" for rfc_id, paths in sorted(dups.items()))
+        raise RuntimeError(f"Duplicate RFC ids detected: {rendered}")
+
     SCHEMAS_DIR.mkdir(parents=True, exist_ok=True)
     for stale in SCHEMAS_DIR.glob("rfc-*.json"):
         stale.unlink()
@@ -167,7 +178,14 @@ def main() -> int:
             data = build_dataset_packaging_schema()
         else:
             text = md_path.read_text(encoding="utf-8")
-            data = extract_first_json_object_with_schema(text)
+            data = extract_marked_schema_with_schema_key(text)
+            if data is None:
+                if rfc_id in STRICT_MARKER_RFC_IDS:
+                    raise RuntimeError(
+                        f"RFC {rfc_id} requires explicit schema markers "
+                        f"({rfc_id}-*.md missing {repr('<!-- opencot:schema:start -->')} block)."
+                    )
+                data = extract_first_json_object_with_schema(text)
 
         if data is None:
             data = stub_schema(rfc_id, shortname, title)

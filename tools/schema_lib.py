@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import re
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +10,9 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 RFCS_DIR = REPO_ROOT / "rfcs"
 SCHEMAS_DIR = REPO_ROOT / "schemas"
 REGISTRY_PATH = SCHEMAS_DIR / "registry.json"
+
+SCHEMA_MARKER_START = "<!-- opencot:schema:start -->"
+SCHEMA_MARKER_END = "<!-- opencot:schema:end -->"
 
 # RFC id -> shortname (registry key). Filenames use shortname with underscores -> hyphens.
 RFC_SHORTNAME: dict[str, str] = {
@@ -61,6 +63,9 @@ RFC_SHORTNAME: dict[str, str] = {
     "0045": "ethics",
 }
 
+# RFC ids where extraction must use explicit markers.
+STRICT_MARKER_RFC_IDS: set[str] = {"0001", "0002", "0003", "0004", "0005", "0006"}
+
 
 # Basename slugs (after rfc-NNNN-) aligned with schemas/registry.json conventions.
 RFC_FILE_SLUG: dict[str, str] = {
@@ -87,22 +92,40 @@ def schema_relative_path(rfc_id: str, shortname: str) -> str:
 
 
 def rfc_markdown_path(rfc_id: str) -> Path:
-    """Return path rfcs/NNNN-*.md (first match)."""
+    """Return path rfcs/NNNN-*.md and fail if zero or multiple matches."""
     matches = sorted(RFCS_DIR.glob(f"{rfc_id}-*.md"))
     if not matches:
         raise FileNotFoundError(f"No RFC markdown for id {rfc_id}")
+    if len(matches) > 1:
+        names = ", ".join(m.name for m in matches)
+        raise RuntimeError(f"Multiple RFC files for id {rfc_id}: {names}")
     return matches[0]
 
 
+def duplicate_rfc_ids() -> dict[str, list[Path]]:
+    """Return RFC id -> paths for ids with multiple markdown files."""
+    grouped: dict[str, list[Path]] = {}
+    for path in sorted(RFCS_DIR.glob("*.md")):
+        parts = path.name.split("-", 1)
+        if len(parts) != 2:
+            continue
+        rfc_id = parts[0]
+        if len(rfc_id) != 4 or not rfc_id.isdigit():
+            continue
+        grouped.setdefault(rfc_id, []).append(path)
+    return {k: v for k, v in grouped.items() if len(v) > 1}
+
+
 def extract_first_json_object_with_schema(text: str) -> dict[str, Any] | None:
-    """Extract first JSON object that contains a top-level \"$schema\" key (brace-balanced)."""
+    """Extract first JSON object that contains a "$schema" key (brace-balanced)."""
     raw = _extract_first_json_object_raw(text)
     if raw is None:
         return None
     try:
-        return json.loads(raw)
+        data = json.loads(raw)
     except json.JSONDecodeError:
         return None
+    return data if isinstance(data, dict) else None
 
 
 def _extract_first_json_object_raw(text: str) -> str | None:
@@ -112,29 +135,7 @@ def _extract_first_json_object_raw(text: str) -> str | None:
     start = text.rfind("{", 0, i)
     if start == -1:
         return None
-    depth = 0
-    in_str = False
-    esc = False
-    for j in range(start, len(text)):
-        c = text[j]
-        if in_str:
-            if esc:
-                esc = False
-            elif c == "\\":
-                esc = True
-            elif c == '"':
-                in_str = False
-            continue
-        if c == '"':
-            in_str = True
-            continue
-        if c == "{":
-            depth += 1
-        elif c == "}":
-            depth -= 1
-            if depth == 0:
-                return text[start : j + 1]
-    return None
+    return _brace_object_from(text, start)
 
 
 def extract_first_brace_object_after(text: str, needle: str) -> dict[str, Any] | None:
@@ -143,16 +144,52 @@ def extract_first_brace_object_after(text: str, needle: str) -> dict[str, Any] |
     if pos == -1:
         return None
     sub = text[pos:]
-    i = sub.find("{")
+    return _parse_first_brace_object(sub)
+
+
+def extract_marked_schema_with_schema_key(text: str) -> dict[str, Any] | None:
+    """Extract JSON object from explicit schema markers and require "$schema" key."""
+    raw = _extract_marked_block_raw(text)
+    if raw is None:
+        return None
+    data = _parse_first_brace_object(raw)
+    if not isinstance(data, dict):
+        return None
+    if "$schema" not in data:
+        return None
+    return data
+
+
+def extract_marked_brace_object(text: str) -> dict[str, Any] | None:
+    """Extract first JSON object from explicit schema markers."""
+    raw = _extract_marked_block_raw(text)
+    if raw is None:
+        return None
+    return _parse_first_brace_object(raw)
+
+
+def _extract_marked_block_raw(text: str) -> str | None:
+    start = text.find(SCHEMA_MARKER_START)
+    if start == -1:
+        return None
+    end = text.find(SCHEMA_MARKER_END, start + len(SCHEMA_MARKER_START))
+    if end == -1:
+        return None
+    return text[start + len(SCHEMA_MARKER_START) : end]
+
+
+def _parse_first_brace_object(text: str) -> dict[str, Any] | None:
+    i = text.find("{")
     if i == -1:
         return None
-    raw = _brace_object_from(sub, i)
+    raw = _brace_object_from(text, i)
     if raw is None:
         return None
     try:
-        return json.loads(raw)
+        data = json.loads(raw)
     except json.JSONDecodeError:
         return None
+    return data if isinstance(data, dict) else None
 
 
 def _brace_object_from(text: str, start: int) -> str | None:
@@ -179,22 +216,6 @@ def _brace_object_from(text: str, start: int) -> str | None:
             if depth == 0:
                 return text[start : j + 1]
     return None
-
-
-def extract_json_block_after_heading(text: str, heading_substring: str) -> dict[str, Any] | None:
-    """Parse first ```json ... ``` block after a heading line containing heading_substring."""
-    idx = text.find(heading_substring)
-    if idx == -1:
-        return None
-    tail = text[idx:]
-    m = re.search(r"```json\s*\n(.*?)```", tail, re.DOTALL)
-    if not m:
-        return None
-    block = m.group(1).strip()
-    try:
-        return json.loads(block)
-    except json.JSONDecodeError:
-        return None
 
 
 def annotate_schema(

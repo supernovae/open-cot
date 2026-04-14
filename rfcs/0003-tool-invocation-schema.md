@@ -91,6 +91,7 @@ This mirrors ReAct and modern agent frameworks.
 
 ## 5. Full Schema (JSON)
 
+<!-- opencot:schema:start -->
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
@@ -139,6 +140,7 @@ This mirrors ReAct and modern agent frameworks.
 
   "required": ["tool_name", "arguments", "triggered_by_step"]
 }
+<!-- opencot:schema:end -->
 
 
 ## 6.  Integration with RFC 0001 (Reasoning Schema)

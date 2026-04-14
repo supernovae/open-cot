@@ -1,0 +1,23 @@
+{
+  "version": "0.1",
+  "trace_id": "trace_001",
+  "verifier_outputs": [
+    {
+      "verifier": "symbolic_math_v1"
+    }
+  ],
+  "fusion_strategy": "majority_vote",
+  "fused_step_results": [
+    {
+      "step_id": "s2",
+      "correct": "true",
+      "confidence": 1.0
+    }
+  ],
+  "fused_rewards": [
+    {
+      "step_id": "s2",
+      "reward": 1.0
+    }
+  ]
+}

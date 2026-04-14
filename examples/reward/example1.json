@@ -1,0 +1,16 @@
+{
+  "version": "0.1",
+  "trace_id": "trace_001",
+  "reward_sources": [
+    "symbolic_verifier"
+  ],
+  "step_rewards": [
+    {
+      "step_id": "s2",
+      "reward": 1.0,
+      "source": "symbolic_verifier"
+    }
+  ],
+  "trajectory_reward": 1.0,
+  "credit_assignment": "monte_carlo"
+}

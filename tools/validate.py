@@ -15,7 +15,19 @@ if str(_TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(_TOOLS_DIR))
 
 from schema_lib import load_registry, registry_schema_paths
+from schema_lib import duplicate_rfc_ids
 from schema_resolver import SchemaResolver
+
+TIER_A_SHORTNAMES: tuple[str, ...] = (
+    "reasoning",
+    "verifier_output",
+    "tool_invocation",
+    "branching",
+    "reward",
+    "ensemble",
+    "agent_loop",
+    "dataset_packaging",
+)
 
 
 def _walk_refs(obj: Any) -> Iterator[str]:
@@ -110,6 +122,41 @@ def _validate_examples(resolver: SchemaResolver, reg: Any) -> list[str]:
     return errors
 
 
+def _check_tier_a_example_coverage() -> list[str]:
+    errors: list[str] = []
+    examples_root = _REPO_ROOT / "examples"
+    for shortname in TIER_A_SHORTNAMES:
+        p = examples_root / shortname
+        if not p.is_dir():
+            errors.append(f"missing required Tier A examples folder: examples/{shortname}/")
+            continue
+        has_json = any(x.is_file() and x.suffix == ".json" and not x.name.startswith("_") for x in p.glob("*.json"))
+        if not has_json:
+            errors.append(f"Tier A examples folder has no JSON fixtures: examples/{shortname}/")
+    return errors
+
+
+def _check_conformance_profiles() -> list[str]:
+    errors: list[str] = []
+    examples_root = _REPO_ROOT / "examples"
+
+    # Profile A: core reasoning
+    if not any((examples_root / "reasoning").glob("*.json")):
+        errors.append("ProfileA failed: examples/reasoning/ must contain at least one fixture")
+
+    # Profile B: tool + verifier sidecars
+    if not any((examples_root / "tool_invocation").glob("*.json")):
+        errors.append("ProfileB failed: examples/tool_invocation/ must contain at least one fixture")
+    if not any((examples_root / "verifier_output").glob("*.json")):
+        errors.append("ProfileB failed: examples/verifier_output/ must contain at least one fixture")
+
+    # Profile C: dataset packaging
+    if not (examples_root / "dataset_packaging" / "manifest.json").is_file():
+        errors.append("ProfileC failed: examples/dataset_packaging/manifest.json is required")
+
+    return errors
+
+
 def _cross_consistency(loaded: dict[str, dict[str, Any]]) -> list[str]:
     """Lightweight checks across known pairs."""
     warnings: list[str] = []
@@ -123,6 +170,7 @@ def _cross_consistency(loaded: dict[str, dict[str, Any]]) -> list[str]:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--no-examples", action="store_true", help="Skip examples/ validation")
+    parser.add_argument("--skip-conformance", action="store_true", help="Skip conformance profile checks")
     args = parser.parse_args()
 
     resolver = SchemaResolver(_REPO_ROOT)
@@ -130,11 +178,20 @@ def main() -> int:
         print("Missing schemas/registry.json — run: python3 tools/sync_schemas_from_rfcs.py", file=sys.stderr)
         return 1
 
+    dups = duplicate_rfc_ids()
+    if dups:
+        rendered = ", ".join(f"{rfc_id}({len(paths)})" for rfc_id, paths in sorted(dups.items()))
+        print(f"Duplicate RFC ids detected: {rendered}", file=sys.stderr)
+        return 1
+
     reg, loaded = _build_registry()
     errs = _check_meta_schemas(loaded)
     errs += _check_refs(resolver, loaded)
     if not args.no_examples:
         errs += _validate_examples(resolver, reg)
+        errs += _check_tier_a_example_coverage()
+    if not args.skip_conformance:
+        errs += _check_conformance_profiles()
     for w in _cross_consistency(loaded):
         print("WARN:", w, file=sys.stderr)
 
