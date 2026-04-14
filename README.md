@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./assets/open-cot-banner.svg" alt="Open CoT ASCII banner" width="100%" />
+<img src="./assets/open-cot-banner.svg?v=2" alt="Open CoT ASCII banner" width="100%" />
 
 ### Chain of Thought Reasoning Framework
 

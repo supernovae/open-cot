@@ -11,29 +11,14 @@
 
   <rect x="8" y="8" width="1384" height="304" rx="14" fill="url(#bg)"/>
 
-  <!-- Shadow layer -->
-  <g filter="url(#shadow)">
-    <text x="140" y="70" fill="#7a8ba7" opacity="0.28"
-      font-family="Menlo, Consolas, 'Liberation Mono', monospace"
-      font-size="38" font-weight="700" letter-spacing="1.2">
-      <tspan x="120" dy="0">  ____   ____  ______ _   _    ____   ___ _____</tspan>
-      <tspan x="120" dy="42"> / __ \ / __ \|  ____| \ | |  / __ \ / _ \_   _|</tspan>
-      <tspan x="120" dy="42">| |  | | |  | | |__  |  \| | | |  | | | | || |</tspan>
-      <tspan x="120" dy="42">| |  | | |  | |  __| | . ` | | |  | | | | || |</tspan>
-      <tspan x="120" dy="42">| |__| | |__| | |____| |\  | | |__| | |_| || |_</tspan>
-      <tspan x="120" dy="42">\____/ \____/|______|_| \_|  \____/ \___/_____|</tspan>
-    </text>
-  </g>
-
-  <!-- Foreground ASCII text -->
-  <text x="136" y="66" fill="#eaf1ff"
-    font-family="Menlo, Consolas, 'Liberation Mono', monospace"
-    font-size="38" font-weight="700" letter-spacing="1.2">
-    <tspan x="116" dy="0">  ____   ____  ______ _   _    ____   ___ _____</tspan>
-    <tspan x="116" dy="42"> / __ \ / __ \|  ____| \ | |  / __ \ / _ \_   _|</tspan>
-    <tspan x="116" dy="42">| |  | | |  | | |__  |  \| | | |  | | | | || |</tspan>
-    <tspan x="116" dy="42">| |  | | |  | |  __| | . ` | | |  | | | | || |</tspan>
-    <tspan x="116" dy="42">| |__| | |__| | |____| |\  | | |__| | |_| || |_</tspan>
-    <tspan x="116" dy="42">\____/ \____/|______|_| \_|  \____/ \___/_____|</tspan>
+  <text x="95" y="64" fill="#eaf1ff" filter="url(#shadow)" xml:space="preserve"
+    font-family="'Courier New', Menlo, Consolas, 'Liberation Mono', monospace"
+    font-size="36" font-weight="700" letter-spacing="0">
+    <tspan x="95" dy="0"> ____   ____  ______ _   _    ____   ___ _____</tspan>
+    <tspan x="95" dy="40">/ __ \ / __ \|  ____| \ | |  / __ \ / _ \_   _|</tspan>
+    <tspan x="95" dy="40">| |  | | |  | | |__  |  \| | | |  | | | | || |</tspan>
+    <tspan x="95" dy="40">| |  | | |  | |  __| | . ` | | |  | | | | || |</tspan>
+    <tspan x="95" dy="40">| |__| | |__| | |____| |\  | | |__| | |_| || |_</tspan>
+    <tspan x="95" dy="40">\____/ \____/|______|_| \_|  \____/ \___/_____|</tspan>
   </text>
 </svg>
