@@ -1,0 +1,31 @@
+name: ShellCheck
+
+on:
+  push:
+    branches: [main]
+    paths: ["**/*.sh"]
+  pull_request:
+    branches: [main]
+    paths: ["**/*.sh"]
+
+permissions:
+  contents: read
+
+jobs:
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ShellCheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Run ShellCheck on all shell scripts
+        run: |
+          set -euo pipefail
+          files=$(find . -name '*.sh' -not -path './.git/*' -not -path './.venv/*')
+          if [ -z "$files" ]; then
+            echo "No shell scripts found — skipping."
+            exit 0
+          fi
+          echo "$files" | xargs shellcheck --severity=warning --format=gcc

@@ -1,0 +1,32 @@
+target-version = "py310"
+line-length = 120
+
+[lint]
+select = [
+  "E",     # pycodestyle errors
+  "W",     # pycodestyle warnings
+  "F",     # pyflakes
+  "I",     # isort
+  "B",     # flake8-bugbear
+  "S",     # flake8-bandit (security)
+  "UP",    # pyupgrade
+  "SIM",   # flake8-simplify
+  "T20",   # flake8-print (flag stray prints)
+  "PT",    # flake8-pytest-style
+  "RUF",   # ruff-specific rules
+]
+ignore = [
+  "S101",  # assert usage is fine in tests
+  "T201",  # print() is fine in CLI tools
+  "E501",  # line length handled by formatter
+]
+
+[lint.per-file-ignores]
+"tests/**" = ["S101", "S603", "S607"]
+"experiments/**" = ["T201", "S603", "S607"]
+"datasets/**" = ["T201"]
+"scripts/**" = ["T201", "S603", "S607"]
+
+[format]
+quote-style = "double"
+indent-style = "space"

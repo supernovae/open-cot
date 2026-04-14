@@ -2,9 +2,12 @@ name: Schema breaking changes
 
 # Semantic diff of JSON Schemas vs PR base branch.
 
+permissions:
+  contents: read
+
 on:
   pull_request:
-    branches: [main, master]
+    branches: [main]
     paths:
       - "schemas/**"
       - "tools/diff_checker.py"

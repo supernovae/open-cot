@@ -2,9 +2,12 @@ name: Validate schemas
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
-    branches: [main, master]
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   validate:
@@ -20,6 +23,18 @@ jobs:
 
       - name: Install tooling dependencies
         run: pip install -r requirements-tools.txt
+
+      - name: Validate JSON syntax of all schema files
+        run: |
+          set -euo pipefail
+          fail=0
+          for f in schemas/*.json examples/**/*.json; do
+            if ! python -m json.tool "$f" > /dev/null 2>&1; then
+              echo "::error file=$f::Invalid JSON syntax"
+              fail=1
+            fi
+          done
+          exit "$fail"
 
       - name: Validate schemas, examples, Tier A coverage, and conformance profiles
         run: python tools/validate.py
