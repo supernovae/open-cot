@@ -1,0 +1,16 @@
+{
+  "model_name": "Qwen/Qwen2.5-1.5B-Instruct",
+  "train_file": "experiments/data/qwen_cot_sft/train.jsonl",
+  "val_file": "experiments/data/qwen_cot_sft/validation.jsonl",
+  "output_dir": "experiments/runs/qwen2.5-1.5b-peft",
+  "epochs": 1,
+  "batch_size": 1,
+  "gradient_accumulation_steps": 8,
+  "learning_rate": 0.0002,
+  "max_length": 1024,
+  "lora_r": 16,
+  "lora_alpha": 32,
+  "lora_dropout": 0.05,
+  "use_4bit": true,
+  "seed": 42
+}
