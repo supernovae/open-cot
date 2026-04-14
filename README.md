@@ -1,13 +1,6 @@
 <div align="center">
 
-<pre>
-____   ____  ______ _   _    ____   ___ _____
-/ __ \ / __ \|  ____| \ | |  / __ \ / _ \_   _|
-| |  | | |  | | |__  |  \| | | |  | | | | || |
-| |  | | |  | |  __| | . ` | | |  | | | | || |
-| |__| | |__| | |____| |\  | | |__| | |_| || |_
-\____/ \____/|______|_| \_|  \____/ \___/_____|
-</pre>
+<img src="./assets/open-cot-banner.svg" alt="Open CoT ASCII banner" width="100%" />
 
 ### Chain of Thought Reasoning Framework
 
