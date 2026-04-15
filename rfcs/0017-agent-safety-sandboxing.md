@@ -46,25 +46,29 @@ This RFC defines a **sandbox layer** that enforces constraints.
 
 ## 4. Sandbox Configuration Schema
 
-    {
-      "allowed_tools": ["search", "calculator"],
-      "blocked_tools": ["shell", "network_raw"],
-      "max_steps": 128,
-      "max_branches": 16,
-      "memory_acl": {
-        "planner": ["read"],
-        "executor": ["read", "write"]
-      }
-    }
+```json
+{
+  "allowed_tools": ["search", "calculator"],
+  "blocked_tools": ["shell", "network_raw"],
+  "max_steps": 128,
+  "max_branches": 16,
+  "memory_acl": {
+    "planner": ["read"],
+    "executor": ["read", "write"]
+  }
+}
+```
 
 ---
 
 ## 5. Example
 
-    {
-      "allowed_tools": ["weather_api"],
-      "max_steps": 32
-    }
+```json
+{
+  "allowed_tools": ["weather_api"],
+  "max_steps": 32
+}
+```
 
 ---
 

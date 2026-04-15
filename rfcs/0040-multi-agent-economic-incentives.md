@@ -36,22 +36,26 @@ It extends:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "incentive_model": "cooperative",
-      "shared_budget": 0.10,
-      "reward_split": {
-        "planner": 0.4,
-        "executor": 0.6
-      }
-    }
+```json
+{
+  "incentive_model": "cooperative",
+  "shared_budget": 0.10,
+  "reward_split": {
+    "planner": 0.4,
+    "executor": 0.6
+  }
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "incentive_model": "competitive"
-    }
+```json
+{
+  "incentive_model": "competitive"
+}
+```
 
 ---
 

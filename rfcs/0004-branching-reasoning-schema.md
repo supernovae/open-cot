@@ -125,6 +125,7 @@ Below are **additions** to the RFC 0001 schema.
     "description": "Identifier for a complete reasoning path from root to leaf."
   }
 }
+```
 <!-- opencot:schema:end -->
 
 
@@ -179,10 +180,11 @@ Below are **additions** to the RFC 0001 schema.
 
   "final_answer": "Path A is optimal based on travel time and ordering."
 }
-
+```
 
 ## 7. Example: Graph-of-Thoughts (GoT)
 
+```json
 {
   "id": "n3",
   "type": "thought",
@@ -190,6 +192,7 @@ Below are **additions** to the RFC 0001 schema.
   "parent": ["n1", "n2"],
   "path_id": "p1"
 }
+```
 
 This supports DAG-style reasoning
 

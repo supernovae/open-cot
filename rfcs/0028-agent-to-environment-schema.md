@@ -29,21 +29,25 @@ This RFC defines a schema for **agent interactions with external environments**,
 
 ## 3. Full Schema (JSON)
 
-    {
-      "env_id": "sim_01",
-      "observation": {},
-      "action": {},
-      "reward": 1.0,
-      "done": false
-    }
+```json
+{
+  "env_id": "sim_01",
+  "observation": {},
+  "action": {},
+  "reward": 1.0,
+  "done": false
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "action": { "move": "north" }
-    }
+```json
+{
+  "action": { "move": "north" }
+}
+```
 
 ---
 

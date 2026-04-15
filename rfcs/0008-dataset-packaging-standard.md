@@ -131,7 +131,7 @@ This allows datasets to be partial (e.g., traces only, or traces + rewards).
   "created_at": "2026-04-14T00:00:00Z",
   "license": "MIT"
 }
-
+```
 
 ## 6. Trace Files
 
@@ -176,6 +176,7 @@ Contains dataset‑level metadata:
   "language": "en",
   "num_tokens": 1234567
 }
+```
 
 ### 10.2 splits.json
 
@@ -185,6 +186,7 @@ Contains dataset‑level metadata:
   "validation": ["trace_101"],
   "test": ["trace_201"]
 }
+```
 
 
 ## 11.  Validation Requirements
@@ -200,6 +202,7 @@ Manifest counts match actual file counts.
 
 ## 12. Example Dataset Package
 
+```text
 dataset/
   manifest.json
   traces/
@@ -214,6 +217,7 @@ dataset/
     dataset.json
     splits.json
     license.txt
+```
 
 
 ## 13. Open Questions Resolution (normative closure)

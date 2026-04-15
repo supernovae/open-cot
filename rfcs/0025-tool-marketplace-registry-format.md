@@ -32,23 +32,27 @@ It extends:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "tool_name": "weather_api",
-      "version": "1.2.0",
-      "description": "Provides weather forecasts.",
-      "capabilities": ["forecast", "current_conditions"],
-      "auth": "api_key",
-      "cost": { "per_call": 0.001 }
-    }
+```json
+{
+  "tool_name": "weather_api",
+  "version": "1.2.0",
+  "description": "Provides weather forecasts.",
+  "capabilities": ["forecast", "current_conditions"],
+  "auth": "api_key",
+  "cost": { "per_call": 0.001 }
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "tool_name": "calculator",
-      "version": "1.0.0"
-    }
+```json
+{
+  "tool_name": "calculator",
+  "version": "1.0.0"
+}
+```
 
 ---
 

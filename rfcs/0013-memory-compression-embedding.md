@@ -61,28 +61,32 @@ Memory entries may include:
 
 ## 5. Full Schema (JSON)
 
-    {
-      "key": "string",
-      "raw_value": {},
-      "compressed_value": "string",
-      "embedding": { "vector": [], "dim": 0 },
-      "summary": "string",
-      "provenance": {
-        "created_at": "string",
-        "updated_at": "string",
-        "source": "string"
-      }
-    }
+```json
+{
+  "key": "string",
+  "raw_value": {},
+  "compressed_value": "string",
+  "embedding": { "vector": [], "dim": 0 },
+  "summary": "string",
+  "provenance": {
+    "created_at": "string",
+    "updated_at": "string",
+    "source": "string"
+  }
+}
+```
 
 ---
 
 ## 6. Example
 
-    {
-      "key": "project_history",
-      "summary": "Agent completed 12 tasks related to GPU provisioning.",
-      "embedding": { "vector": [0.12, 0.44], "dim": 2 }
-    }
+```json
+{
+  "key": "project_history",
+  "summary": "Agent completed 12 tasks related to GPU provisioning.",
+  "embedding": { "vector": [0.12, 0.44], "dim": 2 }
+}
+```
 
 ---
 

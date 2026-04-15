@@ -35,21 +35,25 @@ It extends:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "org_id": "org_01",
-      "governance": {
-        "required_policies": ["safe_mode"],
-        "restricted_tools": ["shell"]
-      }
-    }
+```json
+{
+  "org_id": "org_01",
+  "governance": {
+    "required_policies": ["safe_mode"],
+    "restricted_tools": ["shell"]
+  }
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "governance": { "required_policies": ["audit_all"] }
-    }
+```json
+{
+  "governance": { "required_policies": ["audit_all"] }
+}
+```
 
 ---
 

@@ -54,32 +54,36 @@ This RFC defines a **structured negotiation protocol**.
 
 ## 4. Full Schema (JSON)
 
-    {
-      "tool_name": "string",
-      "agent_id": "string",
-      "requested_capabilities": ["input_schema", "supported_operations"],
-      "tool_response": {
-        "input_schema": {},
-        "supported_operations": ["search", "lookup"],
-        "version": "1.2.0"
-      },
-      "negotiation_status": "success"
-    }
+```json
+{
+  "tool_name": "string",
+  "agent_id": "string",
+  "requested_capabilities": ["input_schema", "supported_operations"],
+  "tool_response": {
+    "input_schema": {},
+    "supported_operations": ["search", "lookup"],
+    "version": "1.2.0"
+  },
+  "negotiation_status": "success"
+}
+```
 
 ---
 
 ## 5. Example
 
-    {
-      "tool_name": "weather_api",
-      "requested_capabilities": ["input_schema"],
-      "tool_response": {
-        "input_schema": {
-          "city": "string",
-          "state": "string"
-        }
-      }
+```json
+{
+  "tool_name": "weather_api",
+  "requested_capabilities": ["input_schema"],
+  "tool_response": {
+    "input_schema": {
+      "city": "string",
+      "state": "string"
     }
+  }
+}
+```
 
 ---
 

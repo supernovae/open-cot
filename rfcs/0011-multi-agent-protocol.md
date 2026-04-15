@@ -77,69 +77,73 @@ A multi‑agent system consists of:
 
 ## 5. Full Schema (JSON)
 
-    {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "OpenCoT Multi-Agent Protocol v0.1",
-      "type": "object",
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OpenCoT Multi-Agent Protocol v0.1",
+  "type": "object",
 
-      "properties": {
-        "version": { "type": "string", "enum": ["0.1"] },
+  "properties": {
+    "version": { "type": "string", "enum": ["0.1"] },
 
-        "agents": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "agent_id": { "type": "string" },
-              "role": { "type": "string" },
-              "capabilities": { "type": "array", "items": { "type": "string" } }
-            },
-            "required": ["agent_id", "role"]
-          }
+    "agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "agent_id": { "type": "string" },
+          "role": { "type": "string" },
+          "capabilities": { "type": "array", "items": { "type": "string" } }
         },
+        "required": ["agent_id", "role"]
+      }
+    },
 
-        "messages": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "message_id": { "type": "string" },
-              "sender": { "type": "string" },
-              "receiver": { "type": "string" },
-              "timestamp": { "type": "string" },
-              "content": { "type": "string" },
-              "metadata": { "type": "object" }
-            },
-            "required": ["message_id", "sender", "receiver", "content"]
-          }
+    "messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "message_id": { "type": "string" },
+          "sender": { "type": "string" },
+          "receiver": { "type": "string" },
+          "timestamp": { "type": "string" },
+          "content": { "type": "string" },
+          "metadata": { "type": "object" }
         },
+        "required": ["message_id", "sender", "receiver", "content"]
+      }
+    },
 
-        "shared_memory": { "type": "object" },
+    "shared_memory": { "type": "object" },
 
-        "coordination_strategy": { "type": "string" }
-      },
+    "coordination_strategy": { "type": "string" }
+  },
 
-      "required": ["version", "agents", "messages"]
-    }
+  "required": ["version", "agents", "messages"]
+}
+```
 
 ---
 
 ## 6. Example
 
+```json
+{
+  "agents": [
+    { "agent_id": "planner", "role": "planner" },
+    { "agent_id": "coder", "role": "executor" }
+  ],
+  "messages": [
     {
-      "agents": [
-        { "agent_id": "planner", "role": "planner" },
-        { "agent_id": "coder", "role": "executor" }
-      ],
-      "messages": [
-        {
-          "message_id": "m1",
-          "sender": "planner",
-          "receiver": "coder",
-          "content": "Implement function f(x)."
-        }
-      ]
+      "message_id": "m1",
+      "sender": "planner",
+      "receiver": "coder",
+      "content": "Implement function f(x)."
     }
+  ]
+}
+```
 
 ---
 

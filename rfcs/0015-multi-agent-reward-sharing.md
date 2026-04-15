@@ -60,31 +60,35 @@ User‑defined reward mapping.
 
 ## 4. Full Schema (JSON)
 
-    {
-      "version": "0.1",
-      "trace_id": "string",
-      "agents": ["planner", "coder", "verifier"],
-      "reward_model": "cooperative",
-      "agent_rewards": {
-        "planner": 1.0,
-        "coder": 1.0,
-        "verifier": 1.0
-      },
-      "metadata": {}
-    }
+```json
+{
+  "version": "0.1",
+  "trace_id": "string",
+  "agents": ["planner", "coder", "verifier"],
+  "reward_model": "cooperative",
+  "agent_rewards": {
+    "planner": 1.0,
+    "coder": 1.0,
+    "verifier": 1.0
+  },
+  "metadata": {}
+}
+```
 
 ---
 
 ## 5. Example: Hierarchical Reward
 
-    {
-      "reward_model": "hierarchical",
-      "agent_rewards": {
-        "planner": 0.5,
-        "coder": 1.0,
-        "verifier": 0.8
-      }
-    }
+```json
+{
+  "reward_model": "hierarchical",
+  "agent_rewards": {
+    "planner": 0.5,
+    "coder": 1.0,
+    "verifier": 0.8
+  }
+}
+```
 
 ---
 

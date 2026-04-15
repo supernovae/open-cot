@@ -117,131 +117,139 @@ Examples:
 
 ## 5. Full Schema (JSON)
 
-    {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "OpenCoT Agent Memory Schema v0.1",
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OpenCoT Agent Memory Schema v0.1",
+  "type": "object",
+
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": ["0.1"],
+      "description": "Schema version."
+    },
+
+    "agent_id": {
+      "type": "string",
+      "description": "Unique identifier for the agent."
+    },
+
+    "short_term_memory": {
+      "type": "array",
+      "description": "Ephemeral memory entries for the current episode.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": { "type": "string" },
+          "value": {},
+          "type": { "type": "string" },
+          "expires_at": { "type": "string" }
+        },
+        "required": ["key", "value"]
+      }
+    },
+
+    "long_term_memory": {
+      "type": "array",
+      "description": "Persistent memory entries across episodes.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": { "type": "string" },
+          "value": {},
+          "type": { "type": "string" },
+          "updated_at": { "type": "string" },
+          "confidence": { "type": "number" }
+        },
+        "required": ["key", "value"]
+      }
+    },
+
+    "episodic_memory": {
+      "type": "array",
+      "description": "Chronological logs of past episodes.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "episode_id": { "type": "string" },
+          "timestamp": { "type": "string" },
+          "summary": { "type": "string" },
+          "metadata": { "type": "object" }
+        },
+        "required": ["episode_id", "timestamp"]
+      }
+    },
+
+    "tool_memory": {
       "type": "object",
-
-      "properties": {
-        "version": {
-          "type": "string",
-          "enum": ["0.1"],
-          "description": "Schema version."
-        },
-
-        "agent_id": {
-          "type": "string",
-          "description": "Unique identifier for the agent."
-        },
-
-        "short_term_memory": {
-          "type": "array",
-          "description": "Ephemeral memory entries for the current episode.",
-          "items": {
-            "type": "object",
-            "properties": {
-              "key": { "type": "string" },
-              "value": {},
-              "type": { "type": "string" },
-              "expires_at": { "type": "string" }
-            },
-            "required": ["key", "value"]
-          }
-        },
-
-        "long_term_memory": {
-          "type": "array",
-          "description": "Persistent memory entries across episodes.",
-          "items": {
-            "type": "object",
-            "properties": {
-              "key": { "type": "string" },
-              "value": {},
-              "type": { "type": "string" },
-              "updated_at": { "type": "string" },
-              "confidence": { "type": "number" }
-            },
-            "required": ["key", "value"]
-          }
-        },
-
-        "episodic_memory": {
-          "type": "array",
-          "description": "Chronological logs of past episodes.",
-          "items": {
-            "type": "object",
-            "properties": {
-              "episode_id": { "type": "string" },
-              "timestamp": { "type": "string" },
-              "summary": { "type": "string" },
-              "metadata": { "type": "object" }
-            },
-            "required": ["episode_id", "timestamp"]
-          }
-        },
-
-        "tool_memory": {
-          "type": "object",
-          "description": "Tool-specific memory keyed by tool name.",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "state": { "type": "object" },
-              "last_used": { "type": "string" }
-            }
-          }
+      "description": "Tool-specific memory keyed by tool name.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "state": { "type": "object" },
+          "last_used": { "type": "string" }
         }
-      },
-
-      "required": ["version", "agent_id"]
+      }
     }
+  },
+
+  "required": ["version", "agent_id"]
+}
+```
 
 ---
 
 ## 6. Example: Short‑Term Memory
 
+```json
+{
+  "short_term_memory": [
     {
-      "short_term_memory": [
-        {
-          "key": "current_subgoal",
-          "value": "Compute partial sum",
-          "type": "string",
-          "expires_at": "2026-04-14T12:00:00Z"
-        }
-      ]
+      "key": "current_subgoal",
+      "value": "Compute partial sum",
+      "type": "string",
+      "expires_at": "2026-04-14T12:00:00Z"
     }
+  ]
+}
+```
 
 ---
 
 ## 7. Example: Long‑Term Memory
 
+```json
+{
+  "long_term_memory": [
     {
-      "long_term_memory": [
-        {
-          "key": "preferred_units",
-          "value": "metric",
-          "type": "preference",
-          "updated_at": "2026-04-10T09:00:00Z",
-          "confidence": 0.95
-        }
-      ]
+      "key": "preferred_units",
+      "value": "metric",
+      "type": "preference",
+      "updated_at": "2026-04-10T09:00:00Z",
+      "confidence": 0.95
     }
+  ]
+}
+```
 
 ---
 
 ## 8. Example: Tool Memory
 
-    {
-      "tool_memory": {
-        "weather_api": {
-          "state": {
-            "cached_city": "Austin",
-            "cached_result": "Clear skies, 72F"
-          },
-          "last_used": "2026-04-14T11:30:00Z"
-        }
-      }
+```json
+{
+  "tool_memory": {
+    "weather_api": {
+      "state": {
+        "cached_city": "Austin",
+        "cached_result": "Clear skies, 72F"
+      },
+      "last_used": "2026-04-14T11:30:00Z"
     }
+  }
+}
+```
 
 ---
 

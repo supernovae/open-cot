@@ -38,28 +38,32 @@ It extends:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "step_id": "s1",
-      "type": "observation",
-      "modality": "image",
-      "content": {
-        "image_ref": "img_001"
-      }
-    }
+```json
+{
+  "step_id": "s1",
+  "type": "observation",
+  "modality": "image",
+  "content": {
+    "image_ref": "img_001"
+  }
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "modality": "table",
-      "content": {
-        "rows": [
-          ["City", "Population"],
-          ["Tokyo", "13.9M"]
-        ]
-      }
-    }
+```json
+{
+  "modality": "table",
+  "content": {
+    "rows": [
+      ["City", "Population"],
+      ["Tokyo", "13.9M"]
+    ]
+  }
+}
+```
 
 ---
 

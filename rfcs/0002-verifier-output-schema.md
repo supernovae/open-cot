@@ -176,12 +176,14 @@ Each verification result includes:
 
   "required": ["version", "results"]
 }
+```
 <!-- opencot:schema:end -->
 
 ## 6. Example
 
 ### 6.1 Verifier Output for a Simple Math Trace
 
+```json
 {
   "version": "0.1",
   "trace_id": "trace_001",
@@ -209,7 +211,7 @@ Each verification result includes:
     }
   ]
 }
-
+```
 
 ## 7. Open Questions Resolution (normative closure)
 

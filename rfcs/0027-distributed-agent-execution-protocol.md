@@ -32,21 +32,25 @@ It supports:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "node_id": "node_01",
-      "capabilities": ["planning"],
-      "status": "healthy",
-      "tasks": ["task_001"]
-    }
+```json
+{
+  "node_id": "node_01",
+  "capabilities": ["planning"],
+  "status": "healthy",
+  "tasks": ["task_001"]
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "node_id": "gpu_node",
-      "status": "healthy"
-    }
+```json
+{
+  "node_id": "gpu_node",
+  "status": "healthy"
+}
+```
 
 ---
 

@@ -38,26 +38,30 @@ It integrates with:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "trace_id": "string",
-      "feedback_id": "string",
-      "human_id": "string",
-      "feedback_type": "ranking",
-      "content": {
-        "ranking": ["output_a", "output_b", "output_c"]
-      },
-      "timestamp": "string",
-      "metadata": {}
-    }
+```json
+{
+  "trace_id": "string",
+  "feedback_id": "string",
+  "human_id": "string",
+  "feedback_type": "ranking",
+  "content": {
+    "ranking": ["output_a", "output_b", "output_c"]
+  },
+  "timestamp": "string",
+  "metadata": {}
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "feedback_type": "binary",
-      "content": { "approved": true }
-    }
+```json
+{
+  "feedback_type": "binary",
+  "content": { "approved": true }
+}
+```
 
 ---
 

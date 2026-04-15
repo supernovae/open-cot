@@ -35,27 +35,31 @@ It extends:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "agent_id": "planner",
-      "permissions": {
-        "tools": {
-          "search": ["execute"],
-          "calculator": ["execute"]
-        },
-        "memory": {
-          "ltm": ["read"],
-          "stm": ["read", "write"]
-        }
-      }
+```json
+{
+  "agent_id": "planner",
+  "permissions": {
+    "tools": {
+      "search": ["execute"],
+      "calculator": ["execute"]
+    },
+    "memory": {
+      "ltm": ["read"],
+      "stm": ["read", "write"]
     }
+  }
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "permissions": { "tools": { "search": ["execute"] } }
-    }
+```json
+{
+  "permissions": { "tools": { "search": ["execute"] } }
+}
+```
 
 ---
 

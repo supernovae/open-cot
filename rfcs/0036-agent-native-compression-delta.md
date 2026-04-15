@@ -34,21 +34,25 @@ It extends:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "delta_type": "memory_delta",
-      "from_version": "1.2.0",
-      "to_version": "1.2.1",
-      "changes": ["updated_preference"]
-    }
+```json
+{
+  "delta_type": "memory_delta",
+  "from_version": "1.2.0",
+  "to_version": "1.2.1",
+  "changes": ["updated_preference"]
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "delta_type": "scratchpad_delta",
-      "changes": ["added_step_42"]
-    }
+```json
+{
+  "delta_type": "scratchpad_delta",
+  "changes": ["added_step_42"]
+}
+```
 
 ---
 

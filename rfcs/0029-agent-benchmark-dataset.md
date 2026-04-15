@@ -34,21 +34,25 @@ It extends:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "task_id": "t001",
-      "prompt": "Solve the puzzle.",
-      "expected": {},
-      "scoring": { "method": "verifier" }
-    }
+```json
+{
+  "task_id": "t001",
+  "prompt": "Solve the puzzle.",
+  "expected": {},
+  "scoring": { "method": "verifier" }
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "task_id": "math_01",
-      "prompt": "Compute 12 * 19."
-    }
+```json
+{
+  "task_id": "math_01",
+  "prompt": "Compute 12 * 19."
+}
+```
 
 ---
 

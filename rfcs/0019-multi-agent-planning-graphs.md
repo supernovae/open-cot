@@ -43,33 +43,37 @@ This RFC defines a **graph‑based planning representation**.
 
 ## 4. Full Schema (JSON)
 
+```json
+{
+  "nodes": [
     {
-      "nodes": [
-        {
-          "id": "n1",
-          "description": "Plan route",
-          "owner": "planner",
-          "status": "pending"
-        }
-      ],
-      "edges": [
-        { "from": "n1", "to": "n2" }
-      ]
+      "id": "n1",
+      "description": "Plan route",
+      "owner": "planner",
+      "status": "pending"
     }
+  ],
+  "edges": [
+    { "from": "n1", "to": "n2" }
+  ]
+}
+```
 
 ---
 
 ## 5. Example
 
-    {
-      "nodes": [
-        { "id": "n1", "owner": "planner" },
-        { "id": "n2", "owner": "executor" }
-      ],
-      "edges": [
-        { "from": "n1", "to": "n2" }
-      ]
-    }
+```json
+{
+  "nodes": [
+    { "id": "n1", "owner": "planner" },
+    { "id": "n2", "owner": "executor" }
+  ],
+  "edges": [
+    { "from": "n1", "to": "n2" }
+  ]
+}
+```
 
 ---
 

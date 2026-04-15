@@ -32,27 +32,31 @@ This RFC defines a **capability declaration format** for agents, enabling:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "agent_id": "planner",
-      "capabilities": {
-        "reasoning": true,
-        "planning": true,
-        "tool_use": ["search"],
-        "memory": ["read"],
-        "safety_level": "restricted"
-      }
-    }
+```json
+{
+  "agent_id": "planner",
+  "capabilities": {
+    "reasoning": true,
+    "planning": true,
+    "tool_use": ["search"],
+    "memory": ["read"],
+    "safety_level": "restricted"
+  }
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "agent_id": "coder",
-      "capabilities": {
-        "tool_use": ["compiler", "executor"]
-      }
-    }
+```json
+{
+  "agent_id": "coder",
+  "capabilities": {
+    "tool_use": ["compiler", "executor"]
+  }
+}
+```
 
 ---
 

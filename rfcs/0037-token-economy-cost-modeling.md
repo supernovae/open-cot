@@ -36,25 +36,29 @@ It integrates with:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "model_cost": {
-        "input_tokens": 1200,
-        "output_tokens": 800
-      },
-      "tool_cost": {
-        "search": 0.002,
-        "calculator": 0.0001
-      },
-      "total_cost": 0.015
-    }
+```json
+{
+  "model_cost": {
+    "input_tokens": 1200,
+    "output_tokens": 800
+  },
+  "tool_cost": {
+    "search": 0.002,
+    "calculator": 0.0001
+  },
+  "total_cost": 0.015
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "total_cost": 0.004
-    }
+```json
+{
+  "total_cost": 0.004
+}
+```
 
 ---
 

@@ -36,24 +36,28 @@ It extends:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "log_id": "l001",
-      "timestamp": "string",
-      "agent_id": "planner",
-      "event": "tool_call",
-      "details": {
-        "tool": "search",
-        "status": "success"
-      }
-    }
+```json
+{
+  "log_id": "l001",
+  "timestamp": "string",
+  "agent_id": "planner",
+  "event": "tool_call",
+  "details": {
+    "tool": "search",
+    "status": "success"
+  }
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "event": "policy_violation"
-    }
+```json
+{
+  "event": "policy_violation"
+}
+```
 
 ---
 

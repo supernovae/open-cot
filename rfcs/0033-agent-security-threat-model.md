@@ -36,19 +36,23 @@ It extends:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "threat": "prompt_injection",
-      "severity": "high",
-      "mitigation": "sandbox_filter"
-    }
+```json
+{
+  "threat": "prompt_injection",
+  "severity": "high",
+  "mitigation": "sandbox_filter"
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "threat": "tool_abuse"
-    }
+```json
+{
+  "threat": "tool_abuse"
+}
+```
 
 ---
 

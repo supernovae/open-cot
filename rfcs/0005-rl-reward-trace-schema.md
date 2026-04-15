@@ -175,6 +175,7 @@ This schema supports:
 
   "required": ["version"]
 }
+```
 <!-- opencot:schema:end -->
 
 
@@ -195,7 +196,7 @@ This schema supports:
   "trajectory_reward": 1.0,
   "credit_assignment": "monte_carlo"
 }
-
+```
 
 ## 7. Example: Branch-Level Reward (ToT)
 
@@ -214,6 +215,7 @@ This schema supports:
     }
   ]
 }
+```
 
 ## 8. Open Questions Resolution (normative closure)
 

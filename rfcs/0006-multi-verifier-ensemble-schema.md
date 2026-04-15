@@ -197,6 +197,7 @@ Supported fusion strategies include:
 
   "required": ["version", "verifier_outputs", "fusion_strategy"]
 }
+```
 <!-- opencot:schema:end -->
 
 ## 6. Example: Majority Vote Ensemble
@@ -225,7 +226,7 @@ Supported fusion strategies include:
     { "step_id": "s4", "reward": 1.0 }
   ]
 }
-
+```
 
 ## 7. Example: Confidence-Weighted Fusion
 
@@ -237,6 +238,7 @@ Supported fusion strategies include:
     "neural_verifier": 0.5
   }
 }
+```
 
 ## 8. Open Questions Resolution (normative closure)
 

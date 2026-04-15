@@ -120,132 +120,138 @@ User‑defined fusion logic (metadata required).
 
 ## 6. Full Schema (JSON)
 
-    {
-      "$schema": "http://json-schema.org/draft-07/schema#",
-      "title": "OpenCoT Reward Fusion Specification v0.1",
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OpenCoT Reward Fusion Specification v0.1",
+  "type": "object",
+
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": ["0.1"],
+      "description": "Schema version."
+    },
+
+    "trace_id": {
+      "type": "string",
+      "description": "ID linking to a reasoning trace (RFC 0001)."
+    },
+
+    "fusion_strategy": {
+      "type": "string",
+      "enum": [
+        "sum",
+        "mean",
+        "weighted",
+        "confidence_weighted",
+        "max",
+        "min",
+        "product",
+        "custom"
+      ],
+      "description": "Strategy used to fuse reward signals."
+    },
+
+    "weights": {
       "type": "object",
+      "description": "Optional weights for weighted fusion strategies.",
+      "additionalProperties": { "type": "number" }
+    },
 
-      "properties": {
-        "version": {
-          "type": "string",
-          "enum": ["0.1"],
-          "description": "Schema version."
-        },
-
-        "trace_id": {
-          "type": "string",
-          "description": "ID linking to a reasoning trace (RFC 0001)."
-        },
-
-        "fusion_strategy": {
-          "type": "string",
-          "enum": [
-            "sum",
-            "mean",
-            "weighted",
-            "confidence_weighted",
-            "max",
-            "min",
-            "product",
-            "custom"
-          ],
-          "description": "Strategy used to fuse reward signals."
-        },
-
-        "weights": {
-          "type": "object",
-          "description": "Optional weights for weighted fusion strategies.",
-          "additionalProperties": { "type": "number" }
-        },
-
-        "step_fusion": {
-          "type": "array",
-          "description": "Fused step-level rewards.",
-          "items": {
-            "type": "object",
-            "properties": {
-              "step_id": { "type": "string" },
-              "reward": { "type": "number" },
-              "sources": {
-                "type": "array",
-                "items": { "type": "string" }
-              }
-            },
-            "required": ["step_id", "reward"]
+    "step_fusion": {
+      "type": "array",
+      "description": "Fused step-level rewards.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "step_id": { "type": "string" },
+          "reward": { "type": "number" },
+          "sources": {
+            "type": "array",
+            "items": { "type": "string" }
           }
         },
+        "required": ["step_id", "reward"]
+      }
+    },
 
-        "branch_fusion": {
-          "type": "array",
-          "description": "Fused branch-level rewards.",
-          "items": {
-            "type": "object",
-            "properties": {
-              "branch_group": { "type": "string" },
-              "path_id": { "type": "string" },
-              "reward": { "type": "number" }
-            },
-            "required": ["reward"]
-          }
+    "branch_fusion": {
+      "type": "array",
+      "description": "Fused branch-level rewards.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "branch_group": { "type": "string" },
+          "path_id": { "type": "string" },
+          "reward": { "type": "number" }
         },
+        "required": ["reward"]
+      }
+    },
 
-        "trajectory_reward": {
-          "type": "number",
-          "description": "Final fused reward for the entire trajectory."
-        },
+    "trajectory_reward": {
+      "type": "number",
+      "description": "Final fused reward for the entire trajectory."
+    },
 
-        "metadata": {
-          "type": "object",
-          "description": "Optional metadata for custom fusion strategies."
-        }
-      },
-
-      "required": ["version", "fusion_strategy"]
+    "metadata": {
+      "type": "object",
+      "description": "Optional metadata for custom fusion strategies."
     }
+  },
+
+  "required": ["version", "fusion_strategy"]
+}
+```
 
 ---
 
 ## 7. Example: Confidence‑Weighted Step Fusion
 
+```json
+{
+  "version": "0.1",
+  "trace_id": "trace_001",
+  "fusion_strategy": "confidence_weighted",
+
+  "step_fusion": [
     {
-      "version": "0.1",
-      "trace_id": "trace_001",
-      "fusion_strategy": "confidence_weighted",
-
-      "step_fusion": [
-        {
-          "step_id": "s2",
-          "reward": 0.98,
-          "sources": ["symbolic_verifier", "neural_verifier"]
-        }
-      ],
-
-      "trajectory_reward": 0.98
+      "step_id": "s2",
+      "reward": 0.98,
+      "sources": ["symbolic_verifier", "neural_verifier"]
     }
+  ],
+
+  "trajectory_reward": 0.98
+}
+```
 
 ---
 
 ## 8. Example: Weighted Branch Fusion
 
+```json
+{
+  "fusion_strategy": "weighted",
+  "weights": {
+    "symbolic_verifier": 1.0,
+    "heuristic": 0.5
+  },
+  "branch_fusion": [
     {
-      "fusion_strategy": "weighted",
-      "weights": {
-        "symbolic_verifier": 1.0,
-        "heuristic": 0.5
-      },
-      "branch_fusion": [
-        {
-          "branch_group": "g1",
-          "path_id": "p1",
-          "reward": 0.72
-        },
-        {
-          "branch_group": "g1",
-          "path_id": "p2",
-          "reward": 0.64
-        }
-      ]
+      "branch_group": "g1",
+      "path_id": "p1",
+      "reward": 0.72
+    },
+    {
+      "branch_group": "g1",
+      "path_id": "p2",
+      "reward": 0.64
     }
+  ]
+}
+```
 
 ---
 

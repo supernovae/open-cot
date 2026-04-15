@@ -30,21 +30,25 @@ It extends:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "agent_id": "planner",
-      "public_key": "base64...",
-      "role": "planner",
-      "trust_level": "high"
-    }
+```json
+{
+  "agent_id": "planner",
+  "public_key": "base64...",
+  "role": "planner",
+  "trust_level": "high"
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "agent_id": "executor",
-      "trust_level": "medium"
-    }
+```json
+{
+  "agent_id": "executor",
+  "trust_level": "medium"
+}
+```
 
 ---
 

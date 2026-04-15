@@ -36,21 +36,25 @@ It extends:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "tool_name": "search",
-      "cost_model": "per_token",
-      "rate": 0.000001
-    }
+```json
+{
+  "tool_name": "search",
+  "cost_model": "per_token",
+  "rate": 0.000001
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "tool_name": "calculator",
-      "cost_model": "flat",
-      "rate": 0.0001
-    }
+```json
+{
+  "tool_name": "calculator",
+  "cost_model": "flat",
+  "rate": 0.0001
+}
+```
 
 ---
 

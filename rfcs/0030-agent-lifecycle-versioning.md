@@ -33,22 +33,26 @@ It ensures reproducibility and traceability across agent versions.
 
 ## 3. Full Schema (JSON)
 
-    {
-      "agent_id": "planner",
-      "version": "1.3.0",
-      "stage": "production",
-      "changelog": ["Improved planning heuristics"]
-    }
+```json
+{
+  "agent_id": "planner",
+  "version": "1.3.0",
+  "stage": "production",
+  "changelog": ["Improved planning heuristics"]
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "agent_id": "coder",
-      "version": "0.9.1",
-      "stage": "staging"
-    }
+```json
+{
+  "agent_id": "coder",
+  "version": "0.9.1",
+  "stage": "staging"
+}
+```
 
 ---
 

@@ -34,21 +34,25 @@ It extends:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "budget": {
-        "max_tokens": 5000,
-        "max_cost": 0.10
-      },
-      "enforcement": "hard"
-    }
+```json
+{
+  "budget": {
+    "max_tokens": 5000,
+    "max_cost": 0.10
+  },
+  "enforcement": "hard"
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "budget": { "max_tokens": 2000 }
-    }
+```json
+{
+  "budget": { "max_tokens": 2000 }
+}
+```
 
 ---
 

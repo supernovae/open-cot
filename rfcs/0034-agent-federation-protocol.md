@@ -36,19 +36,23 @@ It supports:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "federation_id": "fed_01",
-      "members": ["cluster_a", "cluster_b"],
-      "trust": "medium"
-    }
+```json
+{
+  "federation_id": "fed_01",
+  "members": ["cluster_a", "cluster_b"],
+  "trust": "medium"
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "federation_id": "research_net"
-    }
+```json
+{
+  "federation_id": "research_net"
+}
+```
 
 ---
 

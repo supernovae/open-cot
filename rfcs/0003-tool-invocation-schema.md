@@ -140,6 +140,7 @@ This mirrors ReAct and modern agent frameworks.
 
   "required": ["tool_name", "arguments", "triggered_by_step"]
 }
+```
 <!-- opencot:schema:end -->
 
 
@@ -164,7 +165,7 @@ Example:
     "triggered_by_step": "s2"
   }
 }
-
+```
 
 And the observation:
 
@@ -175,12 +176,11 @@ And the observation:
   "content": "Tokyo population is 13.96 million.",
   "parent": "s3"
 }
-
+```
 
 ## 7. Example: ReAct-Style Tool Use
 
 ```json
-
 {
   "version": "0.1",
   "task": "Find the current weather in Austin, TX.",
@@ -214,26 +214,28 @@ And the observation:
   ],
   "final_answer": "Clear skies, 72°F."
 }
+```
 
 ## 8. Error Handling
 
 ```json
-
-"result": {
-  "error": "Timeout contacting weather API."
+{
+  "result": {
+    "error": "Timeout contacting weather API."
+  }
 }
-
+```
 
 Observation steps should reflect the failure:
 
 ```json
-
 {
   "id": "s3",
   "type": "observation",
   "content": "ERROR: Timeout contacting weather API.",
   "parent": "s2"
 }
+```
 
 ## 9. Open Questions Resolution (normative closure)
 

@@ -224,6 +224,7 @@ Termination occurs when:
 
   "final_answer": "The square root of Tokyo's population (~13.96M) is approximately 3736."
 }
+```
 
 ## 8. Open Questions Resolution (normative closure)
 

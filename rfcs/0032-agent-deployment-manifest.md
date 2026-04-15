@@ -36,23 +36,27 @@ It complements:
 
 ## 3. Full Schema (JSON)
 
-    {
-      "agent_id": "planner",
-      "version": "1.3.0",
-      "environment": {
-        "max_steps": 128
-      },
-      "tools": ["search", "calculator"]
-    }
+```json
+{
+  "agent_id": "planner",
+  "version": "1.3.0",
+  "environment": {
+    "max_steps": 128
+  },
+  "tools": ["search", "calculator"]
+}
+```
 
 ---
 
 ## 4. Example
 
-    {
-      "agent_id": "coder",
-      "tools": ["compiler"]
-    }
+```json
+{
+  "agent_id": "coder",
+  "tools": ["compiler"]
+}
+```
 
 ---
 
