@@ -28,8 +28,9 @@ In practice, this project gives you:
 If you are evaluating quickly:
 
 1. Read the phased implementation plan in [`docs/roadmap.md`](./docs/roadmap.md).
-2. Run the local checks in **Quick start** below.
-3. Review contribution and governance expectations in [`docs/contributing.md`](./docs/contributing.md).
+2. If you are new to this space, start with the beginner guide: [`docs/eli5_guide.md`](./docs/eli5_guide.md).
+3. Run the local checks in **Quick start** below.
+4. Review contribution and governance expectations in [`docs/contributing.md`](./docs/contributing.md).
 
 ---
 
