@@ -53,6 +53,7 @@ Every push and pull request is guarded by the following automated checks:
 | **CodeQL Analysis** | GitHub's semantic code analysis for Python — injection flaws, unsafe deserialization, path traversal, etc. | push + PR to `main`; weekly schedule |
 | **Dependency Review** | Flags newly-introduced dependencies with known CVEs (HIGH+); blocks GPL-3.0/AGPL-3.0 licenses | PR to `main` |
 | **Gitleaks Secret Scanning** | Scans full git history for accidentally committed secrets, tokens, and credentials | push + PR to `main` |
+| **PII Prompt Scan (Presidio)** | Uses Microsoft Presidio to detect PII entities in prompt-bearing dataset/task files (`datasets/**`, `benchmarks/**`, `experiments/**/*.jsonl`) and fails contributions when findings are detected | push + PR to `main` (prompt/data paths) |
 
 ### Test Suite
 
@@ -87,4 +88,9 @@ python tools/validate.py
 
 # Tests
 pytest -q
+
+# Prompt PII scanning (Microsoft Presidio)
+pip install presidio-analyzer spacy
+python -m spacy download en_core_web_sm
+python tools/pii_prompt_scan.py --score-threshold 0.7
 ```
