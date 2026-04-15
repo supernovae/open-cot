@@ -133,6 +133,13 @@ For launch packaging, see [`docs/public-launch.md`](./docs/public-launch.md).
 
 See [`docs/contributing.md`](./docs/contributing.md). Contributions that improve schema quality, examples, conversion pipelines, and benchmark reproducibility are especially valuable.
 
+### RFC feedback process
+
+- RFC discussion happens in each RFC's linked GitHub **Discussion** thread.
+- Use GitHub **Issues** for actionable implementation work (bugs/tasks), not normative RFC debate.
+- If you propose an RFC change in a PR, include links to both the RFC file and its Discussion thread.
+- Browse all active RFC discussion threads in [`docs/rfc-discussions.md`](./docs/rfc-discussions.md).
+
 ## License
 
 This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE) for the full text.

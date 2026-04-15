@@ -1,0 +1,283 @@
+{
+  "repository": "supernovae/open-cot",
+  "category_slug": "ideas",
+  "count": 46,
+  "rfcs": {
+    "0001": {
+      "rfc_title": "Initial Structured Reasoning Schema",
+      "rfc_path": "rfcs/0001-initial-schema.md",
+      "discussion_title": "RFC 0001 \u2014 Initial Structured Reasoning Schema",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/1"
+    },
+    "0002": {
+      "rfc_title": "Verifier Output Schema",
+      "rfc_path": "rfcs/0002-verifier-output-schema.md",
+      "discussion_title": "RFC 0002 \u2014 Verifier Output Schema",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/2"
+    },
+    "0003": {
+      "rfc_title": "Tool Invocation Schema",
+      "rfc_path": "rfcs/0003-tool-invocation-schema.md",
+      "discussion_title": "RFC 0003 \u2014 Tool Invocation Schema",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/3"
+    },
+    "0004": {
+      "rfc_title": "Branching Reasoning Extensions",
+      "rfc_path": "rfcs/0004-branching-reasoning-schema.md",
+      "discussion_title": "RFC 0004 \u2014 Branching Reasoning Extensions",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/4"
+    },
+    "0005": {
+      "rfc_title": "RL Reward Trace Schema",
+      "rfc_path": "rfcs/0005-rl-reward-trace-schema.md",
+      "discussion_title": "RFC 0005 \u2014 RL Reward Trace Schema",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/5"
+    },
+    "0006": {
+      "rfc_title": "Multi\u2011Verifier Ensemble Schema",
+      "rfc_path": "rfcs/0006-multi-verifier-ensemble-schema.md",
+      "discussion_title": "RFC 0006 \u2014 Multi\u2011Verifier Ensemble Schema",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/6"
+    },
+    "0007": {
+      "rfc_title": "Agent Loop Protocol",
+      "rfc_path": "rfcs/0007-agent-loop-protocol.md",
+      "discussion_title": "RFC 0007 \u2014 Agent Loop Protocol",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/7"
+    },
+    "0008": {
+      "rfc_title": "Dataset Packaging Standard",
+      "rfc_path": "rfcs/0008-dataset-packaging-standard.md",
+      "discussion_title": "RFC 0008 \u2014 Dataset Packaging Standard",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/8"
+    },
+    "0009": {
+      "rfc_title": "Reward Fusion Specification",
+      "rfc_path": "rfcs/0009-reward-fusion-specification.md",
+      "discussion_title": "RFC 0009 \u2014 Reward Fusion Specification",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/9"
+    },
+    "0010": {
+      "rfc_title": "Agent Memory Schema",
+      "rfc_path": "rfcs/0010-agent-memory-schema.md",
+      "discussion_title": "RFC 0010 \u2014 Agent Memory Schema",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/10"
+    },
+    "0011": {
+      "rfc_title": "Multi\u2011Agent Protocol",
+      "rfc_path": "rfcs/0011-multi-agent-protocol.md",
+      "discussion_title": "RFC 0011 \u2014 Multi\u2011Agent Protocol",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/11"
+    },
+    "0012": {
+      "rfc_title": "Dataset Streaming Format",
+      "rfc_path": "rfcs/0012-dataset-streaming-format.md",
+      "discussion_title": "RFC 0012 \u2014 Dataset Streaming Format",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/12"
+    },
+    "0013": {
+      "rfc_title": "Memory Compression & Embedding",
+      "rfc_path": "rfcs/0013-memory-compression-embedding.md",
+      "discussion_title": "RFC 0013 \u2014 Memory Compression & Embedding",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/13"
+    },
+    "0014": {
+      "rfc_title": "Memory Conflict Resolution",
+      "rfc_path": "rfcs/0014-memory-conflict-resolution.md",
+      "discussion_title": "RFC 0014 \u2014 Memory Conflict Resolution",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/14"
+    },
+    "0015": {
+      "rfc_title": "Multi\u2011Agent Reward Sharing",
+      "rfc_path": "rfcs/0015-multi-agent-reward-sharing.md",
+      "discussion_title": "RFC 0015 \u2014 Multi\u2011Agent Reward Sharing",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/15"
+    },
+    "0016": {
+      "rfc_title": "Tool Capability Negotiation",
+      "rfc_path": "rfcs/0016-tool-capability-negotiation.md",
+      "discussion_title": "RFC 0016 \u2014 Tool Capability Negotiation",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/16"
+    },
+    "0017": {
+      "rfc_title": "Agent Safety & Sandboxing",
+      "rfc_path": "rfcs/0017-agent-safety-sandboxing.md",
+      "discussion_title": "RFC 0017 \u2014 Agent Safety & Sandboxing",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/17"
+    },
+    "0018": {
+      "rfc_title": "Tool Error Taxonomy",
+      "rfc_path": "rfcs/0018-tool-error-taxonomy.md",
+      "discussion_title": "RFC 0018 \u2014 Tool Error Taxonomy",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/18"
+    },
+    "0019": {
+      "rfc_title": "Multi\u2011Agent Planning Graphs",
+      "rfc_path": "rfcs/0019-multi-agent-planning-graphs.md",
+      "discussion_title": "RFC 0019 \u2014 Multi\u2011Agent Planning Graphs",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/19"
+    },
+    "0020": {
+      "rfc_title": "Verifiable Scratchpad Compression",
+      "rfc_path": "rfcs/0020-verifiable-scratchpad-compression.md",
+      "discussion_title": "RFC 0020 \u2014 Verifiable Scratchpad Compression",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/20"
+    },
+    "0021": {
+      "rfc_title": "Agent Capability Declaration",
+      "rfc_path": "rfcs/0021-agent-capability-declaration.md",
+      "discussion_title": "RFC 0021 \u2014 Agent Capability Declaration",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/21"
+    },
+    "0022": {
+      "rfc_title": "Agent Evaluation Protocol",
+      "rfc_path": "rfcs/0022-agent-evaluation-protocol.md",
+      "discussion_title": "RFC 0022 \u2014 Agent Evaluation Protocol",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/22"
+    },
+    "0023": {
+      "rfc_title": "Human\u2011in\u2011the\u2011Loop Feedback Schema",
+      "rfc_path": "rfcs/0023-humain-in-the-loop-schema.md",
+      "discussion_title": "RFC 0023 \u2014 Human\u2011in\u2011the\u2011Loop Feedback Schema",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/23"
+    },
+    "0024": {
+      "rfc_title": "Multi\u2011Modal Reasoning Schema",
+      "rfc_path": "rfcs/0024-multi-modal-reasoning-schema.md",
+      "discussion_title": "RFC 0024 \u2014 Multi\u2011Modal Reasoning Schema",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/24"
+    },
+    "0025": {
+      "rfc_title": "Tool Marketplace Registry Format",
+      "rfc_path": "rfcs/0025-tool-marketplace-registry-format.md",
+      "discussion_title": "RFC 0025 \u2014 Tool Marketplace Registry Format",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/25"
+    },
+    "0026": {
+      "rfc_title": "Agent Identity & Authentication",
+      "rfc_path": "rfcs/0026-agent-identity-auth.md",
+      "discussion_title": "RFC 0026 \u2014 Agent Identity & Authentication",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/26"
+    },
+    "0027": {
+      "rfc_title": "Distributed Agent Execution Protocol",
+      "rfc_path": "rfcs/0027-distributed-agent-execution-protocol.md",
+      "discussion_title": "RFC 0027 \u2014 Distributed Agent Execution Protocol",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/27"
+    },
+    "0028": {
+      "rfc_title": "Agent\u2011to\u2011Environment Interaction Schema",
+      "rfc_path": "rfcs/0028-agent-to-environment-schema.md",
+      "discussion_title": "RFC 0028 \u2014 Agent\u2011to\u2011Environment Interaction Schema",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/28"
+    },
+    "0029": {
+      "rfc_title": "Agent Benchmark Dataset Format",
+      "rfc_path": "rfcs/0029-agent-benchmark-dataset.md",
+      "discussion_title": "RFC 0029 \u2014 Agent Benchmark Dataset Format",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/29"
+    },
+    "0030": {
+      "rfc_title": "Agent Lifecycle & Versioning",
+      "rfc_path": "rfcs/0030-agent-lifecycle-versioning.md",
+      "discussion_title": "RFC 0030 \u2014 Agent Lifecycle & Versioning",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/30"
+    },
+    "0031": {
+      "rfc_title": "Agent Observability & Telemetry",
+      "rfc_path": "rfcs/0031-agent-observability-telemtry.md",
+      "discussion_title": "RFC 0031 \u2014 Agent Observability & Telemetry",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/31"
+    },
+    "0032": {
+      "rfc_title": "Agent Deployment Manifest",
+      "rfc_path": "rfcs/0032-agent-deployment-manifest.md",
+      "discussion_title": "RFC 0032 \u2014 Agent Deployment Manifest",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/32"
+    },
+    "0033": {
+      "rfc_title": "Agent Security Posture & Threat Model",
+      "rfc_path": "rfcs/0033-agent-security-threat-model.md",
+      "discussion_title": "RFC 0033 \u2014 Agent Security Posture & Threat Model",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/33"
+    },
+    "0034": {
+      "rfc_title": "Agent Federation Protocol",
+      "rfc_path": "rfcs/0034-agent-federation-protocol.md",
+      "discussion_title": "RFC 0034 \u2014 Agent Federation Protocol",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/34"
+    },
+    "0035": {
+      "rfc_title": "Data Provenance Tracking",
+      "rfc_path": "rfcs/0035-data-provenance-tracking.md",
+      "discussion_title": "RFC 0035 \u2014 Data Provenance Tracking",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/35"
+    },
+    "0036": {
+      "rfc_title": "Agent\u2011Native Compression & Delta Sync",
+      "rfc_path": "rfcs/0036-agent-native-compression-delta.md",
+      "discussion_title": "RFC 0036 \u2014 Agent\u2011Native Compression & Delta Sync",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/36"
+    },
+    "0037": {
+      "rfc_title": "Token Economy & Cost Modeling",
+      "rfc_path": "rfcs/0037-token-economy-cost-modeling.md",
+      "discussion_title": "RFC 0037 \u2014 Token Economy & Cost Modeling",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/37"
+    },
+    "0038": {
+      "rfc_title": "Cost\u2011Aware Reasoning & Budget Enforcement",
+      "rfc_path": "rfcs/0038-cost-aware-reasoning-budget.md",
+      "discussion_title": "RFC 0038 \u2014 Cost\u2011Aware Reasoning & Budget Enforcement",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/38"
+    },
+    "0039": {
+      "rfc_title": "Tool Cost Modeling & Billing Semantics",
+      "rfc_path": "rfcs/0039-tool-cost-modeling-biling.md",
+      "discussion_title": "RFC 0039 \u2014 Tool Cost Modeling & Billing Semantics",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/39"
+    },
+    "0040": {
+      "rfc_title": "Multi\u2011Agent Economic Incentives",
+      "rfc_path": "rfcs/0040-multi-agent-economic-incentives.md",
+      "discussion_title": "RFC 0040 \u2014 Multi\u2011Agent Economic Incentives",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/40"
+    },
+    "0041": {
+      "rfc_title": "Policy Enforcement Schema",
+      "rfc_path": "rfcs/0041-policy-enforcement-schema.md",
+      "discussion_title": "RFC 0041 \u2014 Policy Enforcement Schema",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/41"
+    },
+    "0042": {
+      "rfc_title": "Permissions & Access Control",
+      "rfc_path": "rfcs/0042-permission-acl.md",
+      "discussion_title": "RFC 0042 \u2014 Permissions & Access Control",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/42"
+    },
+    "0043": {
+      "rfc_title": "Auditing & Compliance Logs",
+      "rfc_path": "rfcs/0043-auditing-compliance-logs.md",
+      "discussion_title": "RFC 0043 \u2014 Auditing & Compliance Logs",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/43"
+    },
+    "0044": {
+      "rfc_title": "Governance & Organizational Controls",
+      "rfc_path": "rfcs/0044-governance-organizational-controls.md",
+      "discussion_title": "RFC 0044 \u2014 Governance & Organizational Controls",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/44"
+    },
+    "0045": {
+      "rfc_title": "Ethical & Risk Constraints for Reasoning Agents",
+      "rfc_path": "rfcs/0045-ethical-risk-contraints-reasoning-agents.md",
+      "discussion_title": "RFC 0045 \u2014 Ethical & Risk Constraints for Reasoning Agents",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/45"
+    },
+    "0046": {
+      "rfc_title": "Conformance & Interoperability Protocol",
+      "rfc_path": "rfcs/0046-conformance-interoperability-protocol.md",
+      "discussion_title": "RFC 0046 \u2014 Conformance & Interoperability Protocol",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/46"
+    }
+  }
+}

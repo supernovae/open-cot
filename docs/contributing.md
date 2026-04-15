@@ -38,9 +38,12 @@ Version taxonomy:
 
 ## Suggested workflow
 
-1. Open an issue or discussion for large additions (new benchmark families, schema changes).
-2. Use small, focused pull requests with a short description of intent and impact.
-3. Add or update **validated** JSON examples under `examples/<registry-shortname>/` (see `schemas/registry.json`) when you change a schema; keep narrative examples under `standards/` when appropriate.
+1. For RFC feedback, use the RFC's linked **GitHub Discussion** thread as the canonical conversation channel.
+2. Use GitHub **Issues** for actionable implementation work (bugs, tasks, follow-ups), not normative RFC discussion.
+3. For RFC-changing PRs, link both the RFC file and its discussion thread in the PR description.
+   - Discover discussion threads quickly: `docs/rfc-discussions.md`.
+4. Use small, focused pull requests with a short description of intent and impact.
+5. Add or update **validated** JSON examples under `examples/<registry-shortname>/` (see `schemas/registry.json`) when you change a schema; keep narrative examples under `standards/` when appropriate.
 
 ## Contribution paths
 

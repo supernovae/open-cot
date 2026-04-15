@@ -39,6 +39,9 @@ jobs:
       - name: Validate schemas, examples, Tier A coverage, and conformance profiles
         run: python tools/validate.py
 
+      - name: Validate RFC discussion links
+        run: python tools/check_rfc_discussion_links.py
+
       - name: Run test suite
         run: pytest -q
 

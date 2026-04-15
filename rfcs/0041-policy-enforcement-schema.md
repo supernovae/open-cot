@@ -3,8 +3,7 @@
 **Author:** Byron / Open CoT Community  
 **Created:** 2026‑04‑14  
 **Target Version:** Schema v0.7  
-**Discussion:** https://github.com/supernovae/open-cot/issues/41
-
+**Discussion:** https://github.com/supernovae/open-cot/discussions/41
 ---
 
 ## 1. Summary
