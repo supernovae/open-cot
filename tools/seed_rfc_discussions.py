@@ -33,7 +33,8 @@ def _gh_api_graphql(query: str, variables: dict[str, str] | None = None) -> dict
     cmd = ["gh", "api", "graphql", "-f", f"query={query}"]
     for key, value in (variables or {}).items():
         cmd.extend(["-f", f"{key}={value}"])
-    out = subprocess.check_output(cmd, cwd=REPO_ROOT, text=True)
+    # cmd is constructed from fixed tokens plus explicit CLI args/GraphQL payload values.
+    out = subprocess.check_output(cmd, cwd=REPO_ROOT, text=True)  # noqa: S603
     return json.loads(out)
 
 
