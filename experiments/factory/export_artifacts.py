@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from experiments.factory.lineage import get_git_commit, utc_now_iso
+from experiments.factory.lineage import get_git_commit, utc_now_iso  # noqa: E402
 
 
 def sha256(path: Path) -> str:

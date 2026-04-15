@@ -39,7 +39,7 @@ def _normalize_text(s: Any) -> str:
 def _fingerprint_trace(trace: dict[str, Any]) -> str:
     task = _normalize_text(trace.get("task", ""))
     answer = _normalize_text(trace.get("final_answer", ""))
-    return hashlib.sha256(f"{task}\n{answer}".encode("utf-8")).hexdigest()
+    return hashlib.sha256(f"{task}\n{answer}".encode()).hexdigest()
 
 
 def _has_sensitive_text(text: str) -> bool:

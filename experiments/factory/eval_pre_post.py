@@ -227,7 +227,9 @@ def run_eval(
     scores: list[dict[str, float]] = []
     audit_events: list[dict[str, Any]] = []
     schema_valid_count = 0
-    for row_idx, (prompt, candidates, gold) in enumerate(zip(prompts, candidate_outputs, expected, strict=True), start=1):
+    for row_idx, (prompt, candidates, gold) in enumerate(
+        zip(prompts, candidate_outputs, expected, strict=True), start=1
+    ):
         pred = candidates[0] if candidates else ""
         trace = _to_trace(prompt, pred, candidates)
         trace, trace_events = apply_runtime_policy(
@@ -369,8 +371,8 @@ def main() -> int:
                 "post_metrics": post["metrics_path"],
                 "pre_traces": pre["traces_path"],
                 "post_traces": post["traces_path"],
-            "pre_audit_events": pre["audit_events_path"],
-            "post_audit_events": post["audit_events_path"],
+                "pre_audit_events": pre["audit_events_path"],
+                "post_audit_events": post["audit_events_path"],
                 "summary": str(args.output_dir / "pre_post_summary.json"),
             },
             "generated_at_utc": utc_now_iso(),

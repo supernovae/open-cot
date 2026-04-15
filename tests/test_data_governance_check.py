@@ -14,8 +14,18 @@ def test_data_governance_detects_duplicates_and_contamination(tmp_path: Path) ->
     report = tmp_path / "report.json"
 
     rows = [
-        {"version": "0.1", "task": "Compute 9 * 8.", "steps": [{"id": "s1", "type": "thought", "content": "72"}], "final_answer": "72"},
-        {"version": "0.1", "task": "Compute 9 * 8.", "steps": [{"id": "s1", "type": "thought", "content": "72"}], "final_answer": "72"},
+        {
+            "version": "0.1",
+            "task": "Compute 9 * 8.",
+            "steps": [{"id": "s1", "type": "thought", "content": "72"}],
+            "final_answer": "72",
+        },
+        {
+            "version": "0.1",
+            "task": "Compute 9 * 8.",
+            "steps": [{"id": "s1", "type": "thought", "content": "72"}],
+            "final_answer": "72",
+        },
     ]
     train.write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
     manifest.write_text(json.dumps({"name": "x"}) + "\n", encoding="utf-8")
