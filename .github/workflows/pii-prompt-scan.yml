@@ -1,0 +1,46 @@
+name: PII Prompt Scan (Presidio)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "datasets/**/*.json"
+      - "datasets/**/*.jsonl"
+      - "benchmarks/**/*.json"
+      - "experiments/**/*.jsonl"
+      - "tools/pii_prompt_scan.py"
+      - ".github/workflows/pii-prompt-scan.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "datasets/**/*.json"
+      - "datasets/**/*.jsonl"
+      - "benchmarks/**/*.json"
+      - "experiments/**/*.jsonl"
+      - "tools/pii_prompt_scan.py"
+      - ".github/workflows/pii-prompt-scan.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  presidio-pii-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Presidio scanner dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install presidio-analyzer spacy
+          python -m spacy download en_core_web_sm
+
+      - name: Scan prompt-bearing files for PII
+        run: |
+          python tools/pii_prompt_scan.py \
+            --score-threshold 0.7 \
+            --model-name en_core_web_sm
