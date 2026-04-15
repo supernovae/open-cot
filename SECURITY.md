@@ -4,7 +4,7 @@
 
 If you discover a security issue, please report it **privately** to project maintainers before opening a public issue.
 
-**Email:** security@opencot.dev (or open a [private security advisory](https://github.com/supernovae/open-cot/security/advisories/new) on GitHub).
+Open a [private security advisory](https://github.com/supernovae/open-cot/security/advisories/new) on GitHub).
 
 Include:
 
