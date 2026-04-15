@@ -1,0 +1,31 @@
+{
+  "version": "0.1.0",
+  "profiles": {
+    "A": [
+      {
+        "shortname": "reasoning",
+        "path": "conformance/fixtures/profile_a/reasoning.json"
+      }
+    ],
+    "B": [
+      {
+        "shortname": "reasoning",
+        "path": "conformance/fixtures/profile_b/reasoning.json"
+      },
+      {
+        "shortname": "tool_invocation",
+        "path": "conformance/fixtures/profile_b/tool_invocation.json"
+      },
+      {
+        "shortname": "verifier_output",
+        "path": "conformance/fixtures/profile_b/verifier_output.json"
+      }
+    ],
+    "C": [
+      {
+        "shortname": "dataset_packaging",
+        "path": "conformance/fixtures/profile_c/manifest.json"
+      }
+    ]
+  }
+}

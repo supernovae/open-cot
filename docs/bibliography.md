@@ -70,4 +70,57 @@ Uses RL with verifiable rewards to produce long, structured reasoning.
 **Relevance:** Aligns with structured scratchpad formats.
 
 ### Qwen2.5‑R1 (2024). *Reinforcement Learning for Reasoning.*  
-https://arxiv.org/pdf/250
+https://arxiv.org/pdf/2501.19393.pdf  
+Documents RL-centric post-training strategies that improve reasoning quality while preserving broad instruction utility.  
+**Relevance:** Supports reward-aware post-training pipelines and reproducibility-oriented run metadata.
+
+---
+
+## 5. Evaluation, Reliability, and Calibration
+
+### Lin et al. (2021). *TruthfulQA: Measuring How Models Mimic Human Falsehoods.*  
+https://arxiv.org/pdf/2109.07958.pdf  
+Introduces reliability-oriented evaluation emphasizing truthful behavior under difficult prompts.  
+**Relevance:** Motivates safety-aware benchmark slices and failure-mode tracking.
+
+### Kadavath et al. (2022). *Language Models (Mostly) Know What They Know.*  
+https://arxiv.org/pdf/2207.05221.pdf  
+Studies calibration and confidence quality in language models.  
+**Relevance:** Motivates confidence and uncertainty metrics in verifier outputs.
+
+### Gao et al. (2023). *Pal: Program-Aided Language Models.*  
+https://arxiv.org/pdf/2211.10435.pdf  
+Uses executable programs to verify intermediate reasoning steps.  
+**Relevance:** Supports stronger step-level verification beyond format checks.
+
+---
+
+## 6. Open-Source Tooling and Reuse Guidance
+
+### EleutherAI LM Evaluation Harness  
+https://github.com/EleutherAI/lm-evaluation-harness  
+De facto open benchmark runner for reproducible LLM evaluation.  
+**Relevance:** Should be integrated through adapters rather than reimplemented.
+
+### Hugging Face TRL  
+https://github.com/huggingface/trl  
+Open-source stack for SFT, DPO, PPO/GRPO-style fine-tuning workflows.  
+**Relevance:** Preferred training primitive for alignment and preference experiments.
+
+### vLLM  
+https://github.com/vllm-project/vllm  
+High-throughput inference engine with consistent generation behavior for evaluation and serving.  
+**Relevance:** Stabilizes benchmark throughput and reproducibility for large eval runs.
+
+---
+
+## 7. Best-Practice Checklist for Open CoT Workflows
+
+Use this checklist when building, fine-tuning, and validating models with Open CoT:
+
+1. **Always emit structured traces** (`version`, `task`, `steps`, `final_answer`) and validate before scoring.  
+2. **Use multi-sample evaluation** with consistency metrics, not only single greedy outputs.  
+3. **Track lineage metadata** (dataset hash, model base, adapter hash, seed, decoding config) for every run.  
+4. **Enforce data governance gates** (license allowlist, dedup, contamination checks, provenance fields).  
+5. **Run policy and safety checks** (budget limits, tool restrictions, redaction/audit events) in runtime scripts.  
+6. **Reuse mature OSS tooling** for training/evaluation kernels and keep Open CoT logic focused on schemas/adapters/conformance.

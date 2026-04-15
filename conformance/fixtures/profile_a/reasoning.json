@@ -1,0 +1,12 @@
+{
+  "version": "0.1",
+  "task": "Compute 9 * 8.",
+  "steps": [
+    {
+      "id": "s1",
+      "type": "calculation",
+      "content": "9 * 8 = 72"
+    }
+  ],
+  "final_answer": "72"
+}

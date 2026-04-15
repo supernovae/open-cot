@@ -7,8 +7,15 @@ import argparse
 import json
 import os
 import random
+import sys
 from pathlib import Path
 from typing import Any
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from experiments.factory.lineage import get_git_commit, sha256_file, utc_now_iso, write_json  # noqa: E402
 
 
 def _load_jsonl(path: Path) -> list[dict[str, Any]]:
@@ -23,8 +30,7 @@ def _load_jsonl(path: Path) -> list[dict[str, Any]]:
 
 
 def _write_run_config(path: Path, data: dict[str, Any]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    write_json(path, data)
 
 
 def main() -> int:
@@ -70,8 +76,25 @@ def main() -> int:
         "use_4bit": args.use_4bit,
         "seed": args.seed,
         "dry_run": args.dry_run,
+        "generated_at_utc": utc_now_iso(),
+        "git_commit": get_git_commit(ROOT),
     }
     _write_run_config(args.output_dir / "training_config.json", run_cfg)
+    write_json(
+        args.output_dir / "lineage_train.json",
+        {
+            "stage": "train_qwen_peft",
+            "base_model": args.model_name,
+            "inputs": {
+                "train_file": str(args.train_file),
+                "train_sha256": sha256_file(args.train_file),
+                "validation_file": str(args.val_file),
+                "validation_sha256": sha256_file(args.val_file),
+            },
+            "parameters": run_cfg,
+            "output_dir": str(args.output_dir),
+        },
+    )
 
     if args.dry_run:
         print("Dry run complete. Training config written.")
@@ -167,6 +190,16 @@ def main() -> int:
     trainer.train()
     trainer.save_model(str(args.output_dir / "adapter"))
     tokenizer.save_pretrained(str(args.output_dir / "adapter"))
+    write_json(
+        args.output_dir / "lineage_train_result.json",
+        {
+            "stage": "train_qwen_peft_result",
+            "adapter_dir": str(args.output_dir / "adapter"),
+            "checkpoint_dir": str(args.output_dir / "checkpoints"),
+            "completed_at_utc": utc_now_iso(),
+            "git_commit": get_git_commit(ROOT),
+        },
+    )
     print(f"Saved adapter to {args.output_dir / 'adapter'}")
     return 0
 

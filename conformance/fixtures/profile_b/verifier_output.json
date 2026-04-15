@@ -1,0 +1,12 @@
+{
+  "version": "0.1",
+  "trace_id": "trace_001",
+  "verifier": "symbolic_math_v1",
+  "results": [
+    {
+      "step_id": "s2",
+      "correct": "true",
+      "confidence": 0.99
+    }
+  ]
+}

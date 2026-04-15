@@ -36,6 +36,12 @@ def _normalize_text(s: Any) -> str:
     return " ".join(str(s or "").strip().split())
 
 
+def _fingerprint_trace(trace: dict[str, Any]) -> str:
+    task = _normalize_text(trace.get("task", ""))
+    answer = _normalize_text(trace.get("final_answer", ""))
+    return hashlib.sha256(f"{task}\n{answer}".encode("utf-8")).hexdigest()
+
+
 def _has_sensitive_text(text: str) -> bool:
     return bool(EMAIL_RE.search(text) or PHONE_RE.search(text) or SSN_RE.search(text))
 
@@ -77,6 +83,8 @@ def main() -> int:
     rejected = 0
     pii_rejections = 0
     invalid_rejections = 0
+    duplicate_rejections = 0
+    seen_fingerprints: set[str] = set()
     with (
         args.input_jsonl.open(encoding="utf-8") as src,
         traces_path.open("w", encoding="utf-8") as out,
@@ -114,6 +122,14 @@ def main() -> int:
                 rej.write(json.dumps({"row": idx, "reason": f"schema_invalid:{e}"}) + "\n")
                 continue
 
+            fingerprint = _fingerprint_trace(trace)
+            if fingerprint in seen_fingerprints:
+                rejected += 1
+                duplicate_rejections += 1
+                rej.write(json.dumps({"row": idx, "reason": "duplicate_trace"}) + "\n")
+                continue
+            seen_fingerprints.add(fingerprint)
+
             out.write(json.dumps(trace, ensure_ascii=False) + "\n")
             kept += 1
             if args.max_rows and kept >= args.max_rows:
@@ -129,8 +145,13 @@ def main() -> int:
         "owner": args.owner,
         "split": args.split,
         "counts": {"kept": kept, "rejected": rejected},
-        "filters": {"pii_rejections": pii_rejections, "invalid_rejections": invalid_rejections},
+        "filters": {
+            "pii_rejections": pii_rejections,
+            "invalid_rejections": invalid_rejections,
+            "duplicate_rejections": duplicate_rejections,
+        },
         "input_sha256": _sha256(args.input_jsonl),
+        "provenance_fields_present": True,
     }
     (args.output_dir / "dataset_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(manifest, indent=2))

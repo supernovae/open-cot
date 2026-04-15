@@ -9,8 +9,9 @@ This directory hosts reproducible demonstration tracks for Open CoT.
 
 Public launch tracks:
 
-- **Track A:** CPU-friendly 15-minute smoke path (`scripts/quickstart_experiment.sh`)
+- **Track A:** CPU-friendly 15-minute smoke path (`scripts/quickstart_cpu_mock.sh`)
 - **Track B:** GPU-recommended Qwen PEFT train/eval path (`local_oss_runbook.md`)
+- **Track C:** Benchmark-only path (`scripts/quickstart_benchmark_only.sh`)
 
 ## Factory pipeline
 
@@ -19,6 +20,7 @@ Scripts under `factory/` provide the low-friction workflow:
 - `prepare_cot_sft.py`: convert RFC0001 trace JSONL into SFT train/validation JSONL.
 - `train_qwen_peft.py`: run LoRA/QLoRA fine-tuning.
 - `eval_pre_post.py`: run pre/post eval and compute schema/benchmark metrics.
+- `run_lm_eval_adapter.py`: run/adapt `lm-eval-harness` outputs into Open CoT traces + summary.
 - `export_artifacts.py`: hash and bundle outputs for reproducibility.
 
 ## Config templates
@@ -36,7 +38,7 @@ Scripts under `factory/` provide the low-friction workflow:
 From repo root:
 
 ```bash
-bash scripts/quickstart_experiment.sh
+bash scripts/quickstart_cpu_mock.sh
 ```
 
 This runs the 15-minute CPU-friendly path:
@@ -45,6 +47,16 @@ This runs the 15-minute CPU-friendly path:
 2. Run pre/post eval with mock generator
 3. Validate schemas/examples
 4. Export artifact hashes
+
+Additional paths:
+
+```bash
+# Benchmark-only profile check path
+bash scripts/quickstart_benchmark_only.sh
+
+# Real model train/eval path (GPU recommended)
+bash scripts/quickstart_gpu_real.sh
+```
 
 ## CPU/GPU guidance
 

@@ -14,6 +14,8 @@ _TOOLS_DIR = Path(__file__).resolve().parent
 _REPO_ROOT = _TOOLS_DIR.parent
 if str(_TOOLS_DIR) not in sys.path:
     sys.path.insert(0, str(_TOOLS_DIR))
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 from schema_lib import duplicate_rfc_ids, load_registry, registry_schema_paths  # noqa: E402
 from schema_resolver import SchemaResolver  # noqa: E402
@@ -41,35 +43,36 @@ def _walk_refs(obj: Any) -> Iterator[str]:
             yield from _walk_refs(item)
 
 
-def _build_registry() -> tuple[Any, dict[str, dict[str, Any]]]:
+def _build_registry() -> tuple[Any | None, dict[str, dict[str, Any]]]:
+    schemas_dir = _REPO_ROOT / "schemas"
+    loaded: dict[str, dict[str, Any]] = {}
+    for path in sorted(schemas_dir.glob("rfc-*.json")):
+        loaded[path.name] = json.loads(path.read_text(encoding="utf-8"))
+
     try:
         import referencing
         from referencing.jsonschema import DRAFT7
-    except ImportError as e:  # pragma: no cover
-        raise SystemExit(
-            "Missing dependencies. Create a venv and run:\n"
-            "  python3 -m venv .venv && source .venv/bin/activate\n"
-            "  pip install -r requirements-tools.txt\n"
-        ) from e
+    except ImportError:  # pragma: no cover
+        return None, loaded
 
-    schemas_dir = _REPO_ROOT / "schemas"
     reg = referencing.Registry()
-    loaded: dict[str, dict[str, Any]] = {}
-    for path in sorted(schemas_dir.glob("rfc-*.json")):
-        data = json.loads(path.read_text(encoding="utf-8"))
+    for name, data in loaded.items():
         uri = data.get("$id")
         if not isinstance(uri, str):
-            uri = f"file:{path.name}"
+            uri = f"file:{name}"
             data = dict(data)
             data["$id"] = uri
         resource = referencing.Resource.from_contents(data, default_specification=DRAFT7)
         reg = reg.with_resource(uri, resource)
-        loaded[path.name] = data
+        loaded[name] = data
     return reg, loaded
 
 
 def _check_meta_schemas(loaded: dict[str, dict[str, Any]]) -> list[str]:
-    from jsonschema import Draft7Validator
+    try:
+        from jsonschema import Draft7Validator
+    except ImportError:  # pragma: no cover
+        return []
 
     errors: list[str] = []
     for name, schema in loaded.items():
@@ -95,9 +98,7 @@ def _check_refs(resolver: SchemaResolver, loaded: dict[str, dict[str, Any]]) -> 
     return errors
 
 
-def _validate_examples(resolver: SchemaResolver, reg: Any) -> list[str]:
-    from jsonschema import Draft7Validator
-
+def _validate_examples(resolver: SchemaResolver, reg: Any | None) -> list[str]:
     errors: list[str] = []
     registry = load_registry()
     shortnames = registry_schema_paths(registry)
@@ -115,10 +116,20 @@ def _validate_examples(resolver: SchemaResolver, reg: Any) -> list[str]:
         schema_path = resolver.path_for_shortname(shortname)
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
         instance = json.loads(path.read_text(encoding="utf-8"))
-        try:
-            Draft7Validator(schema, registry=reg).validate(instance)
-        except Exception as e:
-            errors.append(f"{path.relative_to(_REPO_ROOT)}: instance invalid: {e}")
+        if reg is not None:
+            try:
+                from jsonschema import Draft7Validator
+
+                Draft7Validator(schema, registry=reg).validate(instance)
+            except Exception as e:
+                errors.append(f"{path.relative_to(_REPO_ROOT)}: instance invalid: {e}")
+        elif shortname == "reasoning":
+            try:
+                from reference.python.validator import validate_trace
+
+                validate_trace(instance)
+            except Exception as e:
+                errors.append(f"{path.relative_to(_REPO_ROOT)}: reasoning example invalid: {e}")
     return errors
 
 

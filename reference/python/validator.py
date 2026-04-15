@@ -28,8 +28,24 @@ def validate_trace(
     schema: dict[str, Any] | None = None,
     schema_path: Path | None = None,
 ) -> None:
-    """Raise jsonschema.ValidationError if trace is invalid."""
+    """Validate a trace.
+
+    Uses jsonschema when installed; otherwise applies a lightweight structural check.
+    """
     if jsonschema is None:
-        raise RuntimeError("Install jsonschema to use validate_trace: pip install jsonschema")
+        required = ("version", "task", "steps", "final_answer")
+        for key in required:
+            if key not in trace:
+                raise ValueError(f"missing required field: {key}")
+        steps = trace.get("steps")
+        if not isinstance(steps, list) or not steps:
+            raise ValueError("steps must be a non-empty list")
+        for idx, step in enumerate(steps):
+            if not isinstance(step, dict):
+                raise ValueError(f"steps[{idx}] must be an object")
+            for key in ("id", "type", "content"):
+                if key not in step:
+                    raise ValueError(f"steps[{idx}] missing required field: {key}")
+        return
     resolved = schema if schema is not None else load_schema(schema_path)
     jsonschema.validate(instance=trace, schema=resolved)

@@ -37,9 +37,17 @@ echo "[quickstart] Running pre/post eval with mock generator..."
 echo "[quickstart] Validating schemas/examples..."
 "$PYTHON_BIN" tools/validate.py
 
+echo "[quickstart] Running data governance checks..."
+"$PYTHON_BIN" tools/data_governance_check.py \
+  --train-jsonl datasets/synthetic/task_bank_v0.jsonl \
+  --benchmark-task-specs benchmarks/tasks/task_specs.json \
+  --fail-on-contamination \
+  --output "$RUN_DIR/data_governance_report.json"
+
 echo "[quickstart] Exporting artifact hashes..."
 "$PYTHON_BIN" experiments/factory/export_artifacts.py \
-  --run-dir "$RUN_DIR"
+  --run-dir "$RUN_DIR" \
+  --require-lineage
 
 echo "[quickstart] Complete."
 echo "Outputs:"

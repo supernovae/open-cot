@@ -17,11 +17,14 @@ def test_benchmark_scorer_exact_match() -> None:
         "task": "Compute 9 * 8.",
         "steps": [{"id": "s1", "type": "calculation", "content": "9 * 8 = 72"}],
         "final_answer": "72",
+        "candidate_final_answers": ["72", "72", "70"],
     }
     scores = score_trace(trace, "72")
     assert scores["schema_valid"] == 1.0
     assert scores["final_answer_exact"] == 1.0
     assert scores["step_validity_proxy"] > 0.0
+    assert scores["step_semantic_proxy"] > 0.0
+    assert scores["self_consistency"] > 0.0
 
 
 def test_task_specs_exist() -> None:

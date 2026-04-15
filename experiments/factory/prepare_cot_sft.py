@@ -6,8 +6,15 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import sys
 from pathlib import Path
 from typing import Any
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from experiments.factory.lineage import get_git_commit, sha256_file, utc_now_iso, write_json  # noqa: E402
 
 
 def _trace_to_record(trace: dict[str, Any], include_steps: bool = True) -> dict[str, str]:
@@ -78,12 +85,34 @@ def main() -> int:
 
     manifest = {
         "source": str(args.input),
+        "source_sha256": sha256_file(args.input),
         "train_rows": len(train),
         "validation_rows": len(val),
         "seed": args.seed,
         "val_ratio": args.val_ratio,
+        "generated_at_utc": utc_now_iso(),
+        "git_commit": get_git_commit(ROOT),
     }
-    (args.output_dir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    write_json(args.output_dir / "manifest.json", manifest)
+    write_json(
+        args.output_dir / "lineage_prepare.json",
+        {
+            "stage": "prepare_cot_sft",
+            "source_trace_jsonl": str(args.input),
+            "source_trace_sha256": manifest["source_sha256"],
+            "outputs": {
+                "train_jsonl": str(args.output_dir / "train.jsonl"),
+                "validation_jsonl": str(args.output_dir / "validation.jsonl"),
+            },
+            "parameters": {
+                "seed": args.seed,
+                "val_ratio": args.val_ratio,
+                "exclude_steps": bool(args.exclude_steps),
+            },
+            "generated_at_utc": manifest["generated_at_utc"],
+            "git_commit": manifest["git_commit"],
+        },
+    )
     print(json.dumps(manifest, indent=2))
     return 0
 
