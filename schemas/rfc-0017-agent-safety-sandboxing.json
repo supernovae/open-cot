@@ -1,18 +1,21 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://opencot.dev/schemas/rfc-0017-agent-safety-sandboxing.json",
   "title": "Open CoT RFC 0017 — Agent Safety & Sandboxing Configuration",
   "description": "Defines sandbox policies that constrain agent behavior at runtime: which tools are permitted, step/branch limits, and memory access controls.",
   "type": "object",
   "properties": {
     "allowed_tools": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Tool names the agent may invoke. Use [\"*\"] to allow all."
     },
     "blocked_tools": {
       "type": "array",
-      "items": { "type": "string" },
+      "items": {
+        "type": "string"
+      },
       "description": "Tool names explicitly denied regardless of allowed_tools."
     },
     "max_steps": {
@@ -32,13 +35,23 @@
         "type": "array",
         "items": {
           "type": "string",
-          "enum": ["read", "write", "execute", "admin"]
+          "enum": [
+            "read",
+            "write",
+            "execute",
+            "admin"
+          ]
         }
       }
     }
   },
-  "required": ["allowed_tools", "blocked_tools", "max_steps"],
+  "required": [
+    "allowed_tools",
+    "blocked_tools",
+    "max_steps"
+  ],
   "additionalProperties": true,
+  "$id": "https://opencot.dev/schemas/rfc-0017-agent-safety-sandboxing.json",
   "x-opencot": {
     "rfc": "0017",
     "shortname": "agent_safety_sandboxing",

@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://opencot.dev/schemas/rfc-0037-token-economy-cost-modeling.json",
   "title": "Open CoT RFC 0037 — Token Economy & Cost Modeling",
   "description": "Cost snapshot structure for tracking model inference and tool invocation costs per step or per trajectory.",
   "type": "object",
@@ -19,7 +18,10 @@
           "description": "Number of output/completion tokens generated."
         }
       },
-      "required": ["input_tokens", "output_tokens"]
+      "required": [
+        "input_tokens",
+        "output_tokens"
+      ]
     },
     "tool_cost": {
       "type": "object",
@@ -35,8 +37,12 @@
       "description": "Aggregate cost across model inference and tool invocations."
     }
   },
-  "required": ["model_cost", "total_cost"],
+  "required": [
+    "model_cost",
+    "total_cost"
+  ],
   "additionalProperties": true,
+  "$id": "https://opencot.dev/schemas/rfc-0037-token-economy-cost-modeling.json",
   "x-opencot": {
     "rfc": "0037",
     "shortname": "token_economy_cost_modeling",
