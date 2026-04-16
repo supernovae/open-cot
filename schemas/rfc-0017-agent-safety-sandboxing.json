@@ -1,14 +1,47 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "RFC 0017 — Agent Safety Sandboxing (stub)",
-  "description": "Placeholder JSON Schema for RFC 0017. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "$id": "https://opencot.dev/schemas/rfc-0017-agent-safety-sandboxing.json",
+  "title": "Open CoT RFC 0017 — Agent Safety & Sandboxing Configuration",
+  "description": "Defines sandbox policies that constrain agent behavior at runtime: which tools are permitted, step/branch limits, and memory access controls.",
   "type": "object",
+  "properties": {
+    "allowed_tools": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tool names the agent may invoke. Use [\"*\"] to allow all."
+    },
+    "blocked_tools": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tool names explicitly denied regardless of allowed_tools."
+    },
+    "max_steps": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximum number of loop iterations before forced stop."
+    },
+    "max_branches": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximum number of concurrent reasoning branches."
+    },
+    "memory_acl": {
+      "type": "object",
+      "description": "Access control list mapping role or agent IDs to permission arrays.",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": ["read", "write", "execute", "admin"]
+        }
+      }
+    }
+  },
+  "required": ["allowed_tools", "blocked_tools", "max_steps"],
   "additionalProperties": true,
   "x-opencot": {
     "rfc": "0017",
     "shortname": "agent_safety_sandboxing",
-    "status": "stub",
     "source_rfc": "rfcs/0017-agent-safety-sandboxing.md"
-  },
-  "$id": "https://opencot.dev/schemas/rfc-0017-agent-safety-sandboxing.json"
+  }
 }

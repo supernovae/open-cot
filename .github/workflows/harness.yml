@@ -1,0 +1,46 @@
+name: Harness (TypeScript)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "harness/**"
+      - "schemas/**"
+      - ".github/workflows/harness.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "harness/**"
+      - "schemas/**"
+      - ".github/workflows/harness.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  harness:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: harness
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Run tests
+        run: npm test
+
+      - name: Run chat-demo (smoke test)
+        run: npx tsx examples/chat-demo.ts "What is 2+2?"
+
+      - name: Run coder-demo (smoke test)
+        run: npx tsx examples/coder-demo.ts "Add error handling to the code"
