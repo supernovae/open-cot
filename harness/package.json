@@ -1,0 +1,34 @@
+{
+  "name": "@open-cot/harness",
+  "version": "0.1.0",
+  "description": "Reference harness implementation for the Open CoT standard — emits, consumes, and validates RFC-compliant reasoning traces",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "chat-demo": "tsx examples/chat-demo.ts",
+    "coder-demo": "tsx examples/coder-demo.ts"
+  },
+  "keywords": [
+    "open-cot",
+    "chain-of-thought",
+    "reasoning",
+    "agent",
+    "harness"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.1.0"
+  },
+  "dependencies": {
+    "ajv": "^8.17.0",
+    "ajv-formats": "^3.0.0"
+  }
+}

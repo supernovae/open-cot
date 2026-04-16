@@ -45,6 +45,54 @@ This RFC defines a **sandbox layer** that enforces constraints.
 
 ## 4. Sandbox Configuration Schema
 
+<!-- opencot:schema:start -->
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Open CoT RFC 0017 — Agent Safety & Sandboxing Configuration",
+  "description": "Defines sandbox policies that constrain agent behavior at runtime: which tools are permitted, step/branch limits, and memory access controls.",
+  "type": "object",
+  "properties": {
+    "allowed_tools": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tool names the agent may invoke. Use [\"*\"] to allow all."
+    },
+    "blocked_tools": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tool names explicitly denied regardless of allowed_tools."
+    },
+    "max_steps": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximum number of loop iterations before forced stop."
+    },
+    "max_branches": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Maximum number of concurrent reasoning branches."
+    },
+    "memory_acl": {
+      "type": "object",
+      "description": "Access control list mapping role or agent IDs to permission arrays.",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": ["read", "write", "execute", "admin"]
+        }
+      }
+    }
+  },
+  "required": ["allowed_tools", "blocked_tools", "max_steps"],
+  "additionalProperties": true
+}
+```
+<!-- opencot:schema:end -->
+
+**Example instance:**
+
 ```json
 {
   "allowed_tools": ["search", "calculator"],
