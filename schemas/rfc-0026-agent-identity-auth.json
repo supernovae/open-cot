@@ -1,14 +1,102 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "RFC 0026 — Agent Identity Auth (stub)",
-  "description": "Placeholder JSON Schema for RFC 0026. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "$id": "https://opencot.dev/schema/rfc0026/agent-identity.json",
+  "title": "Open CoT RFC 0026 — Agent Identity",
   "type": "object",
-  "additionalProperties": true,
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "0.2"
+      ]
+    },
+    "agent_id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9._:@/-]+$"
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "orchestrator",
+        "executor",
+        "verifier",
+        "delegated",
+        "custom"
+      ]
+    },
+    "trust_level": {
+      "type": "string",
+      "enum": [
+        "untrusted",
+        "low",
+        "medium",
+        "high",
+        "system"
+      ]
+    },
+    "capabilities_declared": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "public_key": {
+      "type": "string"
+    },
+    "key_algorithm": {
+      "type": "string"
+    },
+    "parent_agent_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "metadata": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "agent_id",
+    "display_name",
+    "role",
+    "trust_level",
+    "capabilities_declared",
+    "created_at",
+    "metadata"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "public_key"
+        ],
+        "properties": {
+          "public_key": {
+            "minLength": 1
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "key_algorithm"
+        ]
+      }
+    }
+  ],
   "x-opencot": {
     "rfc": "0026",
     "shortname": "agent_identity_auth",
-    "status": "stub",
     "source_rfc": "rfcs/0026-agent-identity-auth.md"
-  },
-  "$id": "https://opencot.dev/schemas/rfc-0026-agent-identity-auth.json"
+  }
 }

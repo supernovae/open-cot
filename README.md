@@ -2,9 +2,9 @@
 
 <img src="./assets/open-cot-banner.png" alt="Open CoT banner" width="100%" />
 
-### Chain of Thought Reasoning Framework
+### Cognitive Control Plane for Governed Agent Execution
 
-**Open CoT Standard &amp; Toolkit** — an open-source, community-driven home for interoperable reasoning traces.
+**Open CoT** — an open standard and reference implementation for model-agnostic governed agent execution.
 
 <img src="https://img.shields.io/badge/Project-Open%20CoT-5c6bc0?style=for-the-badge" alt="Open CoT" />
 <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License: MIT" /></a>
@@ -17,143 +17,135 @@
 
 ## Why this exists
 
-Many models now hide or encrypt reasoning traces, making systems harder to audit, compare, and improve. Open CoT defines open, versioned standards for structured reasoning so teams can build interoperable tooling instead of one-off formats.
+Agents need to reach tools, data, and services, but every stack reinvents authorization, safety boundaries, and audit. Models are often treated as if their natural-language output were both intent and permission. There is no **portable contract** between what a model *proposes* and what a deployment *allows*.
 
-The schema is not just descriptive — it is **executable**. The [reference harness](./harness/) proves the standard works by running real agent loops that emit, consume, and validate RFC-compliant traces. The harness becomes the reference implementation; the schema becomes the contract the harness proves out.
+> Open-CoT is a model-agnostic cognitive control plane that standardizes the trusted contract between model output, harness/runtime enforcement, policy, delegation, tool execution, provenance, and audit.
 
-In practice, this project gives you:
+Open-CoT separates those layers: typed schemas for proposals and artifacts, a **normative governed execution model**, and a reference harness that enforces the contract end to end. The same envelopes and state machine can sit behind different models and runtimes because the control plane is explicit, not inferred from free-form text.
 
-- **Shared JSON Schemas** for reasoning traces, tool calls, budgets, and telemetry.
-- **A working TypeScript harness** that runs agents end-to-end against the schemas.
-- **Validation + sync tooling** to keep RFCs, schemas, and examples aligned.
-- **A path to model training** with synthetic data and reproducible benchmarks.
+That matters wherever you need **comparable audit**, **shared tooling across vendors**, or **defensible denial** when a model asks for something unsafe. The goal is not prettier logs; it is a **trusted contract** between proposal and execution.
 
-If you are evaluating quickly:
+## The core insight
 
-1. If you are new to this space, start with the beginner guide: [`docs/eli5_guide.md`](./docs/eli5_guide.md).
-2. Run the **reference harness** to see the schema in action: `cd harness && npm install && npm test`.
-3. Run the local Python checks in **Quick start** below.
-4. Review contribution and governance expectations in [`docs/contributing.md`](./docs/contributing.md).
+If reasoning, tool intent, provenance, budgets, state transitions, and delegation are carried in **stable typed schemas**, then a harness or runtime can be **portable** across models: it does not have to reverse-engineer each vendor’s behavior.
 
----
+**Models propose.** Schemas **express**. The harness **validates**. Policy **decides**. The auth broker **narrows** scope and issues receipts. Tools **execute** only under granted authority. Receipts and audit artifacts **prove** what ran and who allowed it.
 
 ## What this repo contains
 
 | Area | Role |
 |------|------|
-| [`harness/`](./harness/) | **Reference harness** — TypeScript agents that prove the schema is executable, testable, and operational |
+| [`rfcs/`](./rfcs/) | **48 RFCs** — normative definitions for reasoning traces, tool invocation, the governed FSM, sandboxing, budgets, permissions, policy, delegation, provenance, identity, org governance, receipts, and audit |
 | [`schemas/`](./schemas/) | Versioned JSON Schemas per RFC (`registry.json`, `rfc-*-*.json`) |
+| [`harness/`](./harness/) | **Reference harness** (TypeScript) — governed FSM, validation, tools, budgets, trace emission |
 | [`examples/`](./examples/) | Validated instance fixtures keyed by registry shortname |
+| [`reference/python/`](./reference/python/) | Reference Python tooling |
+| [`tools/`](./tools/) | Schema and fixture validation (`validate.py`, sync helpers) |
 | [`standards/`](./standards/) | Human-readable patterns, metrics, narrative docs |
 | [`datasets/`](./datasets/) | Conventions and converters for training-ready data |
-| [`reference/python/`](./reference/python/) | Reference Python tooling |
 | [`benchmarks/`](./benchmarks/) | Tasks, scoring, leaderboards |
-| [`docs/`](./docs/) | Contributing, ELI5 guide, experiment cards |
+| [`conformance/`](./conformance/) | Conformance and interoperability material |
+| [`tests/`](./tests/) | Shared Python tests for validation and tooling |
+| [`docs/`](./docs/) | Contributing, architecture, philosophy, ELI5 guide, experiment cards |
 
-## The idea: schema as contract, harness as proof
+For a concise layout of control plane vs data plane, see [`docs/architecture.md`](./docs/architecture.md).
 
-The schema and the harness verify each other:
+**If you are evaluating quickly:** (1) read [`docs/eli5_guide.md`](./docs/eli5_guide.md), (2) run the harness tests above, (3) run `python tools/validate.py`, (4) skim RFC 0007 plus RFCs 0041, 0042, 0047, and 0048 for the governance spine.
 
-**Schema verifies the harness** by forcing valid event structure, consistent state transitions, budget accounting, tool result shape, completion criteria, and replayability.
+## The governed execution model
 
-**Harness verifies the schema** by proving the schema is sufficient, ergonomic, debuggable, and works under real loops — not just on paper.
+RFC 0007 defines a **fourteen-state** finite state machine. A compliant run starts in **`receive`** and ends in **`audit_seal`**. Along the main path:
 
-This means model creators, framework authors, and tool builders can use the same standard. Reasoning/CoT becomes something you can standardize across OSS models — reducing what each project needs to reinvent and reducing what end users need to implement.
+`receive` → `frame` → `plan` → `request_authority` → `validate_authority` → `delegate_narrow` → `execute_tool` → `observe_result` → `critique_verify` → `finalize` → `audit_seal`
 
-## Reference harness quick start
+Authority and failure routing adds **`deny`**, **`escalate`**, and **`fail_safe`**, each terminating into a sealed audit according to policy.
 
-The TypeScript harness runs two agent implementations against the schema:
+**The model cannot self-authorize.** It may only request capabilities; the harness, policy engine, and broker decide, narrow, and record grants. **Tool side effects occur only in `execute_tool`**, with explicit permission or a documented standing authorization cited on the execution receipt (RFC 0048).
+
+RFC 0007 also allows a **pre-authorized shortcut** from `plan` to `execute_tool` when a deployment holds a **standing grant** (for example, sandbox allowlists): the shortcut must still be cited on the receipt so auditors can see why delegation states were skipped.
+
+## Design principles
+
+- **Typed schemas over ambiguous prose** — contracts are JSON Schema, not instructions embedded in model copy.
+- **The model is an untrusted proposer** — output is validated input, not implicit command.
+- **Portable harness semantics** — the same FSM and envelopes apply across models and adapters.
+- **Explicit provenance and evidence** — receipts, delegation records, and audit envelopes close the loop.
+- **Permission-aware tool execution** — grants are scoped, consumable, and auditable.
+- **Delegation as a bounded request** — narrow, time-bounded authority; no self-issued power of attorney.
+- **Policy-enforced narrowing and auditability** — policy consults at defined boundaries; runs seal into tamper-evident audit material.
+
+Values behind these bullets are expanded in [`docs/philosophy.md`](./docs/philosophy.md).
+
+## Quick start
+
+**Reference harness** (mock backend, no API keys required):
 
 ```bash
-cd harness
-npm install
-npm test                                    # 54 tests, mock backend, zero external deps
-npx tsx examples/chat-demo.ts               # conversational agent demo
-npx tsx examples/coder-demo.ts              # plan-do-act coding agent demo
+cd harness && npm install && npm test
 ```
 
-Use a real LLM (Ollama, OpenAI, vLLM, LiteLLM):
+Optional demos: `npx tsx examples/chat-demo.ts` and `npx tsx examples/coder-demo.ts` (see [`harness/README.md`](./harness/README.md)).
+
+**Python validation** (schemas + examples):
 
 ```bash
-OPENAI_BASE_URL=http://localhost:11434/v1 npx tsx examples/chat-demo.ts "Explain recursion"
-```
-
-See [`harness/README.md`](./harness/README.md) for full architecture, FSM transition map, budget enforcement, and how to add your own agents and tools.
-
-## Python quick start
-
-Run a CPU-friendly smoke experiment end-to-end:
-
-```bash
-bash scripts/quickstart_experiment.sh
-```
-
-Validate schemas and example fixtures locally:
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
+python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements-tools.txt
 python tools/validate.py
-pytest -q
 ```
 
-Next step for real model experimentation:
+**New to the project?** Start with [`docs/eli5_guide.md`](./docs/eli5_guide.md).
 
-- [`experiments/local_oss_runbook.md`](./experiments/local_oss_runbook.md) for Qwen PEFT train/eval
-- [`experiments/factory/eval_pre_post.py`](./experiments/factory/eval_pre_post.py) for scripted pre/post checks
+**Optional:** CPU-friendly smoke path `bash scripts/quickstart_experiment.sh`; after installing `requirements-tools.txt`, run `pytest -q` for repo tests. For local OSS train/eval, see [`experiments/local_oss_runbook.md`](./experiments/local_oss_runbook.md).
+
+**Live LLM** (OpenAI-compatible endpoint such as Ollama):
+
+```bash
+cd harness && OPENAI_BASE_URL=http://localhost:11434/v1 npx tsx examples/chat-demo.ts "Explain recursion"
+```
 
 ## What the harness covers
 
-| Capability | RFCs | Harness layer |
-|-----------|------|---------------|
-| Reasoning trace format | RFC 0001 | `src/schemas/trace.ts`, validated by `src/core/validator.ts` |
-| Tool invocation contracts | RFC 0003, 0018 | `src/core/tool-registry.ts`, `src/tools/` |
-| Agent loop FSM | RFC 0007 | `src/core/transitions.ts` — plan, inspect, act, verify, repair, summarize, stop |
-| Safety sandboxing | RFC 0017 | `src/schemas/sandbox.ts`, enforced in tool registry |
-| Observability telemetry | RFC 0031 | `src/schemas/telemetry.ts`, emitted in agent state |
-| Token cost modeling | RFC 0037 | Tracked via budget tracker |
-| Budget enforcement | RFC 0038 | `src/core/budget-tracker.ts` — hard/soft/warn modes |
+| Capability | RFC | Harness touchpoints |
+|------------|-----|---------------------|
+| Governed execution FSM | RFC 0007 | `src/schemas/agent-loop.ts`, `src/core/transitions.ts` |
+| Permission system | RFC 0042 | `src/schemas/permission.ts` (grants; model cannot mint) |
+| Policy enforcement (consult hooks + loop guardrails) | RFC 0041 | `src/core/loop-policy.ts`, schema alignment with RFC 0041 / 0043 |
+| Delegation flow | RFC 0047 | `src/schemas/delegation.ts`, `AgentState` delegation fields |
+| Execution receipts | RFC 0048 | `src/schemas/receipt.ts` |
+| Audit envelopes | RFC 0043 | `src/schemas/audit-envelope.ts` |
+| Budget enforcement | RFC 0038 | `src/core/budget-tracker.ts` |
+| Tool contracts | RFC 0003 (+ 0018 errors) | `src/core/tool-registry.ts`, `src/tools/` |
+| Safety sandboxing | RFC 0017 | `src/schemas/sandbox.ts`, enforcement in tool registry |
+| Observability telemetry | RFC 0031 | `src/schemas/telemetry.ts`, metrics on `AgentState` |
 
-## Canonical patterns
+The harness and schemas **mutually stress-test** each other: invalid transitions or shapes fail fast in CI; gaps in the spec show up as harness friction.
 
-Open CoT tracks reusable reasoning structures, including:
-
-- Deductive chain
-- Inductive chain
-- Hypothesis -> test -> revision
-- Multi-agent debate
-- Self-critique loop
-- Planning -> execution -> verification
-- Error-driven refinement
-
-See [`standards/reasoning-patterns.md`](./standards/reasoning-patterns.md) for definitions and pattern taxonomy.
+Reasoning **patterns** (plan–verify, debate, and similar) remain documented for datasets and evaluation in [`standards/reasoning-patterns.md`](./standards/reasoning-patterns.md); they sit alongside the control plane, not instead of it.
 
 ## Current status
 
-- RFC-backed schema registry (45 RFCs) and CI validation are in place.
-- **Reference harness** implements two agents (chat + coder) with full FSM, budgets, tools, and schema validation.
-- Tier A examples, synthetic seed data, and reproducible experiment runbooks are implemented.
-- Cross-language validation: TypeScript harness traces can be validated by Python tooling.
+- **48 RFCs** and a versioned JSON Schema registry with CI validation.
+- Reference harness implements the governed FSM, delegation and receipt types, budgets, sandboxed tools, and trace validation (see table above).
+- Cross-language checks: TypeScript-emitted traces validate under Python tooling.
+- Tiered examples, synthetic seed data, and experiment runbooks under [`experiments/`](./experiments/).
 
 ## Experiment cards
 
-To explore high-interest concerns (hidden reasoning, runaway loops, token budgets, policy safety), start with experiment cards:
-
-- [`docs/experiments/`](./docs/experiments/README.md)
-
-For launch packaging, see [`docs/public-launch.md`](./docs/public-launch.md).
+For focused scenarios (hidden reasoning, runaway loops, token budgets, policy hooks), see [`docs/experiments/`](./docs/experiments/README.md). Launch packaging notes live in [`docs/public-launch.md`](./docs/public-launch.md).
 
 ## Contributing
 
-See [`docs/contributing.md`](./docs/contributing.md). Contributions that improve schema quality, harness coverage, examples, conversion pipelines, and benchmark reproducibility are especially valuable.
+See [`docs/contributing.md`](./docs/contributing.md). Improvements to schema clarity, harness coverage, examples, and benchmarks are especially welcome.
+
+Normative changes belong in RFCs first; reference code should follow the spec, not the other way around. Small harness fixes that clarify an already-intended RFC are welcome when they include a pointer to the RFC section they implement.
 
 ### RFC feedback process
 
-- RFC discussion happens in each RFC's linked GitHub **Discussion** thread.
-- Use GitHub **Issues** for actionable implementation work (bugs/tasks), not normative RFC debate.
-- If you propose an RFC change in a PR, include links to both the RFC file and its Discussion thread.
-- Browse all active RFC discussion threads in [`docs/rfc-discussions.md`](./docs/rfc-discussions.md).
+- Use each RFC’s linked GitHub **Discussion** for normative debate.
+- Use **Issues** for actionable implementation work.
+- RFC changes in PRs should link the RFC file and its Discussion thread.
+- Index of discussions: [`docs/rfc-discussions.md`](./docs/rfc-discussions.md).
 
 ## License
 

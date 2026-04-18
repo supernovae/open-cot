@@ -1,14 +1,126 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "RFC 0030 — Agent Lifecycle Versioning (stub)",
-  "description": "Placeholder JSON Schema for RFC 0030. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
-  "type": "object",
-  "additionalProperties": true,
+  "$id": "https://opencot.dev/schema/agent-lifecycle/v0.1",
+  "title": "Open CoT RFC 0030 — Agent Lifecycle",
+  "definitions": {
+    "agent_lifecycle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agent_id",
+        "version",
+        "lifecycle_state",
+        "created_at",
+        "updated_at",
+        "configuration_hash",
+        "capabilities",
+        "policy_refs",
+        "governance_ref"
+      ],
+      "properties": {
+        "agent_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lifecycle_state": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "active",
+            "suspended",
+            "deprecated",
+            "retired"
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "configuration_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "policy_refs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "governance_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "version_transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from_version",
+        "to_version",
+        "migration_strategy",
+        "rollback_allowed",
+        "approved_by",
+        "timestamp"
+      ],
+      "properties": {
+        "from_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "to_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "migration_strategy": {
+          "type": "string",
+          "enum": [
+            "rolling",
+            "blue-green",
+            "canary"
+          ]
+        },
+        "rollback_allowed": {
+          "type": "boolean"
+        },
+        "approved_by": {
+          "type": "string",
+          "minLength": 1
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "$ref": "#/definitions/agent_lifecycle"
+    },
+    {
+      "$ref": "#/definitions/version_transition"
+    }
+  ],
   "x-opencot": {
     "rfc": "0030",
     "shortname": "agent_lifecycle_versioning",
-    "status": "stub",
     "source_rfc": "rfcs/0030-agent-lifecycle-versioning.md"
-  },
-  "$id": "https://opencot.dev/schemas/rfc-0030-agent-lifecycle-versioning.json"
+  }
 }

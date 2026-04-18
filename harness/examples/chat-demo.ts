@@ -34,22 +34,18 @@ async function main() {
   console.log(`\n--- Chat Agent Demo ---`);
   console.log(`Question: ${question}\n`);
 
-  const result = await runChatAgent(question, {
-    backend: pickBackend(),
-    tools: createMockToolRegistry(),
-  });
+  const backend = pickBackend();
+  const trace = await runChatAgent(backend, question, createMockToolRegistry());
 
-  console.log(`Answer: ${result.answer}`);
-  console.log(`\nCompletion: ${result.state.completionStatus}`);
-  console.log(`Steps: ${result.trace.steps.length}`);
-  console.log(`Tokens used: ${result.state.budget.tokensUsed}`);
-  console.log(`Tool calls: ${result.state.budget.toolCallsUsed}`);
+  console.log(`Answer: ${trace.final_answer}`);
+  console.log(`\nCompletion: ${trace.termination ?? "unknown"}`);
+  console.log(`Steps: ${trace.steps.length}`);
 
   console.log(`\n--- Trace (JSON) ---`);
-  console.log(JSON.stringify(result.trace, null, 2));
+  console.log(JSON.stringify(trace, null, 2));
 
   console.log(`\n--- Validation ---`);
-  const validation = await validateFull(result.trace);
+  const validation = await validateFull(trace);
   if (validation.valid) {
     console.log("Trace is VALID against Open CoT schemas.");
   } else {

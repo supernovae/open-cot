@@ -17,6 +17,9 @@ import { DEFAULT_SANDBOX_CONFIG } from "../schemas/sandbox.js";
 import type { TelemetryRecord } from "../schemas/telemetry.js";
 import { createInitialTelemetry } from "../schemas/telemetry.js";
 import type { CompletionStatus, Trace } from "../schemas/trace.js";
+import type { DelegationRequest, DelegationDecision, AuthorityReceipt } from "../schemas/delegation.js";
+import type { PermissionGrant } from "../schemas/permission.js";
+import type { ToolExecutionReceipt } from "../schemas/receipt.js";
 
 export interface AgentState {
   runId: string;
@@ -34,6 +37,12 @@ export interface AgentState {
   completionStatus: CompletionStatus;
   trace: Trace;
   telemetry: TelemetryRecord;
+
+  delegationRequests: DelegationRequest[];
+  delegationDecisions: DelegationDecision[];
+  authorityReceipts: AuthorityReceipt[];
+  activePermissions: PermissionGrant[];
+  toolExecutionReceipts: ToolExecutionReceipt[];
 }
 
 export interface AgentStateInit {
@@ -50,22 +59,27 @@ export function createAgentState(init: AgentStateInit): AgentState {
     runId: randomUUID(),
     objective: init.objective,
     currentSubtask: null,
-    phase: "plan",
+    phase: "receive",
     planVersion: 0,
     blockers: [],
     evidenceCollected: [],
     lastAction: null,
-    nextAllowedPhases: [...VALID_TRANSITIONS.plan],
+    nextAllowedPhases: [...VALID_TRANSITIONS.receive],
     budget: createInitialSnapshot(policy),
     budgetPolicy: policy,
     sandbox: init.sandbox ?? DEFAULT_SANDBOX_CONFIG,
     completionStatus: "running",
     trace: {
-      version: "0.1",
+      version: "0.2",
       task: init.objective,
       steps: [],
       final_answer: "",
     },
     telemetry: createInitialTelemetry(agentId),
+    delegationRequests: [],
+    delegationDecisions: [],
+    authorityReceipts: [],
+    activePermissions: [],
+    toolExecutionReceipts: [],
   };
 }

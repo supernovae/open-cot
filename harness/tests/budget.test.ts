@@ -61,7 +61,7 @@ describe("BudgetTracker", () => {
     tracker.recordStep(state, "s2");
     tracker.recordStep(state, "s3");
     expect(state.completionStatus).toBe("budget_exhausted");
-    expect(state.phase).toBe("stop");
+    expect(state.phase).toBe("audit_seal");
   });
 
   it("does NOT force-stop with soft enforcement", () => {
@@ -80,7 +80,7 @@ describe("BudgetTracker", () => {
     tracker.recordStep(state, "s1");
     tracker.recordStep(state, "s2");
     expect(state.completionStatus).toBe("running");
-    expect(state.phase).toBe("plan");
+    expect(state.phase).toBe("receive");
   });
 
   it("keeps events log", () => {
