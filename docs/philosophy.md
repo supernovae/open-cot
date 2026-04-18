@@ -36,6 +36,10 @@ If validation fails, **deny**. If observation violates policy, **quarantine** an
 
 Designs that “try the tool call and roll back” still owe the same receipts: optimism belongs in the training loss, not in the authorization boundary.
 
+### Token-aware by design
+
+Structure costs tokens, and tokens cost money and context. The control plane should not burn the model's budget on bureaucracy. Capability manifests (RFC 0049) tell the model what it can do upfront so it does not waste tokens guessing. Compact text serialization keeps the overhead under 200 tokens. Context compilation — summarizing observations, windowing traces, stripping harness metadata — keeps the model focused on the task, not the plumbing. See [`docs/token-efficiency.md`](./token-efficiency.md) for active research on wire formats and small-model strategies.
+
 ### Small credible proofs before ambitious claims
 
 The reference harness exists to show that the **contract works**: one end-to-end path that respects the FSM, receipts, and validation. We aim for a narrow, correct slice of the ecosystem—not a declaration that every framework must adopt this stack tomorrow.

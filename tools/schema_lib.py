@@ -64,6 +64,7 @@ RFC_SHORTNAME: dict[str, str] = {
     "0046": "experiment_cards",
     "0047": "delegation_extension",
     "0048": "execution_receipts_audit_envelopes",
+    "0049": "capability_manifest",
 }
 
 # RFC ids where extraction must use explicit markers.

@@ -23,6 +23,7 @@ import type { ToolInvocation } from "../schemas/trace.js";
 import type { ToolExecutionReceipt } from "../schemas/receipt.js";
 import type { BudgetPolicy } from "../schemas/budget.js";
 import type { SandboxConfig } from "../schemas/sandbox.js";
+import { buildManifest, manifestToCompactText } from "../governance/manifest-builder.js";
 
 function sha256(data: string): string {
   return createHash("sha256").update(data).digest("hex");
@@ -101,17 +102,32 @@ export async function runGovernedAgent(
     return { trace: state.trace, envelope, state };
   };
 
+  const compileManifest = (phase: "frame" | "critique_verify") => {
+    const manifest = buildManifest({
+      runId: state.runId,
+      agentId: state.telemetry.agent_id,
+      phase,
+      toolContracts: config.toolRegistry.listTools(),
+      sandbox: state.sandbox,
+      policies: config.policies ?? [],
+      budget: state.budget,
+    });
+    state.capabilityManifest = manifest;
+    return manifestToCompactText(manifest);
+  };
+
   // --- receive ---
   emit.emitThought(state, `[receive] Task: ${config.objective}`);
   budget.recordStep(state, "receive");
   transition(state, "frame", "Log task and begin framing");
 
-  // --- frame ---
+  // --- frame (with capability manifest injection) ---
   if (halted(state)) return finish("");
+  const manifestText = compileManifest("frame");
   const frameResp = await callLLM([
     {
       role: "system",
-      content: "Interpret and frame the user's task. Do not call tools.",
+      content: `Interpret and frame the user's task. Do not call tools.\n\n${manifestText}`,
     },
     { role: "user", content: `[harness:frame]\n${config.objective}` },
   ]);
@@ -120,13 +136,12 @@ export async function runGovernedAgent(
   budget.recordStep(state, "frame");
   transition(state, "plan", "Framing complete");
 
-  // --- plan ---
+  // --- plan (manifest tells the model what it can use) ---
   if (halted(state)) return finish("");
   const planResp = await callLLM([
     {
       role: "system",
-      content:
-        "Propose concrete actions. You may request tools via tool_calls when needed.",
+      content: `Propose concrete actions. You may request tools via tool_calls when needed.\n\n${manifestText}`,
     },
     { role: "user", content: `[harness:plan]\n${config.objective}` },
   ]);
@@ -295,13 +310,14 @@ export async function runGovernedAgent(
     };
     state.toolExecutionReceipts.push(execReceipt);
 
-    // --- critique_verify ---
+    // --- critique_verify (with refreshed capability manifest) ---
     transition(state, "critique_verify", "Evaluate tool output");
     if (halted(state)) return finish("");
+    const refreshedManifest = compileManifest("critique_verify");
     const critique = await callLLM([
       {
         role: "system",
-        content: "Critique tool results for correctness and safety.",
+        content: `Critique tool results for correctness and safety.\n\n${refreshedManifest}`,
       },
       {
         role: "user",

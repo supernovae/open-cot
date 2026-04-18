@@ -70,6 +70,8 @@ You give the agent a task
 
 The model never skips the permission step. If a tool is not in the policy, it does not run.
 
+Before the model even starts planning, the harness gives it a **capability manifest** -- a short briefing that says "here are the tools you can use, here are the ones you can't, and here is your remaining budget." This prevents the model from wasting time asking for things it will never get. The manifest is refreshed after tool calls so the model always knows where it stands.
+
 For simple use cases (like a chatbot doing a pre-approved search), the harness has a shortcut: `plan -> execute_tool` skips the delegation ceremony for tools that are already on the allowlist.
 
 ---

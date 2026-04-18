@@ -8,3 +8,4 @@ export * from "./delegation.js";
 export * from "./permission.js";
 export * from "./receipt.js";
 export * from "./audit-envelope.js";
+export * from "./capability-manifest.js";

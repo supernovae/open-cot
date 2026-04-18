@@ -121,6 +121,19 @@ async function main() {
     console.log(`  ${t}`);
   }
 
+  if (state.capabilityManifest) {
+    console.log(`\n--- Capability Manifest (injected at ${state.capabilityManifest.phase}) ---`);
+    console.log(`Tools available: ${state.capabilityManifest.tools.available.map((t) => `${t.name} (${t.access_level})`).join(", ")}`);
+    if (state.capabilityManifest.tools.blocked.length > 0) {
+      console.log(`Tools blocked: ${state.capabilityManifest.tools.blocked.join(", ")}`);
+    }
+    console.log(`Budget: ${state.capabilityManifest.budget.steps_remaining} steps, ${state.capabilityManifest.budget.tool_calls_remaining} tool calls remaining`);
+    console.log(`Trust level: ${state.capabilityManifest.trust_level}`);
+    if (state.capabilityManifest.active_constraints.length > 0) {
+      console.log(`Constraints: ${state.capabilityManifest.active_constraints.join("; ")}`);
+    }
+  }
+
   console.log(`\n--- Governance Summary ---`);
   console.log(`Delegation requests: ${state.delegationRequests.length}`);
   console.log(`Delegation decisions: ${state.delegationDecisions.length}`);
@@ -147,6 +160,11 @@ async function main() {
   if (process.argv.includes("--envelope")) {
     console.log(`\n--- Full Envelope (JSON) ---`);
     console.log(JSON.stringify(envelope, null, 2));
+  }
+
+  if (process.argv.includes("--manifest") && state.capabilityManifest) {
+    console.log(`\n--- Full Manifest (JSON) ---`);
+    console.log(JSON.stringify(state.capabilityManifest, null, 2));
   }
 }
 

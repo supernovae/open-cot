@@ -20,6 +20,7 @@ import type { CompletionStatus, Trace } from "../schemas/trace.js";
 import type { DelegationRequest, DelegationDecision, AuthorityReceipt } from "../schemas/delegation.js";
 import type { PermissionGrant } from "../schemas/permission.js";
 import type { ToolExecutionReceipt } from "../schemas/receipt.js";
+import type { CapabilityManifest } from "../schemas/capability-manifest.js";
 
 export interface AgentState {
   runId: string;
@@ -43,6 +44,7 @@ export interface AgentState {
   authorityReceipts: AuthorityReceipt[];
   activePermissions: PermissionGrant[];
   toolExecutionReceipts: ToolExecutionReceipt[];
+  capabilityManifest?: CapabilityManifest;
 }
 
 export interface AgentStateInit {

@@ -23,6 +23,7 @@ import type { Trace, ToolInvocation } from "../schemas/trace.js";
 import type { BudgetPolicy } from "../schemas/budget.js";
 import type { SandboxConfig } from "../schemas/sandbox.js";
 import { DEFAULT_SANDBOX_CONFIG } from "../schemas/sandbox.js";
+import { buildManifest, manifestToCompactText } from "../governance/manifest-builder.js";
 
 function halted(state: AgentState): boolean {
   return state.phase === "audit_seal";
@@ -89,10 +90,21 @@ export async function runChatAgent(
   budget.recordStep(state, "frame");
   transition(state, "plan", "Framed");
 
-  // plan
+  // plan (with capability manifest)
   if (halted(state)) return end("");
+  const manifest = buildManifest({
+    runId: state.runId,
+    agentId: state.telemetry.agent_id,
+    phase: "plan",
+    toolContracts: toolRegistry.listTools(),
+    sandbox: sb,
+    policies: [],
+    budget: state.budget,
+  });
+  state.capabilityManifest = manifest;
+  const manifestText = manifestToCompactText(manifest);
   const planResp = await callLLM([
-    { role: "system", content: "Plan and propose actions; use tools only if needed." },
+    { role: "system", content: `Plan and propose actions; use tools only if needed.\n\n${manifestText}` },
     { role: "user", content: `[harness:plan]\n${objective}` },
   ]);
   if (halted(state)) return end(planResp.content);

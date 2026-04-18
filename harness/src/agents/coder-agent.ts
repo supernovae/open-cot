@@ -22,6 +22,7 @@ import type { Trace, ToolInvocation } from "../schemas/trace.js";
 import type { BudgetPolicy } from "../schemas/budget.js";
 import type { SandboxConfig } from "../schemas/sandbox.js";
 import { DEFAULT_SANDBOX_CONFIG } from "../schemas/sandbox.js";
+import { buildManifest, manifestToCompactText } from "../governance/manifest-builder.js";
 
 function halted(state: AgentState): boolean {
   return state.phase === "audit_seal";
@@ -93,6 +94,18 @@ export async function runCoderAgent(
   budget.recordStep(state, "frame");
   transition(state, "plan", "Framed");
 
+  const manifest = buildManifest({
+    runId: state.runId,
+    agentId: state.telemetry.agent_id,
+    phase: "plan",
+    toolContracts: toolRegistry.listTools(),
+    sandbox: state.sandbox,
+    policies: [],
+    budget: state.budget,
+  });
+  state.capabilityManifest = manifest;
+  const manifestText = manifestToCompactText(manifest);
+
   let repairCount = 0;
   let lastCritique = "";
 
@@ -102,8 +115,7 @@ export async function runCoderAgent(
     const planResp = await callLLM([
       {
         role: "system",
-        content:
-          "You are a coding assistant. Propose concrete steps and use tools (readFile, writeFile, runTests) when needed.",
+        content: `You are a coding assistant. Propose concrete steps and use tools when needed.\n\n${manifestText}`,
       },
       { role: "user", content: `[harness:plan]\n${objective}` },
     ]);
