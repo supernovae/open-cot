@@ -23,7 +23,8 @@ import type { Trace, ToolInvocation } from "../schemas/trace.js";
 import type { BudgetPolicy } from "../schemas/budget.js";
 import type { SandboxConfig } from "../schemas/sandbox.js";
 import { DEFAULT_SANDBOX_CONFIG } from "../schemas/sandbox.js";
-import { buildManifest, manifestToCompactText } from "../governance/manifest-builder.js";
+import { buildManifest, serializeManifest } from "../governance/manifest-builder.js";
+import type { WireFormat } from "../governance/manifest-builder.js";
 
 function halted(state: AgentState): boolean {
   return state.phase === "audit_seal";
@@ -41,6 +42,7 @@ export async function runChatAgent(
   toolRegistry: ToolRegistry,
   budgetPolicy?: BudgetPolicy,
   sandbox?: SandboxConfig,
+  wireFormat?: WireFormat,
 ): Promise<Trace> {
   resetStepCounter();
   const budget = createBudgetTracker();
@@ -102,7 +104,7 @@ export async function runChatAgent(
     budget: state.budget,
   });
   state.capabilityManifest = manifest;
-  const manifestText = manifestToCompactText(manifest);
+  const manifestText = serializeManifest(manifest, wireFormat);
   const planResp = await callLLM([
     { role: "system", content: `Plan and propose actions; use tools only if needed.\n\n${manifestText}` },
     { role: "user", content: `[harness:plan]\n${objective}` },

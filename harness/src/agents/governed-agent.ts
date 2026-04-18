@@ -23,7 +23,8 @@ import type { ToolInvocation } from "../schemas/trace.js";
 import type { ToolExecutionReceipt } from "../schemas/receipt.js";
 import type { BudgetPolicy } from "../schemas/budget.js";
 import type { SandboxConfig } from "../schemas/sandbox.js";
-import { buildManifest, manifestToCompactText } from "../governance/manifest-builder.js";
+import { buildManifest, serializeManifest } from "../governance/manifest-builder.js";
+import type { WireFormat } from "../governance/manifest-builder.js";
 
 function sha256(data: string): string {
   return createHash("sha256").update(data).digest("hex");
@@ -41,6 +42,7 @@ export interface GovernedAgentConfig {
   agentId?: string;
   budgetPolicy?: BudgetPolicy;
   sandbox?: SandboxConfig;
+  wireFormat?: WireFormat;
 }
 
 export interface GovernedAgentResult {
@@ -120,7 +122,7 @@ export async function runGovernedAgent(
       budget: state.budget,
     });
     state.capabilityManifest = manifest;
-    return manifestToCompactText(manifest);
+    return serializeManifest(manifest, config.wireFormat);
   };
 
   // --- receive ---

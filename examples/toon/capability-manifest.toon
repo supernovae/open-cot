@@ -1,0 +1,10 @@
+[toon:capability_manifest]
+tools_available[3]{name, access, idempotent}:
+search | pre-authorized | true
+calculator | pre-authorized | true
+writeFile | requires-delegation | false
+tools_blocked: shell
+budget{steps, tool_calls, tokens, retries}: 48 | 18 | 95000 | 2
+trust_level: medium
+constraints: max 5 results per search; no raw HTML in search excerpts
+[/toon:capability_manifest]

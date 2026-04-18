@@ -114,7 +114,31 @@ High-throughput inference engine with consistent generation behavior for evaluat
 
 ---
 
-## 7. Best-Practice Checklist for Open CoT Workflows
+## 7. Token-Efficient Serialization Formats
+
+### Abt, B. (2025). *TOON Format: Token-Oriented Object Notation for LLM-Friendly Data Exchange.*
+https://benjamin-abt.com/blog/2025/12/12/ai-toon-format/
+Production-focused design rationale for TOON, a compact notation that uses inline schema headers and pipe-delimited tabular rows to reduce token usage vs JSON.
+**Relevance:** Primary design reference for the TOON adapter (RFC 0050).
+
+### arXiv 2603.03306 (2026). *Token-Oriented Object Notation vs JSON: A Benchmark of Plain and Constrained Decoding Generation.*
+https://arxiv.org/abs/2603.03306
+Benchmarks TOON against plain JSON and constrained decoding generation; finds TOON's efficiency advantage follows a non-linear curve, becoming significant beyond a structural complexity threshold where cumulative syntax savings amortize initial prompt overhead.
+**Relevance:** Empirical validation of TOON's token savings claims; informs when TOON is worth the adapter complexity.
+
+### Nandakishore, G. (2026). *JTON: A Token-Efficient JSON Superset with Zen Grid Tabular Encoding for Large Language Models.* arXiv 2604.05865.
+https://arxiv.org/abs/2604.05865
+Introduces "Zen Grid" tabular encoding achieving 15–60% token reduction (28.5% average) across seven real-world domains with 100% syntactic validity across 12 LLMs in generation tests.
+**Relevance:** Independent validation that tabular compact formats are viable for LLM I/O; benchmarks complement the TOON paper.
+
+### ATON Format V2 Whitepaper (2025). *Adaptive Token-Oriented Notation — Production-grade data serialization for LLMs.*
+https://www.atonformat.com/whitepaper.html
+Reports 56% token reduction vs JSON with native relationship support, type safety, and nested structure handling.
+**Relevance:** Broader ecosystem evidence that token-efficient structured formats are a viable research direction.
+
+---
+
+## 8. Best-Practice Checklist for Open CoT Workflows
 
 Use this checklist when building, fine-tuning, and validating models with Open CoT:
 
