@@ -1,5 +1,5 @@
 /**
- * Finite state machine transition engine — RFC 0007.
+ * Finite state machine transition engine — RFC 0007 (Governed Execution FSM).
  *
  * Every phase transition is validated against the adjacency map and emits a
  * structured trace step so the full history is replayable.
@@ -7,7 +7,7 @@
 
 import type { Phase } from "../schemas/agent-loop.js";
 import { VALID_TRANSITIONS, TERMINAL_PHASES } from "../schemas/agent-loop.js";
-import type { CompletionStatus } from "../schemas/trace.js";
+import type { CompletionStatus } from "../schemas/audit-envelope.js";
 import type { AgentState } from "./state.js";
 
 export class InvalidTransitionError extends Error {
@@ -25,7 +25,9 @@ export class InvalidTransitionError extends Error {
 
 export class TerminalStateError extends Error {
   constructor(public readonly phase: Phase) {
-    super(`Agent is in terminal phase "${phase}" — no further transitions allowed`);
+    super(
+      `Agent is in terminal phase "${phase}" — no further transitions allowed`,
+    );
     this.name = "TerminalStateError";
   }
 }
@@ -65,7 +67,7 @@ export function transition(
   state.nextAllowedPhases = [...VALID_TRANSITIONS[to]];
   state.telemetry.metrics.steps++;
 
-  if (to === "stop") {
+  if (to === "audit_seal") {
     if (state.completionStatus === "running") {
       state.completionStatus = "succeeded";
     }
@@ -74,8 +76,8 @@ export function transition(
 }
 
 /**
- * Force-stop the agent with a given status. Used for budget exhaustion and
- * external stop signals.
+ * Force-stop the agent with a given status. Used for budget exhaustion,
+ * safety violations, and external stop signals.
  */
 export function forceStop(
   state: AgentState,
@@ -83,16 +85,15 @@ export function forceStop(
   reason: string,
 ): void {
   state.completionStatus = status;
-  if (state.phase !== "stop") {
+  if (state.phase !== "audit_seal") {
     const stepId = `t-${state.trace.steps.length + 1}`;
     state.trace.steps.push({
       id: stepId,
       type: "thought",
-      content: `[force-stop] ${state.phase} -> stop: ${reason}`,
+      content: `[force-stop] ${state.phase} -> fail_safe -> audit_seal: ${reason}`,
     });
-    state.phase = "stop";
+    state.phase = "audit_seal";
     state.nextAllowedPhases = [];
     state.trace.termination = status;
   }
 }
-

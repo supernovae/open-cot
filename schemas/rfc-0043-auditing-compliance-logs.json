@@ -1,14 +1,101 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "RFC 0043 — Auditing Compliance Logs (stub)",
-  "description": "Placeholder JSON Schema for RFC 0043. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "title": "Open CoT RFC 0043 — audit_event",
   "type": "object",
-  "additionalProperties": true,
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "0.2"
+      ]
+    },
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agent_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "run_started",
+        "policy_evaluated",
+        "permission_granted",
+        "permission_consumed",
+        "permission_expired",
+        "permission_revoked",
+        "tool_executed",
+        "delegation_requested",
+        "delegation_decided",
+        "escalation_initiated",
+        "escalation_resolved",
+        "postcondition_violated",
+        "denial_recorded",
+        "budget_warning",
+        "budget_exhausted",
+        "run_completed",
+        "run_failed",
+        "trace_sealed"
+      ]
+    },
+    "details": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "previous_event_id": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hash_algorithm": {
+          "type": "string",
+          "enum": [
+            "sha-256"
+          ]
+        },
+        "content_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "hash_algorithm",
+        "content_hash"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "event_id",
+    "run_id",
+    "agent_id",
+    "timestamp",
+    "event_type",
+    "details",
+    "previous_event_id",
+    "integrity"
+  ],
+  "$id": "https://opencot.dev/schemas/rfc-0043-auditing-compliance-logs.json",
   "x-opencot": {
     "rfc": "0043",
     "shortname": "auditing_compliance_logs",
-    "status": "stub",
     "source_rfc": "rfcs/0043-auditing-compliance-logs.md"
-  },
-  "$id": "https://opencot.dev/schemas/rfc-0043-auditing-compliance-logs.json"
+  }
 }

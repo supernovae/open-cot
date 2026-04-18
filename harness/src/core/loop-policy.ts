@@ -48,19 +48,20 @@ export function checkPolicy(
   const violations: PolicyViolation[] = [];
 
   if (
-    proposed === "stop" &&
+    proposed === "finalize" &&
     policy.requireEvidenceBeforeDone &&
     state.evidenceCollected.length === 0
   ) {
     violations.push({
       rule: "requireEvidenceBeforeDone",
-      message: "Cannot stop without collecting at least one piece of evidence",
+      message:
+        "Cannot finalize without collecting at least one piece of evidence",
       severity: "error",
     });
   }
 
   if (
-    proposed === "stop" &&
+    proposed === "finalize" &&
     policy.requireTestsBeforeCompletion &&
     !hasVerifyStep(state)
   ) {
@@ -73,13 +74,13 @@ export function checkPolicy(
 
   if (
     policy.verifyAfterChange &&
-    state.phase === "act" &&
-    proposed !== "verify" &&
-    proposed !== "stop"
+    state.phase === "execute_tool" &&
+    proposed !== "observe_result" &&
+    proposed !== "fail_safe"
   ) {
     violations.push({
       rule: "verifyAfterChange",
-      message: "Policy requires verify phase after act",
+      message: "Policy requires observe_result after execute_tool",
       severity: "warning",
     });
   }
@@ -87,25 +88,13 @@ export function checkPolicy(
   if (
     policy.summarizeOnThreshold !== null &&
     state.trace.steps.length >= policy.summarizeOnThreshold &&
-    proposed !== "summarize" &&
-    proposed !== "stop" &&
-    state.phase !== "summarize"
+    proposed !== "finalize" &&
+    proposed !== "audit_seal" &&
+    state.phase !== "finalize"
   ) {
     violations.push({
       rule: "summarizeOnThreshold",
-      message: `Step count (${state.trace.steps.length}) exceeds threshold (${policy.summarizeOnThreshold}) — consider summarizing`,
-      severity: "warning",
-    });
-  }
-
-  if (
-    policy.noDuplicateProbes &&
-    proposed === "inspect" &&
-    hasDuplicateInspect(state)
-  ) {
-    violations.push({
-      rule: "noDuplicateProbes",
-      message: "Duplicate inspect detected — same subtask was already inspected",
+      message: `Step count (${state.trace.steps.length}) exceeds threshold (${policy.summarizeOnThreshold}) — consider finalizing`,
       severity: "warning",
     });
   }
@@ -114,12 +103,7 @@ export function checkPolicy(
 }
 
 function hasVerifyStep(state: AgentState): boolean {
-  return state.trace.steps.some((s) => s.type === "verify");
-}
-
-function hasDuplicateInspect(state: AgentState): boolean {
-  const inspects = state.trace.steps.filter(
-    (s) => s.type === "thought" && s.content.includes("[transition]") && s.content.includes("inspect"),
+  return state.trace.steps.some(
+    (s) => s.type === "verify" || s.type === "critique",
   );
-  return inspects.length > 1;
 }

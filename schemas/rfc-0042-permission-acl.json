@@ -1,14 +1,186 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "RFC 0042 — Permission Acl (stub)",
-  "description": "Placeholder JSON Schema for RFC 0042. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "$id": "https://opencot.dev/schema/permission-grant/0.2",
+  "title": "Open CoT RFC 0042 — Permission Grant",
   "type": "object",
-  "additionalProperties": true,
+  "additionalProperties": false,
+  "properties": {
+    "permission_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "granted_to": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resource",
+        "action"
+      ],
+      "properties": {
+        "resource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "read",
+            "write",
+            "execute",
+            "delete",
+            "list"
+          ]
+        },
+        "constraints": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "allowed_fields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "excluded_fields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "max_results": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "max_response_size_bytes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "custom": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "audience": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ttl_seconds": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "one_shot": {
+      "type": "boolean"
+    },
+    "forwardable": {
+      "type": "boolean",
+      "default": false
+    },
+    "granted_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "request_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decision_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "granted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "consumed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "revoked_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "revocation_reason": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "consumed",
+        "expired",
+        "revoked"
+      ]
+    }
+  },
+  "required": [
+    "permission_id",
+    "granted_to",
+    "scope",
+    "audience",
+    "ttl_seconds",
+    "expires_at",
+    "one_shot",
+    "granted_by",
+    "policy_ref",
+    "request_ref",
+    "decision_ref",
+    "granted_at",
+    "status"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "consumed"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "consumed_at"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "revoked"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "revoked_at",
+          "revocation_reason"
+        ]
+      }
+    }
+  ],
   "x-opencot": {
     "rfc": "0042",
     "shortname": "permission_acl",
-    "status": "stub",
     "source_rfc": "rfcs/0042-permission-acl.md"
-  },
-  "$id": "https://opencot.dev/schemas/rfc-0042-permission-acl.json"
+  }
 }

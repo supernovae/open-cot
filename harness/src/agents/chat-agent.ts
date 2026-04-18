@@ -1,144 +1,188 @@
 /**
- * Chat agent — LangGraph-style conversational agent.
- *
- * Demonstrates: plan -> act (optional tool calls) -> verify -> respond.
- * Uses the core FSM, budget tracker, tool registry, and trace emitter.
+ * Chat agent — simple governed mode with pre-authorized tool shortcut
+ * (plan → execute_tool, skipping delegation when sandbox allows the tool).
  */
 
-import type { LLMBackend, LLMResponseWithTools } from "../backends/types.js";
-import type { BudgetTracker } from "../core/budget-tracker.js";
-import { createBudgetTracker } from "../core/budget-tracker.js";
-import type { LoopPolicy } from "../core/loop-policy.js";
-import { DEFAULT_LOOP_POLICY, checkPolicy } from "../core/loop-policy.js";
+import type { LLMBackend, LLMMessage, LLMResponseWithTools } from "../backends/types.js";
 import type { AgentState } from "../core/state.js";
 import { createAgentState } from "../core/state.js";
+import { transition, forceStop } from "../core/transitions.js";
+import { createBudgetTracker } from "../core/budget-tracker.js";
+import type { ToolRegistry } from "../core/tool-registry.js";
 import {
   emitPlan,
   emitAction,
   emitObservation,
   emitVerify,
   emitThought,
+  emitCritique,
   finalizeTrace,
   resetStepCounter,
 } from "../core/trace-emitter.js";
-import { transition } from "../core/transitions.js";
-import type { ToolRegistry } from "../core/tool-registry.js";
 import type { Trace, ToolInvocation } from "../schemas/trace.js";
 import type { BudgetPolicy } from "../schemas/budget.js";
 import type { SandboxConfig } from "../schemas/sandbox.js";
+import { DEFAULT_SANDBOX_CONFIG } from "../schemas/sandbox.js";
 
-function isStopped(state: AgentState): boolean {
-  return (state.phase as string) === "stop";
+function halted(state: AgentState): boolean {
+  return state.phase === "audit_seal";
 }
 
-export interface ChatAgentConfig {
-  backend: LLMBackend;
-  tools: ToolRegistry;
-  budgetPolicy?: BudgetPolicy;
-  loopPolicy?: LoopPolicy;
-  sandbox?: SandboxConfig;
-}
-
-export interface ChatResult {
-  answer: string;
-  trace: Trace;
-  state: AgentState;
+function isPreAuthorized(toolName: string, sandbox: SandboxConfig): boolean {
+  if (sandbox.blockedTools.includes(toolName)) return false;
+  if (sandbox.allowedTools.includes("*")) return true;
+  return sandbox.allowedTools.includes(toolName);
 }
 
 export async function runChatAgent(
-  userMessage: string,
-  config: ChatAgentConfig,
-): Promise<ChatResult> {
+  backend: LLMBackend,
+  objective: string,
+  toolRegistry: ToolRegistry,
+  budgetPolicy?: BudgetPolicy,
+  sandbox?: SandboxConfig,
+): Promise<Trace> {
   resetStepCounter();
-  const policy = config.loopPolicy ?? DEFAULT_LOOP_POLICY;
   const budget = createBudgetTracker();
+  const sb = sandbox ?? DEFAULT_SANDBOX_CONFIG;
   const state = createAgentState({
-    objective: userMessage,
-    budgetPolicy: config.budgetPolicy,
-    sandbox: config.sandbox,
+    objective,
+    budgetPolicy,
+    sandbox: sb,
   });
 
-  let lastLLMResponse: LLMResponseWithTools | undefined;
+  let lastResponse: LLMResponseWithTools | undefined;
 
-  const callLLM = async (
-    messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
-  ): Promise<string> => {
-    if (isStopped(state)) return "";
-    const response = await config.backend.chat(messages);
-    budget.recordTokens(state, response.tokensUsed, `LLM call (${config.backend.name})`);
-    lastLLMResponse = response;
-    return response.content;
+  const callLLM = async (messages: LLMMessage[]): Promise<LLMResponseWithTools> => {
+    if (halted(state)) {
+      return { content: "", tokensUsed: 0, model: "noop", finishReason: "stop" };
+    }
+    try {
+      const response = await backend.chat(messages);
+      budget.recordTokens(state, response.tokensUsed, `LLM (${backend.name})`);
+      lastResponse = response;
+      return response;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      forceStop(state, "fail_safe", msg);
+      return { content: "", tokensUsed: 0, model: "error", finishReason: "stop" };
+    }
   };
 
-  // Phase 1: Plan
-  const planResponse = await callLLM([
-    { role: "system", content: "You are a helpful assistant. Plan your approach step by step." },
-    { role: "user", content: userMessage },
-  ]);
-  if (isStopped(state)) return finish(state, planResponse);
+  const end = (answer: string): Trace => {
+    finalizeTrace(state, answer || state.trace.final_answer || String(state.completionStatus));
+    return state.trace;
+  };
 
-  const planStep = emitPlan(state, planResponse);
+  // receive
+  emitThought(state, `[receive] ${objective}`);
+  budget.recordStep(state, "receive");
+  transition(state, "frame", "Begin framing");
+
+  // frame
+  if (halted(state)) return end("");
+  const frameResp = await callLLM([
+    { role: "system", content: "Interpret the task. Do not use tools." },
+    { role: "user", content: `[harness:frame]\n${objective}` },
+  ]);
+  if (halted(state)) return end(frameResp.content);
+  emitThought(state, `[frame] ${frameResp.content}`);
+  budget.recordStep(state, "frame");
+  transition(state, "plan", "Framed");
+
+  // plan
+  if (halted(state)) return end("");
+  const planResp = await callLLM([
+    { role: "system", content: "Plan and propose actions; use tools only if needed." },
+    { role: "user", content: `[harness:plan]\n${objective}` },
+  ]);
+  if (halted(state)) return end(planResp.content);
+  const planStep = emitPlan(state, planResp.content);
   budget.recordStep(state, "plan");
 
-  // Phase 2: Act (tool calls if the LLM requests them)
-  transition(state, "act", "Executing plan actions");
-  const actResponse = await callLLM([
-    { role: "system", content: "Execute the plan. If you need tools, request them." },
-    { role: "user", content: userMessage },
-    { role: "assistant", content: planResponse },
-  ]);
-  if (isStopped(state)) return finish(state, actResponse);
+  const toolCalls = lastResponse?.toolCalls ?? [];
 
-  if (lastLLMResponse?.toolCalls && lastLLMResponse.toolCalls.length > 0) {
-    for (const tc of lastLLMResponse.toolCalls) {
-      const invocation: ToolInvocation = {
-        tool_name: tc.toolName,
-        arguments: tc.arguments,
-        triggered_by_step: planStep.id,
-      };
-      const actionStep = emitAction(state, `call:${tc.toolName}`, invocation, planStep.id);
-      budget.recordToolCall(state, `tool:${tc.toolName}`);
-      if (isStopped(state)) return finish(state, "");
-
-      const result = await config.tools.call(tc.toolName, tc.arguments, state.sandbox);
-      const obsContent = result.error
-        ? `Error: ${result.error}`
-        : JSON.stringify(result.output);
-      emitObservation(state, obsContent, actionStep.id);
-    }
-  } else {
-    emitThought(state, actResponse, planStep.id);
+  if (toolCalls.length === 0) {
+    transition(state, "finalize", "Pure reasoning path");
+    if (halted(state)) return end(planResp.content);
+    const fin = await callLLM([
+      { role: "system", content: "Produce the final answer for the user." },
+      {
+        role: "user",
+        content: `[harness:finalize]\n${objective}\n\nPlan:\n${planResp.content}`,
+      },
+    ]);
+    if (halted(state)) return end(fin.content || planResp.content);
+    transition(state, "audit_seal", "Complete");
+    return end(fin.content || planResp.content);
   }
-  budget.recordStep(state, "act");
 
-  // Phase 3: Verify
-  const violations = checkPolicy(state, "verify", policy);
-  transition(state, "verify", "Verifying results");
-  const verifyResponse = await callLLM([
-    { role: "system", content: "Verify the results. Are they correct?" },
-    { role: "user", content: userMessage },
-    { role: "assistant", content: actResponse },
-  ]);
-  if (isStopped(state)) return finish(state, verifyResponse);
-
-  const isVerified = !verifyResponse.toLowerCase().includes("incorrect") &&
-    !verifyResponse.toLowerCase().includes("wrong");
-  emitVerify(state, verifyResponse, isVerified ? "verified" : "failed");
-  budget.recordStep(state, "verify");
-
-  if (violations.length > 0) {
-    for (const v of violations) {
-      emitThought(state, `[policy:${v.rule}] ${v.message}`);
+  for (const tc of toolCalls) {
+    if (!isPreAuthorized(tc.toolName, state.sandbox)) {
+      forceStop(state, "failed", `Tool "${tc.toolName}" is not pre-authorized in sandbox`);
+      return end(`Tool "${tc.toolName}" is not allowed in simple chat mode.`);
     }
   }
 
-  // Phase 4: Stop
-  transition(state, "stop", "Delivering final answer");
-  return finish(state, verifyResponse);
-}
+  for (let i = 0; i < toolCalls.length; i++) {
+    if (halted(state)) return end("");
+    const tc = toolCalls[i]!;
 
-function finish(state: AgentState, lastContent: string): ChatResult {
-  const answer = lastContent || state.trace.final_answer || "No answer produced";
-  finalizeTrace(state, answer);
-  return { answer, trace: state.trace, state };
+    if (i > 0) {
+      transition(state, "plan", `Next tool ${i + 1}/${toolCalls.length}`);
+      emitThought(state, `[plan] executing remaining tool ${tc.toolName}`);
+      budget.recordStep(state, "plan");
+    }
+
+    transition(state, "execute_tool", `Pre-authorized call: ${tc.toolName}`);
+    const inv: ToolInvocation = {
+      tool_name: tc.toolName,
+      arguments: tc.arguments,
+      triggered_by_step: planStep.id,
+    };
+    const actionStep = emitAction(state, `call:${tc.toolName}`, inv, planStep.id);
+    budget.recordToolCall(state, `tool:${tc.toolName}`);
+
+    let result;
+    try {
+      result = await toolRegistry.call(tc.toolName, tc.arguments, state.sandbox);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      forceStop(state, "fail_safe", msg);
+      return end("");
+    }
+
+    transition(state, "observe_result", "Tool finished");
+    const obs = result.error ? `Error: ${result.error}` : JSON.stringify(result.output);
+    emitObservation(state, obs, actionStep.id);
+    budget.recordStep(state, "observe_result");
+
+    transition(state, "critique_verify", "Check tool output");
+    if (halted(state)) return end("");
+    const critique = await callLLM([
+      { role: "system", content: "Briefly verify the observation against the user goal." },
+      {
+        role: "user",
+        content: `[harness:critique]\nObjective: ${objective}\nObservation:\n${obs}`,
+      },
+    ]);
+    if (halted(state)) return end(critique.content);
+    emitCritique(state, critique.content);
+    budget.recordStep(state, "critique_verify");
+  }
+
+  if (halted(state)) return end("");
+  transition(state, "finalize", "Compose final answer");
+  const finalResp = await callLLM([
+    { role: "system", content: "Answer the user using the plan and tool observations." },
+    { role: "user", content: `[harness:finalize]\n${objective}` },
+  ]);
+  if (halted(state)) return end(finalResp.content || planResp.content);
+  const verifyText = finalResp.content;
+  const ok =
+    !verifyText.toLowerCase().includes("incorrect") &&
+    !verifyText.toLowerCase().includes("wrong");
+  emitVerify(state, verifyText, ok ? "verified" : "unknown");
+  transition(state, "audit_seal", "Chat run sealed");
+
+  return end(finalResp.content || planResp.content);
 }

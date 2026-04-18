@@ -18,70 +18,71 @@ describe("CoderAgent (mock backend)", () => {
   });
 
   it("completes a coding task through full FSM traversal", async () => {
-    const result = await runCoderAgent(
+    const trace = await runCoderAgent(
+      new MockLLMBackend(),
       "Read the file src/main.ts and modify it to add a greeting.",
-      {
-        backend: new MockLLMBackend(),
-        tools: createMockToolRegistry(),
-      },
+      createMockToolRegistry(),
     );
 
-    expect(result.answer).toBeTruthy();
-    expect(result.trace.version).toBe("0.1");
-    expect(result.trace.steps.length).toBeGreaterThan(5);
+    expect(trace.final_answer).toBeTruthy();
+    expect(trace.version).toBe("0.2");
+    expect(trace.steps.length).toBeGreaterThan(5);
   });
 
   it("emits valid termination status", async () => {
-    const result = await runCoderAgent("Write a new utility function.", {
-      backend: new MockLLMBackend(),
-      tools: createMockToolRegistry(),
-    });
+    const trace = await runCoderAgent(
+      new MockLLMBackend(),
+      "Write a new utility function.",
+      createMockToolRegistry(),
+    );
 
-    const termResult = validateTermination(result.trace);
+    const termResult = validateTermination(trace);
     expect(termResult.valid).toBe(true);
   });
 
   it("pairs all actions with observations", async () => {
-    const result = await runCoderAgent("Inspect file and make changes.", {
-      backend: new MockLLMBackend(),
-      tools: createMockToolRegistry(),
-    });
+    const trace = await runCoderAgent(
+      new MockLLMBackend(),
+      "Inspect file and make changes.",
+      createMockToolRegistry(),
+    );
 
-    const pairingResult = validateActionObservationPairing(result.trace);
+    const pairingResult = validateActionObservationPairing(trace);
     expect(pairingResult.valid).toBe(true);
   });
 
-  it("exercises plan, inspect, act, verify, summarize phases", async () => {
-    const result = await runCoderAgent(
+  it("exercises governed FSM phases in the trace", async () => {
+    const trace = await runCoderAgent(
+      new MockLLMBackend(),
       "Read src/main.ts, write a fix, then verify the changes.",
-      {
-        backend: new MockLLMBackend(),
-        tools: createMockToolRegistry(),
-      },
+      createMockToolRegistry(),
     );
 
-    const traceContent = result.trace.steps.map((s) => s.content).join(" ");
+    const traceContent = trace.steps.map((s) => s.content).join(" ");
+    expect(traceContent).toContain("receive");
+    expect(traceContent).toContain("frame");
     expect(traceContent).toContain("plan");
-    expect(traceContent).toContain("inspect");
-    expect(traceContent).toContain("act");
-    expect(traceContent).toContain("verify");
+    expect(traceContent).toContain("execute_tool");
+    expect(traceContent).toContain("critique_verify");
   });
 
-  it("tracks budget usage across all phases", async () => {
-    const result = await runCoderAgent("Modify the project files.", {
-      backend: new MockLLMBackend(),
-      tools: createMockToolRegistry(),
-    });
+  it("emits a substantive trace", async () => {
+    const trace = await runCoderAgent(
+      new MockLLMBackend(),
+      "Modify the project files.",
+      createMockToolRegistry(),
+    );
 
-    expect(result.state.budget.tokensUsed).toBeGreaterThan(0);
-    expect(result.state.budget.stepsUsed).toBeGreaterThan(3);
+    expect(trace.steps.length).toBeGreaterThan(6);
+    expect(trace.final_answer).toBeTruthy();
   });
 
   it("stops on budget exhaustion mid-task", async () => {
-    const result = await runCoderAgent("Do a complex refactoring.", {
-      backend: new MockLLMBackend(),
-      tools: createMockToolRegistry(),
-      budgetPolicy: {
+    const trace = await runCoderAgent(
+      new MockLLMBackend(),
+      "Do a complex refactoring.",
+      createMockToolRegistry(),
+      {
         maxTokens: 20,
         maxCost: 10,
         maxSteps: 50,
@@ -89,33 +90,30 @@ describe("CoderAgent (mock backend)", () => {
         maxRetries: 5,
         enforcement: "hard",
       },
-    });
+    );
 
-    expect(result.state.completionStatus).toBe("budget_exhausted");
+    expect(trace.termination).toBe("budget_exhausted");
   });
 
   it("respects sandbox tool blocking", async () => {
-    const result = await runCoderAgent(
+    const trace = await runCoderAgent(
+      new MockLLMBackend(),
       "Write a file to disk.",
+      createMockToolRegistry(),
+      undefined,
       {
-        backend: new MockLLMBackend(),
-        tools: createMockToolRegistry(),
-        sandbox: {
-          allowedTools: ["readFile"],
-          blockedTools: ["writeFile"],
-          maxSteps: 50,
-          maxBranches: 5,
-          memoryAcl: { default: ["read"] },
-        },
+        allowedTools: ["readFile"],
+        blockedTools: ["writeFile"],
+        maxSteps: 50,
+        maxBranches: 5,
+        memoryAcl: { default: ["read"] },
       },
     );
 
-    const observations = result.trace.steps.filter(
-      (s) => s.type === "observation",
-    );
-    const blocked = observations.some((s) =>
-      s.content.includes("blocked by sandbox"),
-    );
-    expect(blocked || result.state.completionStatus === "succeeded").toBe(true);
+    const observations = trace.steps.filter((s) => s.type === "observation");
+    const blocked = observations.some((s) => s.content.includes("blocked by sandbox"));
+    const stoppedEarly =
+      trace.final_answer.includes("not allowlisted") || trace.final_answer.includes("blocked");
+    expect(blocked || stoppedEarly || trace.termination === "succeeded").toBe(true);
   });
 });

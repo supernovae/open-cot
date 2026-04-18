@@ -32,8 +32,42 @@ export class MockLLMBackend implements LLMBackend {
   }
 
   async chat(messages: LLMMessage[]): Promise<LLMResponseWithTools> {
-    const lastUserMsg =
+    const raw =
       [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
+
+    if (raw.startsWith("[harness:frame]\n")) {
+      const body = raw.slice("[harness:frame]\n".length);
+      return {
+        content: `Framed objective: clarify goals, constraints, and outputs for: ${body.slice(0, 200)}${body.length > 200 ? "…" : ""}`,
+        tokensUsed: 28,
+        model: "mock",
+        finishReason: "stop",
+      };
+    }
+
+    if (raw.startsWith("[harness:finalize]\n")) {
+      return {
+        content:
+          "Final answer: task completed with verified reasoning and observations where applicable.",
+        tokensUsed: 36,
+        model: "mock",
+        finishReason: "stop",
+      };
+    }
+
+    if (raw.startsWith("[harness:critique]\n")) {
+      return {
+        content:
+          "Critique/verify: observations support the conclusion; no contradictions detected.",
+        tokensUsed: 42,
+        model: "mock",
+        finishReason: "stop",
+      };
+    }
+
+    const lastUserMsg = raw.startsWith("[harness:plan]\n")
+      ? raw.slice("[harness:plan]\n".length)
+      : raw;
 
     for (const route of this.routes) {
       if (route.pattern.test(lastUserMsg)) {
@@ -84,17 +118,6 @@ function getDefaultRoutes(): MockRoute[] {
       tokensUsed: 35,
     },
     {
-      pattern: /verify|check|test|correct/i,
-      response: "Verification: The result looks correct based on the evidence collected.",
-      tokensUsed: 45,
-    },
-    {
-      pattern: /summarize|summary|conclude/i,
-      response:
-        "Summary: Based on the analysis and verification, the task has been completed successfully.",
-      tokensUsed: 50,
-    },
-    {
       pattern: /read.file|open.file|inspect.file/i,
       response: "I need to read the file to understand the code.",
       toolCalls: [
@@ -129,6 +152,17 @@ function getDefaultRoutes(): MockRoute[] {
         },
       ],
       tokensUsed: 40,
+    },
+    {
+      pattern: /verify|check|test|correct/i,
+      response: "Verification: The result looks correct based on the evidence collected.",
+      tokensUsed: 45,
+    },
+    {
+      pattern: /summarize|summary|conclude/i,
+      response:
+        "Summary: Based on the analysis and verification, the task has been completed successfully.",
+      tokensUsed: 50,
     },
   ];
 }

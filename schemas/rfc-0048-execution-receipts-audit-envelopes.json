@@ -1,0 +1,128 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://opencot.dev/schema/v0.8/tool_execution_receipt.json",
+  "title": "Open CoT RFC 0048 — tool_execution_receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "execution_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tool_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "permission_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authority_receipt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "input_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "output_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "output_size_bytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "duration_ms": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "success",
+        "error",
+        "timeout",
+        "quarantined"
+      ]
+    },
+    "error_category": {
+      "type": "string",
+      "enum": [
+        "timeout",
+        "invalid_input",
+        "not_found",
+        "permission_denied",
+        "rate_limit",
+        "internal_error"
+      ]
+    },
+    "postcondition_check": {
+      "type": "string",
+      "enum": [
+        "passed",
+        "failed",
+        "skipped"
+      ]
+    },
+    "postcondition_violation": {
+      "type": "string"
+    },
+    "sandbox_state_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hash_algorithm": {
+          "type": "string",
+          "const": "sha256"
+        },
+        "content_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "hash_algorithm",
+        "content_hash"
+      ]
+    }
+  },
+  "required": [
+    "execution_id",
+    "run_id",
+    "tool_name",
+    "permission_id",
+    "authority_receipt_id",
+    "input_hash",
+    "output_hash",
+    "output_size_bytes",
+    "started_at",
+    "completed_at",
+    "duration_ms",
+    "status",
+    "postcondition_check",
+    "sandbox_state_hash",
+    "integrity"
+  ],
+  "x-opencot": {
+    "rfc": "0048",
+    "shortname": "execution_receipts_audit_envelopes",
+    "source_rfc": "rfcs/0048-execution-receipts-audit-envelopes.md"
+  }
+}

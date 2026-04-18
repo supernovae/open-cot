@@ -1,9 +1,11 @@
 /**
- * Open CoT Trace types — RFC 0001 (Reasoning) + RFC 0007 (Agent Loop).
+ * Open CoT Trace types — RFC 0001 (Reasoning) + RFC 0007 (Governed FSM).
  *
  * These mirror the JSON Schemas in schemas/rfc-0001-reasoning.json and
- * schemas/rfc-0007-agent-loop.json.
+ * the governed trace extension in RFC 0007.
  */
+
+import type { CompletionStatus } from "./audit-envelope.js";
 
 export type StepType =
   | "thought"
@@ -12,16 +14,15 @@ export type StepType =
   | "critique"
   | "plan"
   | "verify"
-  | "summarize";
+  | "summarize"
+  | "delegation_request"
+  | "delegation_decision"
+  | "denial"
+  | "escalation";
 
 export type VerificationStatus = "verified" | "failed" | "unknown";
 
-export type CompletionStatus =
-  | "running"
-  | "succeeded"
-  | "failed"
-  | "budget_exhausted"
-  | "external_stop";
+export { type CompletionStatus } from "./audit-envelope.js";
 
 export interface ToolInvocationResult {
   output: unknown;
@@ -56,4 +57,9 @@ export interface Trace {
   steps: Step[];
   final_answer: string;
   termination?: CompletionStatus;
+  delegation_requests?: string[];
+  delegation_decisions?: string[];
+  authority_receipts?: string[];
+  tool_execution_receipts?: string[];
+  audit_envelope?: string;
 }

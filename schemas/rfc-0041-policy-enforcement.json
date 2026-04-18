@@ -1,16 +1,19 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Open CoT RFC 0041 — Policy Enforcement Schema",
+  "$id": "https://opencot.dev/schema/policy/v0.2",
+  "title": "Open CoT RFC 0041 — Policy Document",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "version": {
       "type": "string",
       "enum": [
-        "0.1"
+        "0.2"
       ]
     },
     "policy_id": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
     },
     "policy_type": {
       "type": "string",
@@ -22,46 +25,156 @@
         "operational"
       ]
     },
+    "description": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "integer",
+      "description": "Lower = higher precedence across policies."
+    },
     "rules": {
       "type": "array",
       "items": {
-        "type": "object",
-        "properties": {
-          "action": {
-            "type": "string",
-            "enum": [
-              "allow",
-              "deny",
-              "require_approval"
-            ]
-          },
-          "subject": {
-            "type": "string"
-          },
-          "resource": {
-            "type": "string"
-          },
-          "condition": {
-            "type": "object"
-          },
-          "reason": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "action",
-          "resource"
-        ]
-      }
+        "$ref": "#/definitions/policyRule"
+      },
+      "minItems": 1
+    },
+    "effective_from": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "effective_until": {
+      "type": "string",
+      "format": "date-time"
     }
   },
   "required": [
     "version",
     "policy_id",
     "policy_type",
+    "priority",
     "rules"
   ],
-  "$id": "https://opencot.dev/schemas/rfc-0041-policy-enforcement.json",
+  "definitions": {
+    "riskLevel": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "ruleAction": {
+      "type": "string",
+      "enum": [
+        "allow",
+        "deny",
+        "narrow",
+        "require_approval"
+      ]
+    },
+    "timeWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ]
+    },
+    "conditions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_risk_level": {
+          "$ref": "#/definitions/riskLevel"
+        },
+        "require_justification": {
+          "type": "boolean"
+        },
+        "time_window": {
+          "$ref": "#/definitions/timeWindow"
+        },
+        "budget_remaining_min": {
+          "type": "number"
+        }
+      }
+    },
+    "narrowing": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "allowed_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "excluded_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "max_results": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_response_size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "policyRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rule_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "action": {
+          "$ref": "#/definitions/ruleAction"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "resource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "conditions": {
+          "$ref": "#/definitions/conditions"
+        },
+        "narrowing": {
+          "$ref": "#/definitions/narrowing"
+        },
+        "escalation_target": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "rule_id",
+        "action",
+        "resource"
+      ]
+    }
+  },
   "x-opencot": {
     "rfc": "0041",
     "shortname": "policy_enforcement",

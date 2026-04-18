@@ -1,239 +1,216 @@
 /**
- * Coder agent — plan-do-act coding agent with full FSM traversal.
- *
- * Demonstrates: plan -> inspect -> act -> verify -> (repair loop) -> summarize -> stop.
- * Exercises every FSM phase, plan versioning, evidence collection,
- * verify-after-change policy, and budget exhaustion handling.
+ * Coder agent — plan / execute (pre-authorized) / observe / critique with repair loop.
  */
 
-import type { LLMBackend, LLMResponseWithTools } from "../backends/types.js";
-import { createBudgetTracker } from "../core/budget-tracker.js";
-import type { BudgetTracker } from "../core/budget-tracker.js";
-import type { LoopPolicy } from "../core/loop-policy.js";
-import { DEFAULT_LOOP_POLICY } from "../core/loop-policy.js";
+import type { LLMBackend, LLMMessage, LLMResponseWithTools } from "../backends/types.js";
 import type { AgentState } from "../core/state.js";
 import { createAgentState } from "../core/state.js";
+import { transition, forceStop } from "../core/transitions.js";
+import { createBudgetTracker } from "../core/budget-tracker.js";
+import type { ToolRegistry } from "../core/tool-registry.js";
 import {
   emitPlan,
   emitAction,
   emitObservation,
-  emitVerify,
   emitThought,
   emitCritique,
   emitSummary,
   finalizeTrace,
   resetStepCounter,
 } from "../core/trace-emitter.js";
-import { transition } from "../core/transitions.js";
-import type { ToolRegistry } from "../core/tool-registry.js";
 import type { Trace, ToolInvocation } from "../schemas/trace.js";
 import type { BudgetPolicy } from "../schemas/budget.js";
 import type { SandboxConfig } from "../schemas/sandbox.js";
+import { DEFAULT_SANDBOX_CONFIG } from "../schemas/sandbox.js";
 
-function isStopped(state: AgentState): boolean {
-  return (state.phase as string) === "stop";
+function halted(state: AgentState): boolean {
+  return state.phase === "audit_seal";
 }
 
-export interface CoderAgentConfig {
-  backend: LLMBackend;
-  tools: ToolRegistry;
-  budgetPolicy?: BudgetPolicy;
-  loopPolicy?: LoopPolicy;
-  sandbox?: SandboxConfig;
-  maxRepairAttempts?: number;
-}
-
-export interface CoderResult {
-  answer: string;
-  trace: Trace;
-  state: AgentState;
+function isPreAuthorized(toolName: string, sandbox: SandboxConfig): boolean {
+  if (sandbox.blockedTools.includes(toolName)) return false;
+  if (sandbox.allowedTools.includes("*")) return true;
+  return sandbox.allowedTools.includes(toolName);
 }
 
 export async function runCoderAgent(
-  task: string,
-  config: CoderAgentConfig,
-): Promise<CoderResult> {
+  backend: LLMBackend,
+  objective: string,
+  toolRegistry: ToolRegistry,
+  budgetPolicy?: BudgetPolicy,
+  sandbox?: SandboxConfig,
+  maxRepairAttempts?: number,
+): Promise<Trace> {
   resetStepCounter();
-  const maxRepairs = config.maxRepairAttempts ?? 3;
+  const maxRepairs = maxRepairAttempts ?? 3;
   const budget = createBudgetTracker();
+  const sb = sandbox ?? DEFAULT_SANDBOX_CONFIG;
   const state = createAgentState({
-    objective: task,
-    budgetPolicy: config.budgetPolicy,
-    sandbox: config.sandbox,
+    objective,
+    budgetPolicy,
+    sandbox: sb,
   });
 
-  let lastLLMResponse: LLMResponseWithTools | undefined;
+  let lastResponse: LLMResponseWithTools | undefined;
 
-  const callLLM = async (
-    messages: Array<{ role: "system" | "user" | "assistant"; content: string }>,
-  ): Promise<string> => {
-    if (isStopped(state)) return "";
-    const response = await config.backend.chat(messages);
-    budget.recordTokens(state, response.tokensUsed, `LLM call (${config.backend.name})`);
-    lastLLMResponse = response;
-    return response.content;
+  const callLLM = async (messages: LLMMessage[]): Promise<LLMResponseWithTools> => {
+    if (halted(state)) {
+      return { content: "", tokensUsed: 0, model: "noop", finishReason: "stop" };
+    }
+    try {
+      const response = await backend.chat(messages);
+      budget.recordTokens(state, response.tokensUsed, `LLM (${backend.name})`);
+      lastResponse = response;
+      return response;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      forceStop(state, "fail_safe", msg);
+      return { content: "", tokensUsed: 0, model: "error", finishReason: "stop" };
+    }
   };
 
-  const executeToolCalls = async (parentStepId: string): Promise<void> => {
-    if (!lastLLMResponse?.toolCalls) return;
-    for (const tc of lastLLMResponse.toolCalls) {
+  const end = (answer: string): Trace => {
+    finalizeTrace(state, answer || state.trace.final_answer || String(state.completionStatus));
+    return state.trace;
+  };
+
+  // receive
+  emitThought(state, `[receive] ${objective}`);
+  budget.recordStep(state, "receive");
+  transition(state, "frame", "Begin framing");
+
+  // frame
+  if (halted(state)) return end("");
+  const frameResp = await callLLM([
+    {
+      role: "system",
+      content: "Frame the coding task: goals, files, risks. Do not call tools yet.",
+    },
+    { role: "user", content: `[harness:frame]\n${objective}` },
+  ]);
+  if (halted(state)) return end(frameResp.content);
+  emitThought(state, `[frame] ${frameResp.content}`);
+  budget.recordStep(state, "frame");
+  transition(state, "plan", "Framed");
+
+  let repairCount = 0;
+  let lastCritique = "";
+
+  while (repairCount <= maxRepairs && !halted(state)) {
+    if (halted(state)) return end("");
+
+    const planResp = await callLLM([
+      {
+        role: "system",
+        content:
+          "You are a coding assistant. Propose concrete steps and use tools (readFile, writeFile, runTests) when needed.",
+      },
+      { role: "user", content: `[harness:plan]\n${objective}` },
+    ]);
+    if (halted(state)) return end(planResp.content);
+    const planStep = emitPlan(state, planResp.content);
+    budget.recordStep(state, "plan");
+
+    const toolCalls = lastResponse?.toolCalls ?? [];
+
+    if (toolCalls.length === 0) {
+      emitThought(state, planResp.content, planStep.id);
+      lastCritique = "No tools invoked; proceeding to finalize.";
+      break;
+    }
+
+    for (const tc of toolCalls) {
+      if (!isPreAuthorized(tc.toolName, state.sandbox)) {
+        forceStop(state, "failed", `Tool "${tc.toolName}" is not pre-authorized`);
+        return end(`Tool "${tc.toolName}" is blocked or not allowlisted.`);
+      }
+    }
+
+    for (let i = 0; i < toolCalls.length; i++) {
+      if (halted(state)) return end("");
+      const tc = toolCalls[i]!;
+
+      if (i > 0) {
+        transition(state, "plan", `Next coding tool ${i + 1}/${toolCalls.length}`);
+        emitThought(state, `[plan] continue with ${tc.toolName}`);
+        budget.recordStep(state, "plan");
+      }
+
+      transition(state, "execute_tool", `Execute ${tc.toolName}`);
       const inv: ToolInvocation = {
         tool_name: tc.toolName,
         arguments: tc.arguments,
-        triggered_by_step: parentStepId,
+        triggered_by_step: planStep.id,
       };
-      const actionStep = emitAction(state, `call:${tc.toolName}`, inv, parentStepId);
+      const actionStep = emitAction(state, `call:${tc.toolName}`, inv, planStep.id);
       budget.recordToolCall(state, `tool:${tc.toolName}`);
-      if (isStopped(state)) return;
 
-      const result = await config.tools.call(tc.toolName, tc.arguments, state.sandbox);
-      emitObservation(
-        state,
-        result.error ? `Error: ${result.error}` : JSON.stringify(result.output),
-        actionStep.id,
-      );
-    }
-  };
-
-  // ── Phase 1: Plan ──
-  const planContent = await callLLM([
-    {
-      role: "system",
-      content:
-        "You are a coding assistant. Break the task into steps: inspect -> edit -> verify.",
-    },
-    { role: "user", content: task },
-  ]);
-  if (isStopped(state)) return finish(state);
-
-  const planStep = emitPlan(state, planContent);
-  budget.recordStep(state, "plan");
-
-  // ── Phase 2: Inspect ──
-  transition(state, "inspect", "Reading files to gather context");
-  const inspectResponse = await callLLM([
-    { role: "system", content: "Inspect the relevant files. Use readFile to gather context." },
-    { role: "user", content: task },
-    { role: "assistant", content: planContent },
-  ]);
-  if (isStopped(state)) return finish(state);
-
-  if (lastLLMResponse?.toolCalls) {
-    await executeToolCalls(planStep.id);
-  } else {
-    emitThought(state, inspectResponse, planStep.id);
-  }
-  budget.recordStep(state, "inspect");
-
-  // ── Phase 3: Act (write/edit files) ──
-  transition(state, "act", "Making code changes");
-  const actResponse = await callLLM([
-    { role: "system", content: "Make the necessary code changes. Use writeFile to edit files." },
-    { role: "user", content: task },
-  ]);
-  if (isStopped(state)) return finish(state);
-
-  if (lastLLMResponse?.toolCalls) {
-    await executeToolCalls(planStep.id);
-  } else {
-    emitThought(state, actResponse, planStep.id);
-  }
-  budget.recordStep(state, "act");
-
-  // ── Phase 4: Verify + Repair loop ──
-  let verified = false;
-  let repairCount = 0;
-
-  while (!verified && repairCount <= maxRepairs && !isStopped(state)) {
-    transition(state, "verify", repairCount === 0 ? "Running tests" : `Re-verifying after repair #${repairCount}`);
-    const verifyResponse = await callLLM([
-      { role: "system", content: "Verify the changes by running tests. Report pass/fail." },
-      { role: "user", content: `verify changes for: ${task}` },
-    ]);
-    if (isStopped(state)) return finish(state);
-
-    let testOutput = "";
-    if (lastLLMResponse?.toolCalls) {
-      for (const tc of lastLLMResponse.toolCalls) {
-        const inv: ToolInvocation = {
-          tool_name: tc.toolName,
-          arguments: tc.arguments,
-          triggered_by_step: planStep.id,
-        };
-        const actionStep = emitAction(state, `call:${tc.toolName}`, inv);
-        budget.recordToolCall(state, `tool:${tc.toolName}`);
-        if (isStopped(state)) return finish(state);
-
-        const result = await config.tools.call(tc.toolName, tc.arguments, state.sandbox);
-        testOutput = result.error ? `Error: ${result.error}` : JSON.stringify(result.output);
-        emitObservation(state, testOutput, actionStep.id);
+      let result;
+      try {
+        result = await toolRegistry.call(tc.toolName, tc.arguments, state.sandbox);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        forceStop(state, "fail_safe", msg);
+        return end("");
       }
-    }
 
-    const passed =
-      verifyResponse.toLowerCase().includes("correct") ||
-      verifyResponse.toLowerCase().includes("passed") ||
-      testOutput.includes('"failed":0');
-    emitVerify(
-      state,
-      verifyResponse + (testOutput ? `\nTest output: ${testOutput}` : ""),
-      passed ? "verified" : "failed",
-    );
-    budget.recordStep(state, "verify");
+      transition(state, "observe_result", "Captured tool output");
+      const obs = result.error ? `Error: ${result.error}` : JSON.stringify(result.output);
+      emitObservation(state, obs, actionStep.id);
+      budget.recordStep(state, "observe_result");
 
-    if (passed) {
-      verified = true;
-    } else if (repairCount < maxRepairs) {
-      repairCount++;
-      transition(state, "repair", `Repair attempt #${repairCount}`);
-      emitCritique(state, `Verification failed. Attempting repair #${repairCount}.`);
-
-      const _repairResponse = await callLLM([
-        { role: "system", content: "Fix the issues found during verification." },
-        { role: "user", content: `fix the error in: ${task}` },
+      transition(state, "critique_verify", "Verify step output");
+      if (halted(state)) return end("");
+      const critiqueResp = await callLLM([
+        {
+          role: "system",
+          content: "Critique the tool output. Say whether changes look correct or need repair.",
+        },
+        {
+          role: "user",
+          content: `[harness:critique]\nTask: ${objective}\nObservation:\n${obs}`,
+        },
       ]);
-      if (isStopped(state)) return finish(state);
+      if (halted(state)) return end(critiqueResp.content);
+      emitCritique(state, critiqueResp.content);
+      budget.recordStep(state, "critique_verify");
+      lastCritique = critiqueResp.content;
+    }
 
-      if (lastLLMResponse?.toolCalls) {
-        await executeToolCalls(planStep.id);
-      } else {
-        emitThought(state, _repairResponse);
-      }
-      budget.recordStep(state, "repair");
+    const failed =
+      lastCritique.toLowerCase().includes("incorrect") ||
+      lastCritique.toLowerCase().includes("failed") ||
+      lastCritique.toLowerCase().includes("error");
 
-      // Back to act before re-verify
-      transition(state, "act", "Re-applying after repair");
-      budget.recordStep(state, "act (post-repair)");
-    } else {
-      emitCritique(state, `Max repair attempts (${maxRepairs}) reached. Proceeding to summarize.`);
+    if (!failed) break;
+
+    if (repairCount >= maxRepairs) {
       state.completionStatus = "failed";
+      emitCritique(state, `Max repair attempts (${maxRepairs}) reached.`);
       break;
     }
+
+    repairCount++;
+    emitCritique(state, `Repair cycle ${repairCount}: re-planning after failed verification.`);
+    transition(state, "plan", "Re-plan after critique");
   }
 
-  // ── Phase 5: Summarize ──
-  if (!isStopped(state)) {
-    transition(state, "summarize", "Producing final summary");
-    const summaryResponse = await callLLM([
-      { role: "system", content: "Summarize what was done and the final state." },
-      { role: "user", content: `summarize: ${task}` },
-    ]);
-    if (!isStopped(state)) {
-      emitSummary(state, summaryResponse);
-      budget.recordStep(state, "summarize");
-    }
-  }
+  if (halted(state)) return end("");
 
-  // ── Phase 6: Stop ──
-  if (!isStopped(state)) {
-    transition(state, "stop", verified ? "Task completed successfully" : "Task completed with issues");
-  }
+  transition(state, "finalize", "Summarize coding outcome");
+  const summaryResp = await callLLM([
+    { role: "system", content: "Summarize what was done and the final state of the code." },
+    { role: "user", content: `[harness:finalize]\n${objective}` },
+  ]);
+  if (halted(state)) return end(summaryResp.content);
+  emitSummary(state, summaryResp.content);
+  budget.recordStep(state, "finalize");
 
-  return finish(state);
-}
+  transition(
+    state,
+    "audit_seal",
+    state.completionStatus === "failed" ? "Completed with issues" : "Coder run sealed",
+  );
 
-function finish(state: AgentState): CoderResult {
-  const answer = state.trace.final_answer || state.completionStatus;
-  finalizeTrace(state, answer);
-  return { answer, trace: state.trace, state };
+  return end(summaryResp.content);
 }

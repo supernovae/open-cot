@@ -46,6 +46,9 @@
     "permission_acl": "schemas/rfc-0042-permission-acl.json",
     "auditing_compliance_logs": "schemas/rfc-0043-auditing-compliance-logs.json",
     "governance_organizational_controls": "schemas/rfc-0044-governance-organizational-controls.json",
-    "ethics": "schemas/rfc-0045-ethics.json"
+    "ethics": "schemas/rfc-0045-ethics.json",
+    "experiment_cards": "schemas/rfc-0046-experiment-cards.json",
+    "delegation_extension": "schemas/rfc-0047-delegation-extension.json",
+    "execution_receipts_audit_envelopes": "schemas/rfc-0048-execution-receipts-audit-envelopes.json"
   }
 }

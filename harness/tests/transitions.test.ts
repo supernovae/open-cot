@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { VALID_TRANSITIONS, ALL_PHASES } from "../src/schemas/agent-loop.js";
 import {
   canTransition,
@@ -18,32 +18,33 @@ describe("FSM transitions", () => {
     }
   });
 
-  it("stop has no valid transitions", () => {
-    expect(VALID_TRANSITIONS.stop).toEqual([]);
+  it("audit_seal has no valid transitions", () => {
+    expect(VALID_TRANSITIONS.audit_seal).toEqual([]);
   });
 
   it("canTransition returns true for valid transitions", () => {
-    expect(canTransition("plan", "act")).toBe(true);
-    expect(canTransition("plan", "inspect")).toBe(true);
-    expect(canTransition("plan", "stop")).toBe(true);
-    expect(canTransition("act", "verify")).toBe(true);
+    expect(canTransition("receive", "frame")).toBe(true);
+    expect(canTransition("frame", "plan")).toBe(true);
+    expect(canTransition("plan", "execute_tool")).toBe(true);
+    expect(canTransition("plan", "finalize")).toBe(true);
+    expect(canTransition("execute_tool", "observe_result")).toBe(true);
+    expect(canTransition("finalize", "audit_seal")).toBe(true);
   });
 
   it("canTransition returns false for invalid transitions", () => {
-    expect(canTransition("plan", "repair")).toBe(false);
-    expect(canTransition("plan", "verify")).toBe(false);
-    expect(canTransition("act", "plan")).toBe(false);
-    expect(canTransition("act", "summarize")).toBe(false);
+    expect(canTransition("plan", "observe_result")).toBe(false);
+    expect(canTransition("receive", "plan")).toBe(false);
+    expect(canTransition("execute_tool", "finalize")).toBe(false);
   });
 
   it("assertTransition throws for invalid transitions", () => {
-    expect(() => assertTransition("plan", "repair")).toThrow(
+    expect(() => assertTransition("plan", "observe_result")).toThrow(
       InvalidTransitionError,
     );
   });
 
   it("assertTransition throws for terminal state", () => {
-    expect(() => assertTransition("stop", "plan")).toThrow(
+    expect(() => assertTransition("audit_seal", "plan")).toThrow(
       TerminalStateError,
     );
   });
@@ -51,40 +52,43 @@ describe("FSM transitions", () => {
   describe("transition()", () => {
     it("moves state to the target phase", () => {
       const state = createAgentState({ objective: "test" });
-      expect(state.phase).toBe("plan");
-      transition(state, "act", "starting work");
-      expect(state.phase).toBe("act");
+      expect(state.phase).toBe("receive");
+      transition(state, "frame", "start");
+      transition(state, "plan", "ready");
+      transition(state, "finalize", "no tools");
+      expect(state.phase).toBe("finalize");
     });
 
     it("appends a trace step", () => {
       const state = createAgentState({ objective: "test" });
       const before = state.trace.steps.length;
-      transition(state, "act", "starting work");
+      transition(state, "frame", "starting work");
       expect(state.trace.steps.length).toBe(before + 1);
-      expect(state.trace.steps.at(-1)!.content).toContain("plan -> act");
+      expect(state.trace.steps.at(-1)!.content).toContain("receive -> frame");
     });
 
     it("updates nextAllowedPhases", () => {
       const state = createAgentState({ objective: "test" });
-      transition(state, "act", "go");
-      expect(state.nextAllowedPhases).toEqual(
-        expect.arrayContaining(["verify", "stop"]),
-      );
+      transition(state, "frame", "go");
+      expect(state.nextAllowedPhases).toEqual(expect.arrayContaining(["plan"]));
     });
 
-    it("sets completionStatus to succeeded when stopping normally", () => {
+    it("sets completionStatus to succeeded when sealing normally", () => {
       const state = createAgentState({ objective: "test" });
-      transition(state, "act", "go");
-      transition(state, "stop", "done");
+      transition(state, "frame", "go");
+      transition(state, "plan", "go");
+      transition(state, "finalize", "wrap");
+      transition(state, "audit_seal", "done");
       expect(state.completionStatus).toBe("succeeded");
+      expect(state.phase).toBe("audit_seal");
     });
   });
 
   describe("forceStop()", () => {
-    it("forces state to stop with the given status", () => {
+    it("forces state to audit_seal with the given status", () => {
       const state = createAgentState({ objective: "test" });
       forceStop(state, "budget_exhausted", "tokens ran out");
-      expect(state.phase).toBe("stop");
+      expect(state.phase).toBe("audit_seal");
       expect(state.completionStatus).toBe("budget_exhausted");
       expect(state.trace.termination).toBe("budget_exhausted");
     });
@@ -100,25 +104,26 @@ describe("FSM transitions", () => {
   });
 
   describe("full FSM path", () => {
-    it("supports plan -> inspect -> act -> verify -> summarize -> stop", () => {
+    it("supports receive -> frame -> plan -> finalize -> audit_seal", () => {
       const state = createAgentState({ objective: "full path" });
-      transition(state, "inspect", "gather context");
-      transition(state, "act", "make changes");
-      transition(state, "verify", "run tests");
-      transition(state, "summarize", "wrap up");
-      transition(state, "stop", "done");
-      expect(state.phase).toBe("stop");
+      transition(state, "frame", "gather context");
+      transition(state, "plan", "decide");
+      transition(state, "finalize", "wrap up");
+      transition(state, "audit_seal", "done");
+      expect(state.phase).toBe("audit_seal");
       expect(state.completionStatus).toBe("succeeded");
     });
 
-    it("supports verify -> repair -> act -> verify loop", () => {
+    it("supports critique_verify -> plan -> execute_tool -> observe_result loop", () => {
       const state = createAgentState({ objective: "repair loop" });
-      transition(state, "act", "initial");
-      transition(state, "verify", "first check");
-      transition(state, "repair", "fix bug");
-      transition(state, "act", "re-apply");
-      transition(state, "verify", "re-check");
-      transition(state, "stop", "all good");
+      transition(state, "frame", "f");
+      transition(state, "plan", "p");
+      transition(state, "execute_tool", "run");
+      transition(state, "observe_result", "seen");
+      transition(state, "critique_verify", "check");
+      transition(state, "plan", "re-plan");
+      transition(state, "finalize", "done");
+      transition(state, "audit_seal", "seal");
       expect(state.completionStatus).toBe("succeeded");
     });
   });
