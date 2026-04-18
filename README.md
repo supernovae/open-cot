@@ -35,7 +35,7 @@ If reasoning, tool intent, provenance, budgets, state transitions, and delegatio
 
 | Area | Role |
 |------|------|
-| [`rfcs/`](./rfcs/) | **48 RFCs** — normative definitions for reasoning traces, tool invocation, the governed FSM, sandboxing, budgets, permissions, policy, delegation, provenance, identity, org governance, receipts, and audit |
+| [`rfcs/`](./rfcs/) | **49 RFCs** — normative definitions for reasoning traces, tool invocation, the governed FSM, sandboxing, budgets, permissions, policy, delegation, provenance, identity, org governance, receipts, audit, and capability manifests |
 | [`schemas/`](./schemas/) | Versioned JSON Schemas per RFC (`registry.json`, `rfc-*-*.json`) |
 | [`harness/`](./harness/) | **Reference harness** (TypeScript) — governed FSM, validation, tools, budgets, trace emission |
 | [`examples/`](./examples/) | Validated instance fixtures keyed by registry shortname |
@@ -74,7 +74,7 @@ RFC 0007 also allows a **pre-authorized shortcut** from `plan` to `execute_tool`
 - **Delegation as a bounded request** — narrow, time-bounded authority; no self-issued power of attorney.
 - **Policy-enforced narrowing and auditability** — policy consults at defined boundaries; runs seal into tamper-evident audit material.
 
-Values behind these bullets are expanded in [`docs/philosophy.md`](./docs/philosophy.md).
+Values behind these bullets are expanded in [`docs/philosophy.md`](./docs/philosophy.md). Token efficiency and context management strategies are covered in [`docs/token-efficiency.md`](./docs/token-efficiency.md).
 
 ## Quick start
 
@@ -117,6 +117,7 @@ cd harness && OPENAI_BASE_URL=http://localhost:11434/v1 npx tsx examples/chat-de
 | Budget enforcement | RFC 0038 | `src/core/budget-tracker.ts` |
 | Tool contracts | RFC 0003 (+ 0018 errors) | `src/core/tool-registry.ts`, `src/tools/` |
 | Safety sandboxing | RFC 0017 | `src/schemas/sandbox.ts`, enforcement in tool registry |
+| Capability manifests | RFC 0049 | `src/governance/manifest-builder.ts`, injected at `frame` / `critique_verify` |
 | Observability telemetry | RFC 0031 | `src/schemas/telemetry.ts`, metrics on `AgentState` |
 
 The harness and schemas **mutually stress-test** each other: invalid transitions or shapes fail fast in CI; gaps in the spec show up as harness friction.
@@ -125,7 +126,7 @@ Reasoning **patterns** (plan–verify, debate, and similar) remain documented fo
 
 ## Current status
 
-- **48 RFCs** and a versioned JSON Schema registry with CI validation.
+- **49 RFCs** and a versioned JSON Schema registry with CI validation.
 - Reference harness implements the governed FSM, delegation and receipt types, budgets, sandboxed tools, and trace validation (see table above).
 - Cross-language checks: TypeScript-emitted traces validate under Python tooling.
 - Tiered examples, synthetic seed data, and experiment runbooks under [`experiments/`](./experiments/).

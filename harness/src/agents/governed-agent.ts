@@ -23,6 +23,7 @@ import type { ToolInvocation } from "../schemas/trace.js";
 import type { ToolExecutionReceipt } from "../schemas/receipt.js";
 import type { BudgetPolicy } from "../schemas/budget.js";
 import type { SandboxConfig } from "../schemas/sandbox.js";
+import { buildManifest, manifestToCompactText } from "../governance/manifest-builder.js";
 
 function sha256(data: string): string {
   return createHash("sha256").update(data).digest("hex");
@@ -101,6 +102,27 @@ export async function runGovernedAgent(
     return { trace: state.trace, envelope, state };
   };
 
+  /**
+   * Capability manifest heartbeat: re-compiles and returns a fresh compact
+   * manifest every time the harness is about to call the LLM.  Budget numbers,
+   * permission state, and tool availability can all change between calls, so
+   * the model always sees the current truth rather than stale context from an
+   * earlier phase.
+   */
+  const manifestHeartbeat = () => {
+    const manifest = buildManifest({
+      runId: state.runId,
+      agentId: state.telemetry.agent_id,
+      phase: state.phase,
+      toolContracts: config.toolRegistry.listTools(),
+      sandbox: state.sandbox,
+      policies: config.policies ?? [],
+      budget: state.budget,
+    });
+    state.capabilityManifest = manifest;
+    return manifestToCompactText(manifest);
+  };
+
   // --- receive ---
   emit.emitThought(state, `[receive] Task: ${config.objective}`);
   budget.recordStep(state, "receive");
@@ -111,7 +133,7 @@ export async function runGovernedAgent(
   const frameResp = await callLLM([
     {
       role: "system",
-      content: "Interpret and frame the user's task. Do not call tools.",
+      content: `Interpret and frame the user's task. Do not call tools.\n\n${manifestHeartbeat()}`,
     },
     { role: "user", content: `[harness:frame]\n${config.objective}` },
   ]);
@@ -125,8 +147,7 @@ export async function runGovernedAgent(
   const planResp = await callLLM([
     {
       role: "system",
-      content:
-        "Propose concrete actions. You may request tools via tool_calls when needed.",
+      content: `Propose concrete actions. You may request tools via tool_calls when needed.\n\n${manifestHeartbeat()}`,
     },
     { role: "user", content: `[harness:plan]\n${config.objective}` },
   ]);
@@ -141,7 +162,7 @@ export async function runGovernedAgent(
     transition(state, "finalize", "No tools required");
     if (halted(state)) return finish(planResp.content);
     const fin = await callLLM([
-      { role: "system", content: "Produce the final user-facing answer." },
+      { role: "system", content: `Produce the final user-facing answer.\n\n${manifestHeartbeat()}` },
       {
         role: "user",
         content: `[harness:finalize]\n${config.objective}\n\nPlan:\n${planResp.content}`,
@@ -301,7 +322,7 @@ export async function runGovernedAgent(
     const critique = await callLLM([
       {
         role: "system",
-        content: "Critique tool results for correctness and safety.",
+        content: `Critique tool results for correctness and safety.\n\n${manifestHeartbeat()}`,
       },
       {
         role: "user",
@@ -319,8 +340,7 @@ export async function runGovernedAgent(
   const finalResp = await callLLM([
     {
       role: "system",
-      content:
-        "Produce the final user-facing answer from the plan and observations.",
+      content: `Produce the final user-facing answer from the plan and observations.\n\n${manifestHeartbeat()}`,
     },
     { role: "user", content: `[harness:finalize]\n${config.objective}` },
   ]);

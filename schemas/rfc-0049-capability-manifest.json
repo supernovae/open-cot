@@ -1,0 +1,137 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://opencot.dev/schema/v0.8/capability_manifest.json",
+  "title": "Open CoT RFC 0049 — Capability Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifest_id",
+    "run_id",
+    "agent_id",
+    "timestamp",
+    "phase",
+    "tools",
+    "budget",
+    "trust_level"
+  ],
+  "properties": {
+    "manifest_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agent_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "phase": {
+      "type": "string",
+      "minLength": 1,
+      "description": "FSM phase at which this manifest was compiled (e.g., frame, critique_verify, plan)."
+    },
+    "tools": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "available",
+        "blocked"
+      ],
+      "properties": {
+        "available": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "description",
+              "access_level"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string"
+              },
+              "access_level": {
+                "type": "string",
+                "enum": [
+                  "pre_authorized",
+                  "requires_delegation"
+                ]
+              },
+              "idempotent": {
+                "type": "boolean"
+              },
+              "tool_contract_ref": {
+                "type": "string",
+                "description": "Optional pointer to tool contract schema (RFC 0003); not serialized in compact text."
+              },
+              "constraints": {
+                "type": "object",
+                "description": "Policy-imposed constraints on this tool (e.g., narrowing).",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "blocked": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "Tool names blocked by sandbox or policy — do not request these."
+        }
+      }
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "steps_remaining": {
+          "type": "integer"
+        },
+        "tool_calls_remaining": {
+          "type": "integer"
+        },
+        "tokens_remaining": {
+          "type": "integer"
+        },
+        "retries_remaining": {
+          "type": "integer"
+        }
+      }
+    },
+    "trust_level": {
+      "type": "string",
+      "enum": [
+        "untrusted",
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "active_constraints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Human-readable summary of active policy constraints."
+    }
+  },
+  "x-opencot": {
+    "rfc": "0049",
+    "shortname": "capability_manifest",
+    "source_rfc": "rfcs/0049-capability-manifest.md"
+  }
+}

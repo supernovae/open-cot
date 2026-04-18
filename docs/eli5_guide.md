@@ -70,6 +70,10 @@ You give the agent a task
 
 The model never skips the permission step. If a tool is not in the policy, it does not run.
 
+Before the model even starts planning, the harness gives it a **capability manifest** -- a short briefing that says "here are the tools you can use, here are the ones you can't, and here is your remaining budget." This prevents the model from wasting time asking for things it will never get.
+
+The manifest uses a **heartbeat** pattern: it re-compiles and re-injects before **every** call to the model, not just at the start. Why? Because models forget. As the conversation grows, information from earlier turns fades -- the model "loses sight" of what it was told 5 turns ago. The heartbeat keeps the truth fresh and prevents the model from hallucinating tool calls against stale or forgotten context. It costs under 200 tokens per injection, which is far less than the tokens wasted when a model guesses wrong and triggers a denial cycle.
+
 For simple use cases (like a chatbot doing a pre-approved search), the harness has a shortcut: `plan -> execute_tool` skips the delegation ceremony for tools that are already on the allowlist.
 
 ---
