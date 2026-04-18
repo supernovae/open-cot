@@ -1,0 +1,11 @@
+[toon:reasoning]
+version: 0.8
+task: What is the population of Tokyo?
+steps[5]{id, type, content, confidence}:
+1 | thought | I need to search for the current population of Tokyo. | 0.95
+2 | action | search("Tokyo population 2026") | 1.0
+3 | observation | Tokyo metropolitan area population: approximately 13.96 million (2026 estimate). | 0.92
+4 | thought | The search returned a clear answer. I should distinguish between the city proper and the metropolitan area. | 0.88
+5 | answer | Tokyo's population is approximately 13.96 million in the city proper (2026 estimate). | 0.90
+final_answer: Tokyo's population is approximately 13.96 million in the city proper (2026 estimate).
+[/toon:reasoning]

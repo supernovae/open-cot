@@ -100,4 +100,29 @@ Step‑level verification research demonstrates:
 
 **Impact:**  
 - Schema includes `step_validity`, `verifier_score`, and `justification`.
-- Benchmarks include step‑level scoring
+- Benchmarks include step‑level scoring.
+
+---
+
+## 7. Token‑Efficient Serialization Formats
+
+### Key Ideas
+- JSON is the standard interchange format for structured LLM I/O, but its verbosity (repeated keys, braces, quotes, commas) wastes tokens, especially for uniform arrays of objects.
+- Several compact formats have emerged targeting the model boundary: **TOON** (Token-Oriented Object Notation), **JTON** (JSON Tabular Object Notation), and **ATON** (Adaptive Token-Oriented Notation).
+- Common techniques include inline schema headers, pipe-delimited tabular rows, and indentation-based nesting — all designed to be human-readable and model-parseable.
+- Published benchmarks report 20–60% token reduction vs JSON with minimal impact on generation validity.
+
+### TOON
+Uses `items[N]{field1, field2}:` headers and pipe-delimited rows. Benchmarked against JSON and constrained decoding (arXiv 2603.03306); efficiency follows a non-linear curve, advantageous beyond a structural complexity threshold.
+
+### JTON
+JSON superset with "Zen Grid" tabular encoding. 15–60% reduction, 28.5% average across seven domains (arXiv 2604.05865). 100% syntactic validity in generation tests across 12 LLMs.
+
+### ATON
+Production-grade format with native relationship support. 56% reduction vs JSON reported in the V2 whitepaper (2025).
+
+**Impact:**
+- [RFC 0050](../rfcs/0050-toon-adapter.md) adds a TOON adapter to the harness as an opt-in wire format.
+- JSON Schema remains normative; TOON is a serialization adapter with round-trip fidelity.
+- The adapter generalizes the pattern established by `manifestToCompactText` (RFC 0049) into a reusable, schema-aware translation layer.
+- Experiment card: [`docs/experiments/toon_format_efficiency.md`](experiments/toon_format_efficiency.md).

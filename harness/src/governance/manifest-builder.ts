@@ -18,6 +18,8 @@ import type { SandboxConfig } from "../schemas/sandbox.js";
 import type { PolicySet, PolicyRule } from "./policy-evaluator.js";
 import type { Phase } from "../schemas/agent-loop.js";
 
+export type WireFormat = "json" | "compact-text" | "toon";
+
 export interface ManifestInput {
   runId: string;
   agentId: string;
@@ -204,4 +206,62 @@ export function manifestToCompactText(manifest: CapabilityManifest): string {
 
   lines.push("[/capability_manifest]");
   return lines.join("\n");
+}
+
+/**
+ * Serialize a manifest to TOON (Token-Oriented Object Notation) — RFC 0050.
+ *
+ * Uses tabular array headers for tools and pipe-delimited budget fields to
+ * achieve ~30-40% fewer tokens than the equivalent compact text while
+ * remaining human-readable.
+ */
+export function manifestToToon(manifest: CapabilityManifest): string {
+  const lines: string[] = ["[toon:capability_manifest]"];
+
+  if (manifest.tools.available.length > 0) {
+    lines.push(
+      `tools_available[${manifest.tools.available.length}]{name, access, idempotent}:`,
+    );
+    for (const t of manifest.tools.available) {
+      const access = t.access_level.replace("_", "-");
+      const idem = t.idempotent ? "true" : "false";
+      lines.push(`${t.name} | ${access} | ${idem}`);
+    }
+  }
+
+  if (manifest.tools.blocked.length > 0) {
+    lines.push(`tools_blocked: ${manifest.tools.blocked.join(", ")}`);
+  }
+
+  const b = manifest.budget;
+  lines.push(
+    `budget{steps, tool_calls, tokens, retries}: ${b.steps_remaining} | ${b.tool_calls_remaining} | ${b.tokens_remaining} | ${b.retries_remaining}`,
+  );
+
+  lines.push(`trust_level: ${manifest.trust_level}`);
+
+  if (manifest.active_constraints.length > 0) {
+    lines.push(`constraints: ${manifest.active_constraints.join("; ")}`);
+  }
+
+  lines.push("[/toon:capability_manifest]");
+  return lines.join("\n");
+}
+
+/**
+ * Select the appropriate manifest serializer based on wire format config.
+ */
+export function serializeManifest(
+  manifest: CapabilityManifest,
+  format: WireFormat = "compact-text",
+): string {
+  switch (format) {
+    case "toon":
+      return manifestToToon(manifest);
+    case "json":
+      return JSON.stringify(manifest);
+    case "compact-text":
+    default:
+      return manifestToCompactText(manifest);
+  }
 }

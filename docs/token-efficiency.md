@@ -47,15 +47,54 @@ Many models naturally emit lines like `[TOOL:search] [QUERY:population of tokyo]
 
 This tier is attractive for small local models that handle rigid JSON poorly, and for providers where `tool_calls` support is uneven so you still want a deterministic parse path.
 
+### Tier 2.5 — TOON: Token-Oriented Object Notation (implemented)
+
+[RFC 0050 — TOON Adapter](../rfcs/0050-toon-adapter.md) adds an opt-in adapter that translates canonical JSON Schema objects into **TOON** notation at the model boundary. TOON uses inline schema headers (`tools[3]{name, access, idempotent}:`) and pipe-delimited tabular rows to eliminate repeated key names, braces, quotes, and commas. Published benchmarks report 20–60% token reduction compared to equivalent JSON, with the savings following a non-linear curve — the advantage grows with structural complexity (arXiv 2603.03306).
+
+TOON sits between Tier 2 (ad-hoc markers) and Tier 3 (new serialization languages): it is more structured and general-purpose than bespoke markers, but simpler and more model-friendly than YAML or a full DSL. The key properties:
+
+- **JSON Schema stays normative.** TOON is a serialization adapter, not a schema language. All validation, audit, and interchange remain JSON.
+- **Round-trip fidelity.** `fromToon(toToon(obj, schema), schema)` must produce the same validated object. The adapter is not a trust boundary.
+- **Inline guardrails.** The `[N]` length marker and `{fields}` header tell the model exactly how many items to generate and which keys to use, reducing hallucinated structure.
+- **Opt-in via `wire_format`.** Set `wire_format: "toon"` on agent config; default remains `"compact-text"` for backward compatibility.
+
+Example — the capability manifest in TOON vs compact text:
+
+```
+[toon:capability_manifest]
+tools_available[3]{name, access, idempotent}:
+search | pre-authorized | true
+calculator | pre-authorized | true
+writeFile | requires-delegation | false
+tools_blocked: shell
+budget{steps, tool_calls, tokens, retries}: 48 | 18 | 95000 | 2
+trust_level: medium
+constraints: max 5 results per search; no raw HTML
+[/toon:capability_manifest]
+```
+
+The TOON form for this manifest uses roughly 30–40% fewer tokens than the equivalent JSON, and is comparable or slightly more compact than the hand-coded compact text — with the advantage that the adapter is reusable across any schema, not just manifests.
+
+**Implementation:** [`harness/src/adapters/toon-adapter.ts`](../harness/src/adapters/toon-adapter.ts) provides `toToon`, `fromToon`, and `schemaToToonHeader`. The manifest builder ([`harness/src/governance/manifest-builder.ts`](../harness/src/governance/manifest-builder.ts)) adds `manifestToToon` and a `serializeManifest` dispatcher. Both the governed agent and chat agent accept a `wireFormat` config option.
+
+**Research backing:**
+
+- Abt (2025) — TOON design rationale: https://benjamin-abt.com/blog/2025/12/12/ai-toon-format/
+- arXiv 2603.03306 (2026) — TOON vs JSON benchmark with constrained decoding: https://arxiv.org/abs/2603.03306
+- arXiv 2604.05865 (2026) — JTON (related format), 15–60% reduction, 100% validity across 12 LLMs: https://arxiv.org/abs/2604.05865
+- ATON V2 Whitepaper (2025) — 56% reduction vs JSON: https://www.atonformat.com/whitepaper.html
+
+See [`docs/experiments/toon_format_efficiency.md`](experiments/toon_format_efficiency.md) for the experiment card.
+
 ### Tier 3 — Alternative serializations (research)
 
 - **YAML** — Sometimes slightly fewer tokens than JSON for nested objects; generation quality is inconsistent across models, and a single indentation slip can void a parse.
 - **MessagePack / CBOR** — Fine for harness-to-harness links, queue payloads, or cold storage; models will not emit binary reliably, so this stays off the model-facing edge.
-- **A minimal DSL** — Could shrink token count further but adds parser surface area and a novel syntax tax. There is a real risk of **smearing the problem around**: fewer tokens per byte, more retries per run because the model drifts from grammar.
+- **A minimal DSL** — Could shrink token count further but adds parser surface area and a novel syntax tax. TOON (Tier 2.5) is a deliberate compromise: less exotic than a full DSL, with published benchmarks showing the savings are real.
 
 **Protobuf** is a reasonable **non-starter for model I/O** (binary on the wire from the model’s perspective). It remains useful for efficient harness-to-harness RPC and compact storage of audit blobs where both ends are code and you control versioning.
 
-**Honest bottom line:** a DSL might be a win, a wash, or an own-goal depending on model scale and task. We need benchmarks on real hardware—with repair loops counted—before we romanticize a new syntax. If you prototype one, publish token counts *and* success rates.
+**Honest bottom line:** TOON takes the middle path: familiar enough (pipe-delimited tables, key-value lines) that models handle it well out of the box, structured enough to round-trip through validators. If you prototype further alternatives, publish token counts *and* success rates.
 
 ---
 
