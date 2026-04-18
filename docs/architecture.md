@@ -35,8 +35,9 @@ These names describe responsibilities; a single deployment may fold multiple rol
 5. **Auth broker** — Takes approved or narrowed delegation and produces **`AuthorityReceipt`** with `granted_scope ≤ requested_scope` (RFC 0047 / 0048). This is where scope is tightened, not where the model freelances.
 6. **Tool executor** — Dispatches a registered tool only inside **`execute_tool`**, consuming or citing permission, emitting **`ToolExecutionReceipt`**.
 7. **Audit engine** — Assembles integrity-backed **audit envelopes** (RFC 0043 / 0048) and drives the terminal **`audit_seal`** state so a run has a durable, reviewable closure.
+8. **Capability manifest** (RFC 0049) — A harness-compiled briefing injected before every LLM call (the **manifest heartbeat**). Tells the model what tools are available, what is blocked, what constraints apply, and how much budget remains. The model never builds this — only the harness does. The heartbeat counters context decay: as the conversation grows, the model progressively forgets earlier instructions. Re-injecting at every turn keeps the truth visible. Cost is under 200 tokens per injection; savings from prevented hallucinated tool calls and avoided denial cycles are significantly higher.
 
-The **harness** in this repository implements the FSM gate, schema validation (via Ajv against repo JSON Schemas), loop-level policy checks, budgets, sandbox enforcement for registered tools, and trace emission. A production deployment might split policy and broker onto separate services, but the **same artifacts** (requests, decisions, receipts, envelopes) should still appear in the trace.
+The **harness** in this repository implements the FSM gate, schema validation (via Ajv against repo JSON Schemas), loop-level policy checks, budgets, sandbox enforcement for registered tools, capability manifest heartbeat, and trace emission. A production deployment might split policy and broker onto separate services, but the **same artifacts** (requests, decisions, receipts, envelopes) should still appear in the trace.
 
 ## Data flow: one tool call
 

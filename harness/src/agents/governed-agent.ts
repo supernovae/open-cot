@@ -102,11 +102,18 @@ export async function runGovernedAgent(
     return { trace: state.trace, envelope, state };
   };
 
-  const compileManifest = (phase: "frame" | "critique_verify") => {
+  /**
+   * Capability manifest heartbeat: re-compiles and returns a fresh compact
+   * manifest every time the harness is about to call the LLM.  Budget numbers,
+   * permission state, and tool availability can all change between calls, so
+   * the model always sees the current truth rather than stale context from an
+   * earlier phase.
+   */
+  const manifestHeartbeat = () => {
     const manifest = buildManifest({
       runId: state.runId,
       agentId: state.telemetry.agent_id,
-      phase,
+      phase: state.phase,
       toolContracts: config.toolRegistry.listTools(),
       sandbox: state.sandbox,
       policies: config.policies ?? [],
@@ -121,13 +128,12 @@ export async function runGovernedAgent(
   budget.recordStep(state, "receive");
   transition(state, "frame", "Log task and begin framing");
 
-  // --- frame (with capability manifest injection) ---
+  // --- frame ---
   if (halted(state)) return finish("");
-  const manifestText = compileManifest("frame");
   const frameResp = await callLLM([
     {
       role: "system",
-      content: `Interpret and frame the user's task. Do not call tools.\n\n${manifestText}`,
+      content: `Interpret and frame the user's task. Do not call tools.\n\n${manifestHeartbeat()}`,
     },
     { role: "user", content: `[harness:frame]\n${config.objective}` },
   ]);
@@ -136,12 +142,12 @@ export async function runGovernedAgent(
   budget.recordStep(state, "frame");
   transition(state, "plan", "Framing complete");
 
-  // --- plan (manifest tells the model what it can use) ---
+  // --- plan ---
   if (halted(state)) return finish("");
   const planResp = await callLLM([
     {
       role: "system",
-      content: `Propose concrete actions. You may request tools via tool_calls when needed.\n\n${manifestText}`,
+      content: `Propose concrete actions. You may request tools via tool_calls when needed.\n\n${manifestHeartbeat()}`,
     },
     { role: "user", content: `[harness:plan]\n${config.objective}` },
   ]);
@@ -156,7 +162,7 @@ export async function runGovernedAgent(
     transition(state, "finalize", "No tools required");
     if (halted(state)) return finish(planResp.content);
     const fin = await callLLM([
-      { role: "system", content: "Produce the final user-facing answer." },
+      { role: "system", content: `Produce the final user-facing answer.\n\n${manifestHeartbeat()}` },
       {
         role: "user",
         content: `[harness:finalize]\n${config.objective}\n\nPlan:\n${planResp.content}`,
@@ -310,14 +316,13 @@ export async function runGovernedAgent(
     };
     state.toolExecutionReceipts.push(execReceipt);
 
-    // --- critique_verify (with refreshed capability manifest) ---
+    // --- critique_verify ---
     transition(state, "critique_verify", "Evaluate tool output");
     if (halted(state)) return finish("");
-    const refreshedManifest = compileManifest("critique_verify");
     const critique = await callLLM([
       {
         role: "system",
-        content: `Critique tool results for correctness and safety.\n\n${refreshedManifest}`,
+        content: `Critique tool results for correctness and safety.\n\n${manifestHeartbeat()}`,
       },
       {
         role: "user",
@@ -335,8 +340,7 @@ export async function runGovernedAgent(
   const finalResp = await callLLM([
     {
       role: "system",
-      content:
-        "Produce the final user-facing answer from the plan and observations.",
+      content: `Produce the final user-facing answer from the plan and observations.\n\n${manifestHeartbeat()}`,
     },
     { role: "user", content: `[harness:finalize]\n${config.objective}` },
   ]);

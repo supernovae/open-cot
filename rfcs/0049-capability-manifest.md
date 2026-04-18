@@ -22,7 +22,9 @@ The following requirements apply to conforming harnesses for Schema v0.8.
 
 **N2 — Provenance.** Each manifest instance MUST be attributable to a `run_id`, `agent_id`, and compilation `timestamp`, and MUST record the FSM `phase` at which it was produced.
 
-**N3 — Injection.** The harness MUST inject the manifest (compact text form by default; see §7) at FSM states **`frame`** (initial briefing) and **`critique_verify`** (post-consumption refresh). The harness MAY additionally inject at **`plan`** when it detects the plan references tools absent from the last injected manifest or when budget figures are materially stale.
+**N3 — Heartbeat injection.** The harness MUST re-compile and inject a fresh manifest before **every LLM call** during a governed run. Models lose sight of earlier context as the conversation grows (context decay); a stale manifest from three LLM calls ago is effectively invisible. Re-injecting at every model-facing turn keeps budget numbers, tool availability, and constraints current regardless of how far the run has progressed. This pattern is called the **manifest heartbeat**.
+
+At minimum, the manifest MUST be injected at FSM states **`frame`**, **`plan`**, **`critique_verify`**, and **`finalize`** — every state where the model makes decisions. Conforming harnesses SHOULD inject at every LLM call without exception; the cost is under 200 tokens per injection and is repaid many times over by preventing hallucinated tool calls and wasted delegation cycles.
 
 **N4 — Audit.** The structured JSON form MUST be retained on **AgentState** for the run and MUST be referenceable from the audit envelope (RFC 0048) as part of the governed trace.
 
@@ -44,16 +46,26 @@ The manifest aggregates, at minimum:
 
 **Trust level** is one of `untrusted`, `low`, `medium`, `high`, derived from agent identity and deployment policy. It informs expected delegation friction, not cryptographic proof.
 
-## 5. Injection points (FSM alignment)
+## 5. Injection points — the manifest heartbeat
 
-Injection is synchronized with the governed loop (RFC 0007):
+Models experience **context decay**: as the conversation grows, information from earlier turns becomes progressively less influential on the model's output. A capability manifest injected only at `frame` is effectively forgotten by `critique_verify` in a long run. The harness counters this by re-compiling and re-injecting the manifest before every LLM call — the **manifest heartbeat**.
 
-1. **`frame`** — Full manifest: complete tool availability (subject to policy), blocked list, constraints summary, budget snapshot, trust level.
-2. **`critique_verify`** — Refresh: updated budget counters; tool availability unchanged unless permissions were revoked mid-run, in which case the harness MUST emit a new manifest reflecting the revocation before the model continues planning.
+Each heartbeat is cheap (under 200 tokens for a typical setup) and carries current truth:
 
-Optional:
+- **Budget numbers** reflect actual consumption, not the snapshot from three turns ago.
+- **Tool availability** reflects any permissions revoked or consumed mid-run.
+- **Constraints** reflect any policy narrowing applied during delegation.
 
-3. **`plan`** — If static analysis of the draft plan references tools not present in the last manifest, or if budget drift exceeds harness-defined thresholds, the harness SHOULD re-inject an updated manifest.
+The heartbeat is synchronized with the governed FSM (RFC 0007):
+
+| FSM state | Heartbeat role |
+|-----------|---------------|
+| **`frame`** | Initial briefing — full manifest with all available tools, blocked tools, budget, trust level, constraints. |
+| **`plan`** | Planning briefing — model sees what it can request before committing to a plan. Prevents hallucinated tool references. |
+| **`critique_verify`** | Post-execution refresh — updated budget after tool calls; revoked permissions reflected. |
+| **`finalize`** | Final-answer briefing — model knows remaining budget and can decide whether to attempt more work or synthesize. |
+
+Conforming harnesses SHOULD inject at every LLM call, not only the four states listed above. Any additional LLM call (for example, a re-plan after critique) benefits from the same heartbeat. The per-injection cost is negligible compared to the tokens saved by preventing the model from proposing actions against stale or forgotten context.
 
 ## 6. Representations
 
@@ -158,10 +170,10 @@ Typical deployments SHOULD target **under 200 tokens** for a five-tool setup in 
 ## 10. Lifecycle
 
 1. During **`receive`**, the harness gathers registry, sandbox, policy, budget, and identity inputs.
-2. The harness compiles **JSON** `capability_manifest`, assigns `manifest_id`, sets `phase` to the emitting state, and persists it on AgentState.
-3. At **`frame`**, the harness injects the **compact text** manifest (commonly as a system-message preamble or equivalent channel).
-4. At **`critique_verify`**, the harness refreshes budget fields, recompiles or patches the manifest, re-injects compact text, and appends or supersedes the JSON record per implementation policy while preserving audit continuity (new `manifest_id` recommended when semantics change).
-5. The **audit envelope** references manifest ids or embeds hashes of canonical JSON as required by RFC 0048.
+2. Before **every LLM call** (the heartbeat), the harness recompiles the manifest from current state, assigns a fresh `manifest_id`, sets `phase` to the current FSM state, and persists it on AgentState (latest manifest replaces previous; implementations MAY retain history for audit).
+3. The harness injects the **compact text** form into the system message preamble (or equivalent model-facing channel).
+4. After tool execution, budget and permission changes are reflected in the next heartbeat automatically — no explicit "refresh" step is needed because every heartbeat reads current state.
+5. The **audit envelope** references the final manifest id or embeds hashes of canonical JSON as required by RFC 0048.
 
 ## 11. Cross-references
 
@@ -249,7 +261,7 @@ constraints: max 5 results per search, no raw HTML in search excerpts
 Conformance for a harness implementation is indicated by all of the following:
 
 - The harness compiles the manifest from tool registry, sandbox configuration, active policy rules, and budget tracker state, joined with agent identity for `trust_level`.
-- The manifest is injected at **`frame`** and **`critique_verify`** using the compact text format unless an implementation-specific channel requires structured duplication.
+- The manifest heartbeat fires before **every LLM call** (at minimum: `frame`, `plan`, `critique_verify`, `finalize`) using the compact text format.
 - For representative five-tool profiles, compact serialization stays **under 200 tokens** (excluding outer system prompt boilerplate).
 - Structured JSON validates against the schema in §7.
 - Each run retains manifest history or the latest manifest on **AgentState** suitable for audit.
