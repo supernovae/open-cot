@@ -269,10 +269,10 @@ function parseObjectBlock(
       continue;
     }
 
-    const scalarArrMatch = trimmed.match(/^(\w+)\[(\d+)\]:\s*(.+)$/);
+    const scalarArrMatch = trimmed.match(/^(\w+)\[(\d+)\]:(.+)$/);
     if (scalarArrMatch) {
       const arrName = scalarArrMatch[1]!;
-      const values = scalarArrMatch[3]!.split(",").map((v) => v.trim());
+      const values = scalarArrMatch[3]!.trim().split(",").map((v) => v.trim());
       result[arrName] = values;
       ctx.pos++;
       continue;
@@ -346,7 +346,11 @@ function parseTabularRows(
 }
 
 function isObjectKeyLine(line: string): boolean {
-  return /^\w[\w_]*(\[.*)?\s*:/.test(line) && !line.includes("|");
+  if (line.includes("|")) return false;
+  const colonIdx = line.indexOf(":");
+  if (colonIdx === -1) return false;
+  const before = line.slice(0, colonIdx).trimEnd();
+  return /^\w[\w_]*(\[[^\]]*\])?$/.test(before);
 }
 
 function isArrayHeader(line: string): boolean {
@@ -422,12 +426,13 @@ export function schemaToToonHeader(
 ): string | null {
   if (schema.type !== "array" || !schema.items?.properties) return null;
 
-  const itemSchema = schema.items;
-  const fields = itemSchema.required
-    ? [...itemSchema.required, ...Object.keys(itemSchema.properties).filter(
-        (k) => !itemSchema.required!.includes(k),
+  const props = schema.items.properties;
+  const required = schema.items.required;
+  const fields = required
+    ? [...required, ...Object.keys(props).filter(
+        (k) => !required.includes(k),
       )]
-    : Object.keys(itemSchema.properties);
+    : Object.keys(props);
 
   const label = name ?? "items";
   return `${label}[N]{${fields.join(", ")}}`;

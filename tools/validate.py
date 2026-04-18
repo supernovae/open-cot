@@ -105,11 +105,15 @@ def _validate_examples(resolver: SchemaResolver, reg: Any | None) -> list[str]:
     examples_root = _REPO_ROOT / "examples"
     if not examples_root.is_dir():
         return errors
+    # Folders that contain cross-schema illustrative fixtures (not tied to one schema).
+    _SKIP_FOLDERS = {"toon"}
     for path in sorted(examples_root.rglob("*.json")):
         if path.name.startswith("_"):
             continue
         rel_parent = path.relative_to(examples_root).parts[0] if path.relative_to(examples_root).parts else ""
         shortname = rel_parent
+        if shortname in _SKIP_FOLDERS:
+            continue
         if shortname not in shortnames:
             errors.append(f"{path.relative_to(_REPO_ROOT)}: unknown example folder {shortname!r}")
             continue
