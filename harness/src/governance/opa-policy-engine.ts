@@ -145,8 +145,8 @@ export class OpaPolicyEngine implements DelegationPolicyEngine {
     const timeoutMs = this.config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const path = this.config.policyPath.replace(/^\/+/, "");
-      const url = `${this.config.baseUrl.replace(/\/+$/, "")}/v1/data/${path}`;
+      const path = trimLeadingSlashes(this.config.policyPath);
+      const url = `${trimTrailingSlashes(this.config.baseUrl)}/v1/data/${path}`;
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -297,4 +297,20 @@ function isToolAllowedBySandbox(toolName: string, sandbox: SandboxConfig): boole
     return true;
   }
   return sandbox.allowedTools.includes(toolName);
+}
+
+function trimLeadingSlashes(value: string): string {
+  let start = 0;
+  while (start < value.length && value.charCodeAt(start) === 47) {
+    start += 1;
+  }
+  return value.slice(start);
+}
+
+function trimTrailingSlashes(value: string): string {
+  let end = value.length;
+  while (end > 0 && value.charCodeAt(end - 1) === 47) {
+    end -= 1;
+  }
+  return value.slice(0, end);
 }
