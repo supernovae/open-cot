@@ -1,18 +1,19 @@
 {
+  "schema_version": "0.2",
   "execution_id": "exec-u1v2w3x4",
   "run_id": "run-e5f6g7h8",
   "tool_name": "email",
   "permission_id": "perm-q7r8s9t0",
   "authority_receipt_id": "rcpt-m3n4o5p6",
-  "input_hash": "sha256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
-  "output_hash": "sha256:ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
+  "input_hash": "7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069",
+  "output_hash": "ef2d127de37b942baad06145e54b0c619a1f22327b2ebbcfbec78f5564afe39d",
   "output_size_bytes": 342,
   "started_at": "2026-04-18T14:30:02Z",
-  "completed_at": "2026-04-18T14:30:02Z",
+  "completed_at": "2026-04-18T14:30:03Z",
   "duration_ms": 145,
   "status": "success",
   "postcondition_check": "passed",
-  "sandbox_state_hash": "sha256:9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+  "sandbox_state_hash": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
   "integrity": {
     "hash_algorithm": "sha256",
     "content_hash": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"

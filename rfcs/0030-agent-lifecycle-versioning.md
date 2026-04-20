@@ -1,5 +1,7 @@
 # RFC 0030 — Agent Lifecycle & Versioning, Status: Draft, Author: Open CoT Community, Created: 2026-04-14
 
+**Discussion:** https://github.com/supernovae/open-cot/discussions/30
+
 ## 1. Summary
 
 This RFC defines **agent lifecycle states** and **versioning** of agent configurations for Open-CoT. Long-running governed agents need a model where **configuration can evolve** (prompts, tools, policies) without silently mutating in-flight runs or breaking permission grants. The **`agent_lifecycle`** record binds an **`agent_id`** to a semantic **`version`**, a **`lifecycle_state`**, capability and policy references, and a **`configuration_hash`** for reproducibility. **`version_transition`** documents approved rollout strategies (**rolling**, **blue-green**, **canary**) and whether **rollback** is permitted.
@@ -26,11 +28,11 @@ This RFC does not define CI/CD mechanics, container image formats, or canary met
 | `deprecated` | Still runnable for compatibility but SHOULD not start new long-lived sessions; migrations encouraged. |
 | `retired` | MUST NOT schedule new work; historical traces remain addressable. |
 
-**`created_at`** / **`updated_at`** are RFC 3339 timestamps. **`configuration_hash`** hashes the canonical serialized bundle (system prompt, tool allow list, model route, feature flags) so two hosts can verify they run identical configs. **`capabilities[]`** mirrors outward-facing skills for routing ([RFC 0021](0021-agent-capability-declaration.md) may elaborate). **`policy_refs[]`** lists attached policy documents or snapshots ([RFC 0041](0041-policy-enforcement-schema.md)). **`governance_ref`** points to organizational controls ([RFC 0044](0044-governance-organizational-controls.md))—team ownership, data classes, approval workflow ids.
+**`created_at`** / **`observed_at`** are RFC 3339 timestamps. **`configuration_hash`** hashes the canonical serialized bundle (system prompt, tool allow list, model route, feature flags) so two hosts can verify they run identical configs. **`capabilities[]`** mirrors outward-facing skills for routing ([RFC 0021](0021-agent-capability-declaration.md) may elaborate). **`policy_refs[]`** lists attached policy documents or snapshots ([RFC 0041](0041-policy-enforcement-schema.md)). **`governance_ref`** points to organizational controls ([RFC 0044](0044-governance-organizational-controls.md))—team ownership, data classes, approval workflow ids.
 
 ### 3.2 `version_transition`
 
-**`from_version`** / **`to_version`** describe the movement between semver strings. **`migration_strategy`** selects rollout mechanics: **`rolling`** (gradual instance replacement), **`blue-green`** (atomic switch), **`canary`** (percentage traffic). **`rollback_allowed`** documents whether automated or manual rollback to `from_version` remains approved. **`approved_by`** is a human or system principal id; **`timestamp`** records the decision instant.
+**`from_version`** / **`to_version`** describe the movement between semver strings. **`migration_strategy`** selects rollout mechanics: **`rolling`** (gradual instance replacement), **`blue-green`** (atomic switch), **`canary`** (percentage traffic). **`rollback_allowed`** documents whether automated or manual rollback to `from_version` remains approved. **`approved_by`** is a human or system principal id; **`decided_at`** records the decision instant. `version_order` provides deterministic transition ordering independent of wall-clock drift.
 
 ### 3.3 Permissions and governance coupling
 
@@ -42,7 +44,7 @@ Permission grants ([RFC 0042](0042-permission-acl.md)) SHOULD include optional `
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://opencot.dev/schema/agent-lifecycle/v0.1",
+  "$id": "https://opencot.dev/schema/agent-lifecycle/v0.2",
   "title": "Open CoT RFC 0030 — Agent Lifecycle",
   "definitions": {
     "agent_lifecycle": {
@@ -53,7 +55,7 @@ Permission grants ([RFC 0042](0042-permission-acl.md)) SHOULD include optional `
         "version",
         "lifecycle_state",
         "created_at",
-        "updated_at",
+        "observed_at",
         "configuration_hash",
         "capabilities",
         "policy_refs",
@@ -67,7 +69,7 @@ Permission grants ([RFC 0042](0042-permission-acl.md)) SHOULD include optional `
           "enum": ["draft", "active", "suspended", "deprecated", "retired"]
         },
         "created_at": { "type": "string", "format": "date-time" },
-        "updated_at": { "type": "string", "format": "date-time" },
+        "observed_at": { "type": "string", "format": "date-time" },
         "configuration_hash": { "type": "string", "minLength": 1 },
         "capabilities": {
           "type": "array",
@@ -89,7 +91,8 @@ Permission grants ([RFC 0042](0042-permission-acl.md)) SHOULD include optional `
         "migration_strategy",
         "rollback_allowed",
         "approved_by",
-        "timestamp"
+        "decided_at",
+        "version_order"
       ],
       "properties": {
         "from_version": { "type": "string", "minLength": 1 },
@@ -100,7 +103,8 @@ Permission grants ([RFC 0042](0042-permission-acl.md)) SHOULD include optional `
         },
         "rollback_allowed": { "type": "boolean" },
         "approved_by": { "type": "string", "minLength": 1 },
-        "timestamp": { "type": "string", "format": "date-time" }
+        "decided_at": { "type": "string", "format": "date-time" },
+        "version_order": { "type": "integer", "minimum": 0 }
       }
     }
   },
@@ -122,7 +126,7 @@ Permission grants ([RFC 0042](0042-permission-acl.md)) SHOULD include optional `
   "version": "3.6.0",
   "lifecycle_state": "active",
   "created_at": "2026-03-01T09:00:00Z",
-  "updated_at": "2026-04-14T08:15:00Z",
+  "observed_at": "2026-04-14T08:15:00Z",
   "configuration_hash": "sha256:9aa7…21",
   "capabilities": ["ticketing.read", "email.summarize", "kb.search"],
   "policy_refs": [
@@ -142,7 +146,8 @@ Permission grants ([RFC 0042](0042-permission-acl.md)) SHOULD include optional `
   "migration_strategy": "canary",
   "rollback_allowed": true,
   "approved_by": "alice@example.com",
-  "timestamp": "2026-04-13T17:45:00Z"
+  "decided_at": "2026-04-13T17:45:00Z",
+  "version_order": 42
 }
 ```
 

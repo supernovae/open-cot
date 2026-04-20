@@ -104,7 +104,7 @@
           "minLength": 1
         },
         "delegation_request": {
-          "$ref": "https://opencot.dev/schema/rfc0047/delegation-extension.json#/$defs/delegation_request"
+          "$ref": "https://opencot.dev/schema/rfc0047/delegation-extension-v0.2.json#/$defs/delegation_request"
         },
         "trust_chain": {
           "type": "array",
@@ -147,7 +147,7 @@
           ]
         },
         "delegation_decision": {
-          "$ref": "https://opencot.dev/schema/rfc0047/delegation-extension.json#/$defs/delegation_decision"
+          "$ref": "https://opencot.dev/schema/rfc0047/delegation-extension-v0.2.json#/$defs/delegation_decision"
         },
         "response_integrity": {
           "$ref": "#/$defs/integrity"

@@ -1,7 +1,7 @@
 {
   "repository": "supernovae/open-cot",
   "category_slug": "ideas",
-  "count": 46,
+  "count": 51,
   "rfcs": {
     "0001": {
       "rfc_title": "Initial Structured Reasoning Schema",
@@ -278,6 +278,36 @@
       "rfc_path": "rfcs/0046-conformance-interoperability-protocol.md",
       "discussion_title": "RFC 0046 \u2014 Conformance & Interoperability Protocol",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/46"
+    },
+    "0047": {
+      "rfc_title": "Delegation Extension",
+      "rfc_path": "rfcs/0047-delegation-extension.md",
+      "discussion_title": "RFC 0047 \u2014 Delegation Extension",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/47"
+    },
+    "0048": {
+      "rfc_title": "Execution Receipts & Audit Envelopes",
+      "rfc_path": "rfcs/0048-execution-receipts-audit-envelopes.md",
+      "discussion_title": "RFC 0048 \u2014 Execution Receipts & Audit Envelopes",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/48"
+    },
+    "0049": {
+      "rfc_title": "Capability Manifest",
+      "rfc_path": "rfcs/0049-capability-manifest.md",
+      "discussion_title": "RFC 0049 \u2014 Capability Manifest",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/49"
+    },
+    "0050": {
+      "rfc_title": "TOON Adapter: Token-Oriented Object Notation",
+      "rfc_path": "rfcs/0050-toon-adapter.md",
+      "discussion_title": "RFC 0050 \u2014 TOON Adapter: Token-Oriented Object Notation",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/50"
+    },
+    "0051": {
+      "rfc_title": "Temporal Semantics & Validity Extension",
+      "rfc_path": "rfcs/0051-temporal-semantics-validity-extension.md",
+      "discussion_title": "RFC 0051 \u2014 Temporal Semantics & Validity Extension",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/51"
     }
   }
 }

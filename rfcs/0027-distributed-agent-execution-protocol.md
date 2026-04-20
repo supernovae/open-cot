@@ -1,5 +1,7 @@
 # RFC 0027 — Distributed Agent Execution Protocol, Status: Draft, Author: Open CoT Community, Created: 2026-04-14
 
+**Discussion:** https://github.com/supernovae/open-cot/discussions/27
+
 ## 1. Summary
 
 This RFC defines the **Distributed Agent Execution Protocol** for Open-CoT: **`execution_node`** advertisements, **`task_assignment`** with explicit **`delegated_scope`**, and terminal **`execution_result`** records (hashes, trace pointers, **`receipt_refs[]`**). Each node runs its own governed FSM ([RFC 0007](0007-agent-loop-protocol.md)); coordination is explicit.

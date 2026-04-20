@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://opencot.dev/schema/agent-lifecycle/v0.1",
+  "$id": "https://opencot.dev/schema/agent-lifecycle/v0.2",
   "title": "Open CoT RFC 0030 — Agent Lifecycle",
   "definitions": {
     "agent_lifecycle": {
@@ -11,7 +11,7 @@
         "version",
         "lifecycle_state",
         "created_at",
-        "updated_at",
+        "observed_at",
         "configuration_hash",
         "capabilities",
         "policy_refs",
@@ -40,7 +40,7 @@
           "type": "string",
           "format": "date-time"
         },
-        "updated_at": {
+        "observed_at": {
           "type": "string",
           "format": "date-time"
         },
@@ -77,7 +77,8 @@
         "migration_strategy",
         "rollback_allowed",
         "approved_by",
-        "timestamp"
+        "decided_at",
+        "version_order"
       ],
       "properties": {
         "from_version": {
@@ -103,9 +104,13 @@
           "type": "string",
           "minLength": 1
         },
-        "timestamp": {
+        "decided_at": {
           "type": "string",
           "format": "date-time"
+        },
+        "version_order": {
+          "type": "integer",
+          "minimum": 0
         }
       }
     }

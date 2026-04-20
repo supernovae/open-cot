@@ -14,13 +14,14 @@ const sampleScope = {
 
 function makeRequest(overrides?: Partial<DelegationRequest>): DelegationRequest {
   return {
+    schema_version: "0.2",
     request_id: "req-test-1",
     requester: "agent-test",
     run_id: "run-test",
     intent: "Search the web",
     justification: "Need external facts",
     requested_scope: sampleScope,
-    timestamp: new Date().toISOString(),
+    observed_at: new Date().toISOString(),
     ...overrides,
   };
 }
@@ -31,6 +32,7 @@ describe("PermissionManager", () => {
     const grant = pm.grant({
       granted_to: "agent-1",
       scope: sampleScope,
+      audience: "tool:search",
       ttl_seconds: 3600,
       one_shot: false,
       forwardable: false,
@@ -49,6 +51,7 @@ describe("PermissionManager", () => {
     const grant = pm.grant({
       granted_to: "agent-1",
       scope: sampleScope,
+      audience: "tool:search",
       ttl_seconds: 3600,
       one_shot: true,
       forwardable: false,
@@ -63,6 +66,7 @@ describe("PermissionManager", () => {
     const grant = pm.grant({
       granted_to: "agent-1",
       scope: sampleScope,
+      audience: "tool:search",
       ttl_seconds: 3600,
       one_shot: false,
       forwardable: false,
@@ -77,6 +81,7 @@ describe("PermissionManager", () => {
     const grant = pm.grant({
       granted_to: "agent-1",
       scope: sampleScope,
+      audience: "tool:search",
       ttl_seconds: 0,
       one_shot: false,
       forwardable: false,
@@ -91,6 +96,7 @@ describe("PermissionManager", () => {
     const grant = pm.grant({
       granted_to: "agent-1",
       scope: sampleScope,
+      audience: "tool:search",
       ttl_seconds: 3600,
       one_shot: false,
       forwardable: false,
@@ -107,6 +113,7 @@ describe("PermissionManager", () => {
     const a = pm.grant({
       granted_to: "agent-1",
       scope: sampleScope,
+      audience: "tool:search",
       ttl_seconds: 3600,
       one_shot: false,
       forwardable: false,
@@ -115,6 +122,7 @@ describe("PermissionManager", () => {
     const b = pm.grant({
       granted_to: "agent-2",
       scope: { resource: "tool:calc", action: "execute" },
+      audience: "tool:calc",
       ttl_seconds: 3600,
       one_shot: false,
       forwardable: false,
@@ -130,6 +138,7 @@ describe("PermissionManager", () => {
     const grant = pm.grant({
       granted_to: "agent-1",
       scope: sampleScope,
+      audience: "tool:search",
       ttl_seconds: 3600,
       one_shot: true,
       forwardable: false,
@@ -305,13 +314,14 @@ describe("AuthBroker", () => {
     const broker = new AuthBroker(new PermissionManager());
     const request = makeRequest({ request_id: "req-denied" });
     const decision: DelegationDecision = {
+      schema_version: "0.2",
       decision_id: "dec-deny",
       request_id: request.request_id,
       status: "denied",
       decided_by: { kind: "harness" },
       policy_refs: [],
       denial_reason: "no",
-      timestamp: request.timestamp,
+      decided_at: request.observed_at,
     };
     expect(() => broker.materialize(decision, request)).toThrow(
       /approved or narrowed/,
@@ -340,9 +350,12 @@ describe("AuditEngine", () => {
       event_type: "test.c",
       details: { n: 3 },
     });
-    expect(e1.previous_event_id).toBeNull();
-    expect(e2.previous_event_id).toBe(e1.event_id);
-    expect(e3.previous_event_id).toBe(e2.event_id);
+    expect(e1.parent_event_id).toBeNull();
+    expect(e2.parent_event_id).toBe(e1.event_id);
+    expect(e3.parent_event_id).toBe(e2.event_id);
+    expect(e1.ordering.event_seq).toBe(0);
+    expect(e2.ordering.event_seq).toBe(1);
+    expect(e3.ordering.event_seq).toBe(2);
     expect(e1.integrity.content_hash).toMatch(/^[0-9a-f]{64}$/);
   });
 
@@ -358,8 +371,8 @@ describe("AuditEngine", () => {
     expect(envelope.trace_hash).toMatch(/^[0-9a-f]{64}$/);
     expect(envelope.integrity.content_hash).toMatch(/^[0-9a-f]{64}$/);
     expect(envelope.integrity.hash_algorithm).toBe("sha256");
-    expect(envelope.started_at).toBe(state.telemetry.timestamp);
-    expect(Date.parse(envelope.sealed_at)).not.toBeNaN();
+    expect(envelope.started_at).toBe(state.telemetry.observed_at);
+    expect(Date.parse(envelope.completed_at)).not.toBeNaN();
     expect(AuditEngine.verify(envelope)).toBe(true);
   });
 });

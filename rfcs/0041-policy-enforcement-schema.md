@@ -1,4 +1,4 @@
-# RFC 0041 — Policy Enforcement Schema (v0.2)
+# RFC 0041 — Policy Enforcement Schema (v0.3)
 
 **Status:** Draft  
 **Author:** Byron / Open CoT Community  
@@ -10,9 +10,9 @@
 
 ## 1. Summary
 
-This RFC defines the **Policy Enforcement Schema (v0.2)** for Open-CoT, a cognitive control plane for governed agent execution. The policy engine decides when a model may invoke tools, access data or memory, or perform other governed operations. Given a **delegation request** (RFC 0047) and active policies, it returns **`allow`**, **`deny`**, **`narrow`**, or **`require_approval`**, with optional `narrowing` constraints, denial reasons, or escalation targets.
+This RFC defines the **Policy Enforcement Schema (v0.3)** for Open-CoT, a cognitive control plane for governed agent execution. The policy engine decides when a model may invoke tools, access data or memory, or perform other governed operations. Given a **delegation request** (RFC 0047) and active policies, it returns **`allow`**, **`deny`**, **`narrow`**, or **`require_approval`**, with optional `narrowing` constraints, denial reasons, or escalation targets.
 
-v0.2 adds **`narrow`**: approval under **reduced scope** (for example, mailbox reads limited to headers). It formalizes **`conditions`** (risk, justification, time window, budget), **temporal validity**, **policy `priority`**, **composable narrowing** across policies, and the **`policy_evaluation_result`** record for audit and permission handoff (RFC 0042). It extends RFC 0017 (Safety & Sandboxing) and RFC 0026 (Agent Identity) and aligns with RFC 0007 (governed FSM).
+v0.3 preserves **`narrow`** and introduces canonical temporal naming from RFC 0051: policy validity bounds use `effective_at` / `expires_at`, condition windows use `validity_window`, and evaluation records use `decided_at`. It formalizes deterministic temporal validity semantics while retaining composable narrowing and policy priority behavior.
 
 ---
 
@@ -50,7 +50,7 @@ Operators need typed policies, graduated responses (`narrow`, `require_approval`
 
 ## 5. Decisions and actions
 
-Rule `action` and result `decision` share: **`allow`** (grant as narrowed so far), **`deny`** (reject), **`narrow`** (approve only under `narrowing` / merged `narrowed_scope`), **`require_approval`** (defer; `escalation_target` SHOULD name queue or role). **`narrow`** is the v0.2 extension for data minimization without a hard deny.
+Rule `action` and result `decision` share: **`allow`** (grant as narrowed so far), **`deny`** (reject), **`narrow`** (approve only under `narrowing` / merged `narrowed_scope`), **`require_approval`** (defer; `escalation_target` SHOULD name queue or role). **`narrow`** remains the data minimization path without a hard deny.
 
 ---
 
@@ -62,24 +62,24 @@ Resources SHOULD use prefixes: `tool:<name>` (RFC 0003), `data:<path>`, `memory:
 
 ## 7. Conditions and narrowing
 
-**`conditions`** (all present sub-fields must pass for a match): `max_risk_level` (`low` ≤ `medium` ≤ `high`), `require_justification`, `time_window` (`start`/`end` ISO 8601, UTC), `budget_remaining_min`. Omitted keys impose no constraint from that key.
+**`conditions`** (all present sub-fields must pass for a match): `max_risk_level` (`low` ≤ `medium` ≤ `high`), `require_justification`, `validity_window` (`effective_at`/`expires_at` ISO 8601 UTC; half-open), `budget_remaining_min`. Omitted keys impose no constraint from that key.
 
 **`narrowing`**: `allowed_fields`, `excluded_fields`, `max_results`, `max_response_size_bytes`. If `action` is `narrow`, `narrowing` SHOULD be present; if not `narrow`, ignore `narrowing`. Empty intersection of allowed vs excluded fields MUST yield **`deny`**; otherwise apply intersection rules in §10.
 
 ---
 
-## 8. Normative JSON Schema — Policy document (v0.2)
+## 8. Normative JSON Schema — Policy document (v0.3)
 
 <!-- opencot:schema:start -->
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://opencot.dev/schema/policy/v0.2",
+  "$id": "https://opencot.dev/schema/policy/v0.3",
   "title": "Open CoT RFC 0041 — Policy Document",
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "version": { "type": "string", "enum": ["0.2"] },
+    "version": { "type": "string", "enum": ["0.3"] },
     "policy_id": { "type": "string", "minLength": 1 },
     "policy_type": {
       "type": "string",
@@ -88,21 +88,21 @@ Resources SHOULD use prefixes: `tool:<name>` (RFC 0003), `data:<path>`, `memory:
     "description": { "type": "string" },
     "priority": { "type": "integer", "description": "Lower = higher precedence across policies." },
     "rules": { "type": "array", "items": { "$ref": "#/definitions/policyRule" }, "minItems": 1 },
-    "effective_from": { "type": "string", "format": "date-time" },
-    "effective_until": { "type": "string", "format": "date-time" }
+    "effective_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" }
   },
   "required": ["version", "policy_id", "policy_type", "priority", "rules"],
   "definitions": {
     "riskLevel": { "type": "string", "enum": ["low", "medium", "high"] },
     "ruleAction": { "type": "string", "enum": ["allow", "deny", "narrow", "require_approval"] },
-    "timeWindow": {
+    "validityWindow": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "start": { "type": "string", "format": "date-time" },
-        "end": { "type": "string", "format": "date-time" }
+        "effective_at": { "type": "string", "format": "date-time" },
+        "expires_at": { "type": "string", "format": "date-time" }
       },
-      "required": ["start", "end"]
+      "required": ["effective_at", "expires_at"]
     },
     "conditions": {
       "type": "object",
@@ -110,7 +110,7 @@ Resources SHOULD use prefixes: `tool:<name>` (RFC 0003), `data:<path>`, `memory:
       "properties": {
         "max_risk_level": { "$ref": "#/definitions/riskLevel" },
         "require_justification": { "type": "boolean" },
-        "time_window": { "$ref": "#/definitions/timeWindow" },
+        "validity_window": { "$ref": "#/definitions/validityWindow" },
         "budget_remaining_min": { "type": "number" }
       }
     },
@@ -154,7 +154,7 @@ Engines MUST emit one object per evaluated `(request_id, policy_id)` or define a
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://opencot.dev/schema/policy_evaluation_result/v0.2",
+  "$id": "https://opencot.dev/schema/policy_evaluation_result/v0.3",
   "title": "Open CoT RFC 0041 — Policy Evaluation Result",
   "type": "object",
   "additionalProperties": false,
@@ -167,7 +167,7 @@ Engines MUST emit one object per evaluated `(request_id, policy_id)` or define a
     "narrowed_scope": { "type": "object", "additionalProperties": true },
     "denial_reason": { "type": "string" },
     "escalation_target": { "type": "string" },
-    "timestamp": { "type": "string", "format": "date-time" },
+    "decided_at": { "type": "string", "format": "date-time" },
     "context": {
       "type": "object",
       "additionalProperties": false,
@@ -179,7 +179,7 @@ Engines MUST emit one object per evaluated `(request_id, policy_id)` or define a
       }
     }
   },
-  "required": ["evaluation_id", "request_id", "policy_id", "decision", "timestamp"]
+  "required": ["evaluation_id", "request_id", "policy_id", "decision", "decided_at"]
 }
 ```
 <!-- opencot:schema:end -->
@@ -188,7 +188,7 @@ Engines MUST emit one object per evaluated `(request_id, policy_id)` or define a
 
 ## 10. Evaluation semantics
 
-**Temporal validity.** Policy is active at `t` if `effective_from` is absent or `t` ≥ `effective_from`, and `effective_until` is absent or `t` < `effective_until` (half-open on end). Inactive policies MUST NOT affect the outcome.
+**Temporal validity.** Policy is active at `t` if `effective_at` is absent or `t` ≥ `effective_at`, and `expires_at` is absent or `t` < `expires_at` (half-open on end). Inactive policies MUST NOT affect the outcome.
 
 **Intra-policy.** Among rules whose `subject`, `resource`, and `conditions` match, the **first entry in `rules`** wins. No match ⇒ this policy contributes **no match** (not `allow`).
 
@@ -206,12 +206,12 @@ Engines MUST emit one object per evaluated `(request_id, policy_id)` or define a
 
 ```json
 {
-  "version": "0.2",
+  "version": "0.3",
   "policy_id": "safety_no_shell",
   "policy_type": "safety",
   "description": "Block shell for autonomous runs.",
   "priority": 10,
-  "effective_from": "2026-04-14T00:00:00Z",
+  "effective_at": "2026-04-14T00:00:00Z",
   "rules": [
     { "rule_id": "deny_shell", "action": "deny", "subject": "*", "resource": "tool:shell", "reason": "Unattended shell out of scope." },
     { "rule_id": "allow_search", "action": "allow", "subject": "*", "resource": "tool:search" }
@@ -223,7 +223,7 @@ Engines MUST emit one object per evaluated `(request_id, policy_id)` or define a
 
 ```json
 {
-  "version": "0.2",
+  "version": "0.3",
   "policy_id": "compliance_email_minimization",
   "policy_type": "compliance",
   "description": "Headers/metadata only for mailbox reads.",
@@ -249,7 +249,7 @@ Engines MUST emit one object per evaluated `(request_id, policy_id)` or define a
 
 ```json
 {
-  "version": "0.2",
+  "version": "0.3",
   "policy_id": "ops_db_write_gate",
   "policy_type": "operational",
   "description": "Human approval for DB mutations.",
@@ -260,7 +260,7 @@ Engines MUST emit one object per evaluated `(request_id, policy_id)` or define a
     "subject": "*",
     "resource": "tool:db_write",
     "conditions": {
-      "time_window": { "start": "2026-04-14T00:00:00Z", "end": "2099-12-31T23:59:59Z" },
+      "validity_window": { "effective_at": "2026-04-14T00:00:00Z", "expires_at": "2099-12-31T23:59:59Z" },
       "budget_remaining_min": 0
     },
     "escalation_target": "queue:dba-oncall",
@@ -284,7 +284,7 @@ Engines MUST emit one object per evaluated `(request_id, policy_id)` or define a
     "max_results": 50,
     "max_response_size_bytes": 1048576
   },
-  "timestamp": "2026-04-18T12:34:56Z",
+  "decided_at": "2026-04-18T12:34:56Z",
   "context": {
     "agent_id": "agent/analyst-7",
     "run_id": "run_19c0",
@@ -302,12 +302,12 @@ Fail-closed default limits accidental over-permissioning. **`narrow`** is unsafe
 
 ## 13. Open questions resolution
 
-| Topic | v0.2 resolution |
+| Topic | v0.3 resolution |
 |--------|------------------|
 | Partial approval / minimization | `narrow` + `narrowing` / `narrowed_scope`. |
 | Multi-policy | Deterministic sort; precedence **deny > narrow > require_approval > allow**. |
 | No rule match | Fail-closed **`deny`**. |
-| Audit trail | `policy_evaluation_result` + `evaluation_id`, `timestamp`, `request_id`. |
+| Audit trail | `policy_evaluation_result` + `evaluation_id`, `decided_at`, `request_id`. |
 | Conditions / hooks | `conditions` + `context.budget_snapshot`, `risk_assessment`. |
 | Rule vs policy order | Policy `priority` + Unicode `policy_id`; rules by **array order**. |
 
@@ -315,6 +315,6 @@ Fail-closed default limits accidental over-permissioning. **`narrow`** is unsafe
 
 ## 14. Acceptance criteria and conclusion
 
-A conforming engine **MUST**: (1) validate policy documents against §8 with `version` `0.2` unless documented otherwise; (2) emit §9 results with required fields for each evaluation; (3) implement §10 including temporal filter, first-match rules, fail-closed default, merge precedence, narrowing intersection, determinism; (4) populate `denial_reason` / `narrowed_scope` / `escalation_target` when emitting the corresponding decisions (document any optional omissions). Authors **SHOULD** set `description`, per-rule `reason`, and `effective_*` for shared policies.
+A conforming engine **MUST**: (1) validate policy documents against §8 with `version` `0.3` unless documented otherwise; (2) emit §9 results with required fields for each evaluation; (3) implement §10 including temporal filter, first-match rules, fail-closed default, merge precedence, narrowing intersection, determinism; (4) populate `denial_reason` / `narrowed_scope` / `escalation_target` when emitting the corresponding decisions (document any optional omissions). Authors **SHOULD** set `description`, per-rule `reason`, and explicit validity bounds (`effective_at` / `expires_at`) for shared policies.
 
-RFC 0041 v0.2 normatively specifies policy documents, the **`narrow`** decision, evaluation results, and deterministic merge semantics—forming the **decision layer** with RFC 0026 (identity) and RFC 0047 (delegation).
+RFC 0041 v0.3 normatively specifies policy documents, the **`narrow`** decision, canonical temporal semantics, evaluation results, and deterministic merge semantics—forming the **decision layer** with RFC 0026 (identity), RFC 0047 (delegation), and RFC 0051 (temporal semantics).

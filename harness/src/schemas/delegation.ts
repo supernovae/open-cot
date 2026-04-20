@@ -1,5 +1,5 @@
 /**
- * Delegation types — RFC 0047.
+ * Delegation types — RFC 0047 v0.2.
  *
  * Typed schema objects for the authority request/decision/receipt flow.
  * Model-provided fields are clearly separated from harness-provided fields.
@@ -22,6 +22,7 @@ export interface DelegationProvenance {
  * timing, and provenance.
  */
 export interface DelegationRequest {
+  schema_version: "0.2";
   request_id: string;
   /** Harness-verified agent identity — never model-provided. */
   requester: string;
@@ -34,7 +35,7 @@ export interface DelegationRequest {
   preferred_ttl_seconds?: number;
   preferred_audience?: string;
   task_context_ref?: string;
-  timestamp: string;
+  observed_at: string;
   provenance?: DelegationProvenance;
 }
 
@@ -55,6 +56,7 @@ export interface DecidedBy {
  * All fields are harness-provided — the model does not participate.
  */
 export interface DelegationDecision {
+  schema_version: "0.2";
   decision_id: string;
   request_id: string;
   status: DelegationStatus;
@@ -63,7 +65,7 @@ export interface DelegationDecision {
   narrowed_scope?: RequestedScope;
   denial_reason?: string;
   escalation_target?: string;
-  timestamp: string;
+  decided_at: string;
 }
 
 export interface ReceiptIntegrity {
@@ -78,15 +80,16 @@ export interface ReceiptIntegrity {
  * materialized permission. Tamper-evident via integrity hash.
  */
 export interface AuthorityReceipt {
+  schema_version: "0.2";
   receipt_id: string;
   decision_id: string;
   request_id: string;
   permission_id: string;
   granted_scope: RequestedScope;
-  granted_at: string;
+  effective_at: string;
   expires_at: string;
   one_shot: boolean;
   forwardable: boolean;
-  audience?: string;
+  audience: string;
   integrity: ReceiptIntegrity;
 }

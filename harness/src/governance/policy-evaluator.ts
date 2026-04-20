@@ -12,7 +12,16 @@ export interface PolicyRule {
   action: "allow" | "deny" | "narrow" | "require_approval";
   subject?: string;
   resource: string;
-  conditions?: Record<string, unknown>;
+  conditions?: {
+    max_risk_level?: "low" | "medium" | "high";
+    require_justification?: boolean;
+    validity_window?: {
+      effective_at: string;
+      expires_at: string;
+    };
+    budget_remaining_min?: number;
+    [key: string]: unknown;
+  };
   narrowing?: {
     allowed_fields?: string[];
     excluded_fields?: string[];
@@ -27,6 +36,8 @@ export interface PolicySet {
   policy_type: "safety" | "compliance" | "organizational" | "ethical" | "operational";
   rules: PolicyRule[];
   priority: number;
+  effective_at?: string;
+  expires_at?: string;
 }
 
 function sha256Hex(input: string): string {
@@ -63,10 +74,25 @@ function resourceMatches(scopeResource: string, pattern: string): boolean {
   return scopeResource === pattern;
 }
 
+function isWithinHalfOpenWindow(
+  nowIso: string,
+  effectiveAt?: string,
+  expiresAt?: string,
+): boolean {
+  if (effectiveAt && nowIso < effectiveAt) {
+    return false;
+  }
+  if (expiresAt && nowIso >= expiresAt) {
+    return false;
+  }
+  return true;
+}
+
 function ruleMatches(
   rule: PolicyRule,
   agentId: string,
   requestedScope: RequestedScope,
+  nowIso: string,
 ): boolean {
   const subjectPattern = rule.subject ?? "*";
   if (!subjectMatches(agentId, subjectPattern)) {
@@ -76,8 +102,22 @@ function ruleMatches(
     return false;
   }
   if (rule.conditions && Object.keys(rule.conditions).length > 0) {
+    const validityWindow = rule.conditions.validity_window;
+    if (
+      validityWindow &&
+      !isWithinHalfOpenWindow(
+        nowIso,
+        validityWindow.effective_at,
+        validityWindow.expires_at,
+      )
+    ) {
+      return false;
+    }
     const scopeConstraints = requestedScope.constraints ?? {};
     for (const [key, expected] of Object.entries(rule.conditions)) {
+      if (key === "validity_window") {
+        continue;
+      }
       if (!(key in scopeConstraints)) {
         return false;
       }
@@ -133,7 +173,10 @@ export class PolicyEvaluator {
   }
 
   evaluate(request: DelegationRequest, agent_id: string): DelegationDecision {
-    const sorted = [...this.policies].sort((a, b) => a.priority - b.priority);
+    const nowIso = new Date().toISOString();
+    const sorted = [...this.policies]
+      .filter((p) => isWithinHalfOpenWindow(nowIso, p.effective_at, p.expires_at))
+      .sort((a, b) => a.priority - b.priority);
 
     let firstNarrow: MatchHit | undefined;
     let firstEscalation: MatchHit | undefined;
@@ -141,7 +184,7 @@ export class PolicyEvaluator {
 
     for (const policy of sorted) {
       const rule = policy.rules.find((r) =>
-        ruleMatches(r, agent_id, request.requested_scope),
+        ruleMatches(r, agent_id, request.requested_scope, nowIso),
       );
       if (!rule) {
         continue;
@@ -159,6 +202,7 @@ export class PolicyEvaluator {
           escalation_target: undefined,
           matched: { policy, rule },
           outcomeKind: "deny",
+          decidedAt: nowIso,
         });
       }
 
@@ -193,6 +237,7 @@ export class PolicyEvaluator {
         escalation_target: undefined,
         matched: firstNarrow,
         outcomeKind: "narrow",
+        decidedAt: nowIso,
       });
     }
 
@@ -213,6 +258,7 @@ export class PolicyEvaluator {
           firstEscalation.policy.policy_id,
         matched: firstEscalation,
         outcomeKind: "require_approval",
+        decidedAt: nowIso,
       });
     }
 
@@ -228,6 +274,7 @@ export class PolicyEvaluator {
         escalation_target: undefined,
         matched: firstAllow,
         outcomeKind: "allow",
+        decidedAt: nowIso,
       });
     }
 
@@ -242,6 +289,7 @@ export class PolicyEvaluator {
       escalation_target: undefined,
       matched: undefined,
       outcomeKind: "default_deny",
+      decidedAt: nowIso,
     });
   }
 
@@ -256,6 +304,7 @@ export class PolicyEvaluator {
     escalation_target?: string;
     matched: MatchHit | undefined;
     outcomeKind: string;
+    decidedAt: string;
   }): DelegationDecision {
     const basis = stableStringify({
       request_id: args.request.request_id,
@@ -271,10 +320,12 @@ export class PolicyEvaluator {
         ? { policy_id: args.matched.policy.policy_id, rule_id: args.matched.rule.rule_id }
         : null,
       outcomeKind: args.outcomeKind,
+      decided_at: args.decidedAt,
     });
     const decision_id = sha256Hex(basis);
 
     return {
+      schema_version: "0.2",
       decision_id,
       request_id: args.request.request_id,
       status: args.status,
@@ -283,7 +334,7 @@ export class PolicyEvaluator {
       narrowed_scope: args.narrowed_scope,
       denial_reason: args.denial_reason,
       escalation_target: args.escalation_target,
-      timestamp: args.request.timestamp,
+      decided_at: args.decidedAt,
     };
   }
 }

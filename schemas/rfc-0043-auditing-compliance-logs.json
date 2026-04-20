@@ -7,7 +7,7 @@
     "schema_version": {
       "type": "string",
       "enum": [
-        "0.2"
+        "0.3"
       ]
     },
     "event_id": {
@@ -22,7 +22,7 @@
       "type": "string",
       "minLength": 1
     },
-    "timestamp": {
+    "observed_at": {
       "type": "string",
       "format": "date-time"
     },
@@ -53,12 +53,33 @@
       "type": "object",
       "additionalProperties": true
     },
-    "previous_event_id": {
+    "parent_event_id": {
       "type": [
         "string",
         "null"
       ],
       "format": "uuid"
+    },
+    "ordering": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "event_seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "causal_predecessors": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "event_seq"
+      ]
     },
     "integrity": {
       "type": "object",
@@ -67,7 +88,7 @@
         "hash_algorithm": {
           "type": "string",
           "enum": [
-            "sha-256"
+            "sha256"
           ]
         },
         "content_hash": {
@@ -86,10 +107,11 @@
     "event_id",
     "run_id",
     "agent_id",
-    "timestamp",
+    "observed_at",
     "event_type",
     "details",
-    "previous_event_id",
+    "parent_event_id",
+    "ordering",
     "integrity"
   ],
   "$id": "https://opencot.dev/schemas/rfc-0043-auditing-compliance-logs.json",

@@ -1,10 +1,11 @@
 {
   "delegation_request": {
+    "schema_version": "0.2",
     "request_id": "req-a1b2c3d4",
     "requester": "agent-planner-01",
     "run_id": "run-e5f6g7h8",
     "intent": "Read email headers to find meeting invitations",
-    "justification": "The user asked me to check for upcoming meetings. I need to access email metadata to identify calendar invitations.",
+    "justification": "The user asked me to check for upcoming meetings.",
     "requested_scope": {
       "resource": "tool:email",
       "action": "read"
@@ -12,13 +13,14 @@
     "preferred_ttl_seconds": 60,
     "preferred_audience": "tool:email",
     "task_context_ref": "s-3",
-    "timestamp": "2026-04-18T14:30:00Z",
+    "observed_at": "2026-04-18T14:30:00Z",
     "provenance": {
       "trace_step_id": "s-3",
       "plan_version": 1
     }
   },
   "delegation_decision": {
+    "schema_version": "0.2",
     "decision_id": "dec-i9j0k1l2",
     "request_id": "req-a1b2c3d4",
     "status": "narrowed",
@@ -26,18 +28,28 @@
       "kind": "policy",
       "policy_id": "compliance-email-001"
     },
-    "policy_refs": ["compliance-email-001"],
+    "policy_refs": [
+      "compliance-email-001"
+    ],
     "narrowed_scope": {
       "resource": "tool:email",
       "action": "read",
       "constraints": {
-        "allowed_fields": ["subject", "from", "date"],
-        "excluded_fields": ["body", "attachments"]
+        "allowed_fields": [
+          "subject",
+          "from",
+          "date"
+        ],
+        "excluded_fields": [
+          "body",
+          "attachments"
+        ]
       }
     },
-    "timestamp": "2026-04-18T14:30:01Z"
+    "decided_at": "2026-04-18T14:30:01Z"
   },
   "authority_receipt": {
+    "schema_version": "0.2",
     "receipt_id": "rcpt-m3n4o5p6",
     "decision_id": "dec-i9j0k1l2",
     "request_id": "req-a1b2c3d4",
@@ -46,11 +58,18 @@
       "resource": "tool:email",
       "action": "read",
       "constraints": {
-        "allowed_fields": ["subject", "from", "date"],
-        "excluded_fields": ["body", "attachments"]
+        "allowed_fields": [
+          "subject",
+          "from",
+          "date"
+        ],
+        "excluded_fields": [
+          "body",
+          "attachments"
+        ]
       }
     },
-    "granted_at": "2026-04-18T14:30:01Z",
+    "effective_at": "2026-04-18T14:30:01Z",
     "expires_at": "2026-04-18T14:31:01Z",
     "one_shot": true,
     "forwardable": false,

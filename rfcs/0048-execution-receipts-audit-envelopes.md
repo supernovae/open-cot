@@ -1,4 +1,4 @@
-# RFC 0048 — Execution Receipts & Audit Envelopes (v0.1)
+# RFC 0048 — Execution Receipts & Audit Envelopes (v0.2)
 
 **Status:** Draft  
 **Author:** Byron / Open CoT Community  
@@ -16,128 +16,128 @@ Produced by the tool executor after every tool call. Fields: `execution_id` (uui
 
 ## 3. `audit_envelope`
 
-Sealed summary of a governed run (RFC 0043 introduces auditing; this RFC specifies the envelope schema and lifecycle). Fields: `envelope_id` (uuid), `run_id`, `agent_id`, `task_hash`, `started_at`, `sealed_at`, `completion_status` ∈ {`succeeded`,`failed`,`denied`,`budget_exhausted`,`external_stop`,`escalation_timeout`,`fail_safe`}, `trace_hash`, `delegation_requests` / `delegation_decisions` (string IDs), `authority_receipts` / `tool_execution_receipts` (ID arrays), `delegation_summary` (`total_requested`, `total_approved`, `total_denied`, `total_narrowed`, `total_escalated`), `permission_summary` (`total_granted`, `total_consumed`, `total_expired`, `total_revoked`), `budget_final` (RFC 0038 `BudgetSnapshot`), `policy_violations` (`violation_id`, `policy_id`, `rule_id`, `description`, `severity`, `timestamp`), `integrity` (`hash_algorithm`, `content_hash`, optional `signature`, `signing_key_id`). `content_hash` covers all fields **except** `integrity`.
+Sealed summary of a governed run (RFC 0043 introduces auditing; this RFC specifies the envelope schema and lifecycle). Fields: `envelope_id` (uuid), `run_id`, `agent_id`, `task_hash`, `started_at`, `completed_at`, `completion_status` ∈ {`succeeded`,`failed`,`denied`,`budget_exhausted`,`external_stop`,`escalation_timeout`,`fail_safe`}, `trace_hash`, `delegation_requests` / `delegation_decisions` (string IDs), `authority_receipts` / `tool_execution_receipts` (ID arrays), `delegation_summary` (`total_requested`, `total_granted`, `total_denied`, `total_narrowed`, `total_escalated`), `permission_summary` (`total_granted`, `total_consumed`, `total_expired`, `total_revoked`), `budget_final` (RFC 0038 `BudgetSnapshot`), `policy_violations` (`violation_id`, `policy_id`, `rule_id`, `description`, `severity`, `observed_at`), `integrity` (`hash_algorithm`, `content_hash`, optional `signature`, `signing_key_id`). `content_hash` covers all fields **except** `integrity`.
 
-## 4. JSON Schema — `tool_execution_receipt`
+## 4. JSON Schema — receipt and envelope bundle (normative)
 
 <!-- opencot:schema:start -->
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://opencot.dev/schema/v0.8/tool_execution_receipt.json",
-  "title": "Open CoT RFC 0048 — tool_execution_receipt",
+  "$id": "https://opencot.dev/schema/v0.9/execution-receipts-audit-envelopes.json",
+  "title": "Open CoT RFC 0048 — execution receipts and audit envelopes",
   "type": "object",
-  "additionalProperties": false,
-  "properties": {
-    "execution_id": { "type": "string", "format": "uuid" },
-    "run_id": { "type": "string", "minLength": 1 },
-    "tool_name": { "type": "string", "minLength": 1 },
-    "permission_id": { "type": "string", "minLength": 1 },
-    "authority_receipt_id": { "type": "string", "minLength": 1 },
-    "input_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-    "output_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-    "output_size_bytes": { "type": "integer", "minimum": 0 },
-    "started_at": { "type": "string", "format": "date-time" },
-    "completed_at": { "type": "string", "format": "date-time" },
-    "duration_ms": { "type": "integer", "minimum": 0 },
-    "status": { "type": "string", "enum": ["success", "error", "timeout", "quarantined"] },
-    "error_category": { "type": "string", "enum": ["timeout", "invalid_input", "not_found", "permission_denied", "rate_limit", "internal_error"] },
-    "postcondition_check": { "type": "string", "enum": ["passed", "failed", "skipped"] },
-    "postcondition_violation": { "type": "string" },
-    "sandbox_state_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+  "oneOf": [
+    { "$ref": "#/$defs/tool_execution_receipt" },
+    { "$ref": "#/$defs/audit_envelope" }
+  ],
+  "$defs": {
     "integrity": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
         "hash_algorithm": { "type": "string", "const": "sha256" },
-        "content_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+        "content_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "signature": { "type": "string" },
+        "signing_key_id": { "type": "string" }
       },
       "required": ["hash_algorithm", "content_hash"]
-    }
-  },
-  "required": ["execution_id", "run_id", "tool_name", "permission_id", "authority_receipt_id", "input_hash", "output_hash", "output_size_bytes", "started_at", "completed_at", "duration_ms", "status", "postcondition_check", "sandbox_state_hash", "integrity"]
-}
-```
-<!-- opencot:schema:end -->
-
-## 5. JSON Schema — `audit_envelope`
-
-<!-- opencot:schema:start -->
-```json
-{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://opencot.dev/schema/v0.8/audit_envelope.json",
-  "title": "Open CoT RFC 0048 — audit_envelope",
-  "type": "object",
-  "additionalProperties": false,
-  "definitions": {
+    },
     "budget_snapshot_rfc0038": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "tokens_used": { "type": "integer", "minimum": 0 }, "tokens_remaining": { "type": "integer" },
-        "cost_used": { "type": "number", "minimum": 0 }, "cost_remaining": { "type": "number" },
-        "steps_used": { "type": "integer", "minimum": 0 }, "steps_remaining": { "type": "integer" },
-        "tool_calls_used": { "type": "integer", "minimum": 0 }, "tool_calls_remaining": { "type": "integer" },
-        "retries_used": { "type": "integer", "minimum": 0 }, "retries_remaining": { "type": "integer" }
+        "tokens_used": { "type": "integer", "minimum": 0 },
+        "tokens_remaining": { "type": "integer" },
+        "cost_used": { "type": "number", "minimum": 0 },
+        "cost_remaining": { "type": "number" },
+        "steps_used": { "type": "integer", "minimum": 0 },
+        "steps_remaining": { "type": "integer" },
+        "tool_calls_used": { "type": "integer", "minimum": 0 },
+        "tool_calls_remaining": { "type": "integer" },
+        "retries_used": { "type": "integer", "minimum": 0 },
+        "retries_remaining": { "type": "integer" }
       },
       "required": ["tokens_used", "tokens_remaining", "cost_used", "cost_remaining", "steps_used", "steps_remaining", "tool_calls_used", "tool_calls_remaining", "retries_used", "retries_remaining"]
     },
     "policy_violation_entry": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "violation_id": { "type": "string", "minLength": 1 },
+        "policy_id": { "type": "string", "minLength": 1 },
+        "rule_id": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "severity": { "type": "string", "enum": ["info", "low", "medium", "high", "critical"] },
+        "observed_at": { "type": "string", "format": "date-time" }
+      },
+      "required": ["violation_id", "policy_id", "rule_id", "description", "severity", "observed_at"]
+    },
+    "tool_execution_receipt": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "violation_id": { "type": "string", "minLength": 1 }, "policy_id": { "type": "string", "minLength": 1 },
-        "rule_id": { "type": "string", "minLength": 1 }, "description": { "type": "string" },
-        "severity": { "type": "string", "enum": ["info", "low", "medium", "high", "critical"] },
-        "timestamp": { "type": "string", "format": "date-time" }
+        "schema_version": { "type": "string", "enum": ["0.2"] },
+        "execution_id": { "type": "string", "format": "uuid" },
+        "run_id": { "type": "string", "minLength": 1 },
+        "tool_name": { "type": "string", "minLength": 1 },
+        "permission_id": { "type": "string", "minLength": 1 },
+        "authority_receipt_id": { "type": "string", "minLength": 1 },
+        "input_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "output_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "output_size_bytes": { "type": "integer", "minimum": 0 },
+        "started_at": { "type": "string", "format": "date-time" },
+        "completed_at": { "type": "string", "format": "date-time" },
+        "duration_ms": { "type": "integer", "minimum": 0 },
+        "status": { "type": "string", "enum": ["success", "error", "timeout", "quarantined"] },
+        "error_category": { "type": "string", "enum": ["timeout", "invalid_input", "not_found", "permission_denied", "rate_limit", "internal_error"] },
+        "postcondition_check": { "type": "string", "enum": ["passed", "failed", "skipped"] },
+        "postcondition_violation": { "type": "string" },
+        "sandbox_state_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "integrity": { "$ref": "#/$defs/integrity" }
       },
-      "required": ["violation_id", "policy_id", "rule_id", "description", "severity", "timestamp"]
-    }
-  },
-  "properties": {
-    "envelope_id": { "type": "string", "format": "uuid" },
-    "run_id": { "type": "string", "minLength": 1 },
-    "agent_id": { "type": "string", "minLength": 1 },
-    "task_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-    "started_at": { "type": "string", "format": "date-time" },
-    "sealed_at": { "type": "string", "format": "date-time" },
-    "completion_status": { "type": "string", "enum": ["succeeded", "failed", "denied", "budget_exhausted", "external_stop", "escalation_timeout", "fail_safe"] },
-    "trace_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-    "delegation_requests": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-    "delegation_decisions": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-    "authority_receipts": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-    "tool_execution_receipts": { "type": "array", "items": { "type": "string", "format": "uuid" } },
-    "delegation_summary": {
-      "type": "object", "additionalProperties": false,
-      "properties": {
-        "total_requested": { "type": "integer", "minimum": 0 }, "total_approved": { "type": "integer", "minimum": 0 },
-        "total_denied": { "type": "integer", "minimum": 0 }, "total_narrowed": { "type": "integer", "minimum": 0 },
-        "total_escalated": { "type": "integer", "minimum": 0 }
-      },
-      "required": ["total_requested", "total_approved", "total_denied", "total_narrowed", "total_escalated"]
+      "required": ["schema_version", "execution_id", "run_id", "tool_name", "permission_id", "authority_receipt_id", "input_hash", "output_hash", "output_size_bytes", "started_at", "completed_at", "duration_ms", "status", "postcondition_check", "sandbox_state_hash", "integrity"]
     },
-    "permission_summary": {
-      "type": "object", "additionalProperties": false,
+    "audit_envelope": {
+      "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "total_granted": { "type": "integer", "minimum": 0 }, "total_consumed": { "type": "integer", "minimum": 0 },
-        "total_expired": { "type": "integer", "minimum": 0 }, "total_revoked": { "type": "integer", "minimum": 0 }
+        "schema_version": { "type": "string", "enum": ["0.2"] },
+        "envelope_id": { "type": "string", "format": "uuid" },
+        "run_id": { "type": "string", "minLength": 1 },
+        "agent_id": { "type": "string", "minLength": 1 },
+        "task_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "started_at": { "type": "string", "format": "date-time" },
+        "completed_at": { "type": "string", "format": "date-time" },
+        "completion_status": { "type": "string", "enum": ["succeeded", "failed", "denied", "budget_exhausted", "external_stop", "escalation_timeout", "fail_safe"] },
+        "trace_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "delegation_requests": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "delegation_decisions": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "authority_receipts": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "tool_execution_receipts": { "type": "array", "items": { "type": "string", "format": "uuid" } },
+        "delegation_summary": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "total_requested": { "type": "integer", "minimum": 0 }, "total_granted": { "type": "integer", "minimum": 0 },
+            "total_denied": { "type": "integer", "minimum": 0 }, "total_narrowed": { "type": "integer", "minimum": 0 },
+            "total_escalated": { "type": "integer", "minimum": 0 }
+          },
+          "required": ["total_requested", "total_granted", "total_denied", "total_narrowed", "total_escalated"]
+        },
+        "permission_summary": {
+          "type": "object", "additionalProperties": false,
+          "properties": {
+            "total_granted": { "type": "integer", "minimum": 0 }, "total_consumed": { "type": "integer", "minimum": 0 },
+            "total_expired": { "type": "integer", "minimum": 0 }, "total_revoked": { "type": "integer", "minimum": 0 }
+          },
+          "required": ["total_granted", "total_consumed", "total_expired", "total_revoked"]
+        },
+        "budget_final": { "$ref": "#/$defs/budget_snapshot_rfc0038" },
+        "policy_violations": { "type": "array", "items": { "$ref": "#/$defs/policy_violation_entry" } },
+        "integrity": { "$ref": "#/$defs/integrity" }
       },
-      "required": ["total_granted", "total_consumed", "total_expired", "total_revoked"]
-    },
-    "budget_final": { "$ref": "#/definitions/budget_snapshot_rfc0038" },
-    "policy_violations": { "type": "array", "items": { "$ref": "#/definitions/policy_violation_entry" } },
-    "integrity": {
-      "type": "object", "additionalProperties": false,
-      "properties": {
-        "hash_algorithm": { "type": "string", "const": "sha256" },
-        "content_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
-        "signature": { "type": "string" }, "signing_key_id": { "type": "string" }
-      },
-      "required": ["hash_algorithm", "content_hash"]
+      "required": ["schema_version", "envelope_id", "run_id", "agent_id", "task_hash", "started_at", "completed_at", "completion_status", "trace_hash", "delegation_requests", "delegation_decisions", "authority_receipts", "tool_execution_receipts", "delegation_summary", "permission_summary", "budget_final", "policy_violations", "integrity"]
     }
-  },
-  "required": ["envelope_id", "run_id", "agent_id", "task_hash", "started_at", "sealed_at", "completion_status", "trace_hash", "delegation_requests", "delegation_decisions", "authority_receipts", "tool_execution_receipts", "delegation_summary", "permission_summary", "budget_final", "policy_violations", "integrity"]
+  }
 }
 ```
 <!-- opencot:schema:end -->
@@ -180,6 +180,7 @@ Synthetic 64-char lowercase hex stands in for real SHA-256; conforming `content_
 
 ```json
 {
+  "schema_version": "0.2",
   "execution_id": "a1b2c3d4-e5f6-47a8-9c0d-1e2f3a4b5c6d",
   "run_id": "run_20260418_01",
   "tool_name": "web_search",
@@ -202,6 +203,7 @@ Synthetic 64-char lowercase hex stands in for real SHA-256; conforming `content_
 
 ```json
 {
+  "schema_version": "0.2",
   "execution_id": "f6e5d4c3-b2a1-4098-8765-43210fedcba9",
   "run_id": "run_20260418_02",
   "tool_name": "filesystem_read",
@@ -225,19 +227,20 @@ Synthetic 64-char lowercase hex stands in for real SHA-256; conforming `content_
 
 ```json
 {
+  "schema_version": "0.2",
   "envelope_id": "11111111-2222-4333-8444-555555555555",
   "run_id": "run_20260418_03",
   "agent_id": "planner-alpha",
   "task_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
   "started_at": "2026-04-18T11:59:00.000Z",
-  "sealed_at": "2026-04-18T12:10:00.000Z",
+  "completed_at": "2026-04-18T12:10:00.000Z",
   "completion_status": "succeeded",
   "trace_hash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
   "delegation_requests": ["dreq_01"],
   "delegation_decisions": ["ddec_01"],
   "authority_receipts": ["authrecv_99"],
   "tool_execution_receipts": ["aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb"],
-  "delegation_summary": { "total_requested": 1, "total_approved": 1, "total_denied": 0, "total_narrowed": 1, "total_escalated": 0 },
+  "delegation_summary": { "total_requested": 1, "total_granted": 1, "total_denied": 0, "total_narrowed": 1, "total_escalated": 0 },
   "permission_summary": { "total_granted": 2, "total_consumed": 2, "total_expired": 0, "total_revoked": 0 },
   "budget_final": {
     "tokens_used": 4200, "tokens_remaining": 800, "cost_used": 0.04, "cost_remaining": 0.06,
@@ -261,7 +264,7 @@ Synthetic 64-char lowercase hex stands in for real SHA-256; conforming `content_
 
 ## 11. Open Questions & Resolution
 
-| # | Question | v0.1 stance |
+| # | Question | v0.2 stance |
 |---|----------|-------------|
 | A | Canonical serialization for hashed payloads? | Document and version per harness; future RFC MAY mandate JCS. |
 | B | Mandatory signature algorithm? | Signatures optional; algorithm tied to `signing_key_id` registry. |
@@ -270,7 +273,7 @@ Synthetic 64-char lowercase hex stands in for real SHA-256; conforming `content_
 
 ## 12. Acceptance Criteria
 
-- [ ] Both JSON Schemas validate instances (examples need real computed `content_hash` values).  
+- [ ] The bundled schema validates both `tool_execution_receipt` and `audit_envelope` instances (examples need real computed `content_hash` values).  
 - [ ] Harness emits one receipt per governed tool execution and one sealed envelope per terminal run.  
 - [ ] Verifiers mark **INVALID** on hash or signature mismatch.  
 - [ ] No raw tool I/O in receipts or envelopes.  

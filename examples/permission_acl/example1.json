@@ -5,12 +5,20 @@
     "resource": "tool:email",
     "action": "read",
     "constraints": {
-      "allowed_fields": ["subject", "from", "date"],
-      "excluded_fields": ["body", "attachments"]
+      "allowed_fields": [
+        "subject",
+        "from",
+        "date"
+      ],
+      "excluded_fields": [
+        "body",
+        "attachments"
+      ]
     }
   },
   "audience": "tool:email",
   "ttl_seconds": 60,
+  "effective_at": "2026-04-18T14:30:01Z",
   "expires_at": "2026-04-18T14:31:01Z",
   "one_shot": true,
   "forwardable": false,
@@ -18,7 +26,6 @@
   "policy_ref": "compliance-email-001",
   "request_ref": "req-a1b2c3d4",
   "decision_ref": "dec-i9j0k1l2",
-  "granted_at": "2026-04-18T14:30:01Z",
   "status": "consumed",
   "consumed_at": "2026-04-18T14:30:02Z"
 }

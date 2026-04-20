@@ -1,41 +1,14 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://opencot.dev/schema/v0.8/toon_adapter.json",
-  "title": "Open CoT RFC 0050 — TOON Adapter Configuration",
-  "description": "Configuration for the TOON (Token-Oriented Object Notation) adapter. Controls wire format selection and TOON-specific serialization options.",
+  "title": "RFC 0050 — Toon Adapter (stub)",
+  "description": "Placeholder JSON Schema for RFC 0050. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
   "type": "object",
-  "additionalProperties": false,
-  "required": ["wire_format"],
-  "properties": {
-    "wire_format": {
-      "type": "string",
-      "enum": ["json", "compact-text", "toon"],
-      "default": "compact-text",
-      "description": "Serialization format for model-facing context injection. 'json' uses minified JSON, 'compact-text' uses the existing hand-coded compact serializer, 'toon' uses Token-Oriented Object Notation."
-    },
-    "toon_options": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Options specific to the TOON wire format. Ignored when wire_format is not 'toon'.",
-      "properties": {
-        "include_headers": {
-          "type": "boolean",
-          "default": true,
-          "description": "Whether to include inline schema headers for arrays. Headers cost a few tokens but help the model parse and validate structure."
-        },
-        "delimiter": {
-          "type": "string",
-          "default": "|",
-          "description": "Column delimiter for tabular array rows."
-        },
-        "indent": {
-          "type": "integer",
-          "default": 2,
-          "minimum": 1,
-          "maximum": 4,
-          "description": "Number of spaces per indentation level for nested objects."
-        }
-      }
-    }
-  }
+  "additionalProperties": true,
+  "x-opencot": {
+    "rfc": "0050",
+    "shortname": "toon_adapter",
+    "status": "stub",
+    "source_rfc": "rfcs/0050-toon-adapter.md"
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0050-toon-adapter.json"
 }

@@ -6,15 +6,31 @@
     "version": {
       "type": "string",
       "enum": [
-        "0.1"
+        "0.2"
       ]
     },
     "agent_id": {
       "type": "string"
     },
-    "timestamp": {
+    "observed_at": {
       "type": "string",
       "format": "date-time"
+    },
+    "ordering": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "event_seq": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "parent_event_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_seq"
+      ]
     },
     "metrics": {
       "type": "object",
@@ -46,7 +62,8 @@
   "required": [
     "version",
     "agent_id",
-    "timestamp",
+    "observed_at",
+    "ordering",
     "metrics"
   ],
   "$id": "https://opencot.dev/schemas/rfc-0031-agent-observability-telemetry.json",

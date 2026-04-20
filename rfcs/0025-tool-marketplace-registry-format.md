@@ -1,5 +1,7 @@
 # RFC 0025 — Tool Marketplace & Registry Format, Status: Draft, Author: Open CoT Community, Created: 2026-04-14
 
+**Discussion:** https://github.com/supernovae/open-cot/discussions/25
+
 ## 1. Summary
 
 This RFC defines the **Tool Marketplace & Registry Format** for Open-CoT: a versioned **`tool_registry`** catalog of **`tool_registry_entry`** records for publishing and discovering tools under governance. Entries include **input** / **output** JSON Schemas, **`required_permissions[]`**, **`risk_level`**, **`cost_estimate`**, **`timeout_default_ms`**, **`categories[]`**, **`author`**, **`documentation_url`**, and optional **`health_check_endpoint`**.

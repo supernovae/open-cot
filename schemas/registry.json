@@ -51,6 +51,7 @@
     "delegation_extension": "schemas/rfc-0047-delegation-extension.json",
     "execution_receipts_audit_envelopes": "schemas/rfc-0048-execution-receipts-audit-envelopes.json",
     "capability_manifest": "schemas/rfc-0049-capability-manifest.json",
-    "toon_adapter": "schemas/rfc-0050-toon-adapter.json"
+    "toon_adapter": "schemas/rfc-0050-toon-adapter.json",
+    "temporal_semantics": "schemas/rfc-0051-temporal-semantics.json"
   }
 }
