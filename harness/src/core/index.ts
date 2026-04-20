@@ -32,3 +32,9 @@ export {
   validateTermination,
 } from "./validator.js";
 export type { ValidationResult } from "./validator.js";
+export {
+  callLLMWithCircuitBreaker,
+  estimateMessageTokens,
+  estimateTextTokens,
+} from "./llm-circuit-breaker.js";
+export type { CircuitBreakerOptions, StreamSafetyConfig } from "./llm-circuit-breaker.js";

@@ -7,6 +7,7 @@
 
 import type {
   LLMBackend,
+  LLMChatOptions,
   LLMMessage,
   LLMResponseWithTools,
   ToolCallRequest,
@@ -31,7 +32,24 @@ export class MockLLMBackend implements LLMBackend {
     this.routes.push(route);
   }
 
-  async chat(messages: LLMMessage[]): Promise<LLMResponseWithTools> {
+  async chat(
+    messages: LLMMessage[],
+    options?: LLMChatOptions,
+  ): Promise<LLMResponseWithTools> {
+    if (options?.signal?.aborted) {
+      throw makeAbortError("Mock backend aborted before decode");
+    }
+
+    const response = this.resolveResponse(messages);
+    const capped = applyOutputCap(response, options?.maxOutputTokens);
+
+    if (options?.stream && options.onChunk && capped.content) {
+      await emitStream(capped.content, options);
+    }
+    return capped;
+  }
+
+  private resolveResponse(messages: LLMMessage[]): LLMResponseWithTools {
     const raw =
       [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
 
@@ -87,6 +105,70 @@ export class MockLLMBackend implements LLMBackend {
       model: "mock",
       finishReason: "stop",
     };
+  }
+}
+
+function makeAbortError(message: string): Error {
+  const err = new Error(message);
+  err.name = "AbortError";
+  return err;
+}
+
+function estimateTokens(text: string): number {
+  if (!text) return 0;
+  return Math.max(1, Math.ceil(text.length / 4));
+}
+
+function applyOutputCap(
+  response: LLMResponseWithTools,
+  maxOutputTokens?: number,
+): LLMResponseWithTools {
+  if (
+    maxOutputTokens === undefined ||
+    maxOutputTokens <= 0 ||
+    response.content.length === 0
+  ) {
+    return response;
+  }
+
+  const completionEstimate = estimateTokens(response.content);
+  if (completionEstimate <= maxOutputTokens) {
+    return response;
+  }
+
+  const maxChars = Math.max(1, maxOutputTokens * 4);
+  const truncated = response.content.slice(0, maxChars);
+  const promptEstimate = Math.max(
+    0,
+    response.tokensUsed - completionEstimate,
+  );
+  return {
+    ...response,
+    content: truncated,
+    tokensUsed: promptEstimate + estimateTokens(truncated),
+    finishReason: "length",
+  };
+}
+
+async function emitStream(
+  content: string,
+  options: LLMChatOptions,
+): Promise<void> {
+  const chunks = content.match(/\S+\s*/g) ?? [content];
+  let aggregate = "";
+  let completionTokensEstimated = 0;
+
+  for (const piece of chunks) {
+    if (options.signal?.aborted) {
+      throw makeAbortError("Mock backend aborted during streamed decode");
+    }
+    aggregate += piece;
+    completionTokensEstimated += estimateTokens(piece);
+    await options.onChunk?.({
+      contentDelta: piece,
+      content: aggregate,
+      completionTokensEstimated,
+    });
   }
 }
 

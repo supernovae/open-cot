@@ -111,6 +111,17 @@ The budget tracker (RFC 0038) enforces:
 
 When any hard-enforced budget hits zero, the agent is force-stopped with `budget_exhausted` status and the trace records why.
 
+### Streaming decode circuit breaker
+
+The harness now enforces token/safety limits during streamed decoding (not only after full responses):
+
+- **Preflight budget gate**: estimate prompt token cost before each model call; if insufficient remaining budget, stop before decode starts.
+- **Mid-stream token breaker**: stream callbacks track emitted completion tokens and abort decode once the remaining completion allowance is exhausted.
+- **Mid-stream safety breaker**: stream callbacks can stop runaway or unsafe output patterns and route to `fail_safe`.
+- **FSM-first shutdown**: on breaker trip, the run is forced into terminal state (`budget_exhausted`, `fail_safe`, or `external_stop`) before any subsequent tool side effects.
+
+This keeps authority in the harness FSM even when a model ignores budget instructions.
+
 ## Tool contracts
 
 Every tool is registered with a contract (RFC 0003 + RFC 0018):
