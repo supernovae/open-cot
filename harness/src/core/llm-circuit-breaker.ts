@@ -3,6 +3,8 @@ import type {
   LLMMessage,
   LLMResponseWithTools,
   LLMStreamChunk,
+  LLMToolChoice,
+  LLMToolDefinition,
 } from "../backends/types.js";
 import type { BudgetTracker } from "./budget-tracker.js";
 import type { AgentState } from "./state.js";
@@ -38,6 +40,8 @@ export interface CircuitBreakerOptions {
   llmReason?: string;
   stream?: boolean;
   safety?: Partial<StreamSafetyConfig>;
+  tools?: LLMToolDefinition[];
+  toolChoice?: LLMToolChoice;
 }
 
 function isAbortError(err: unknown): boolean {
@@ -163,6 +167,8 @@ export async function callLLMWithCircuitBreaker(
       maxOutputTokens: requestOutputCap,
       signal: controller.signal,
       onChunk: options.stream === false ? undefined : onChunk,
+      tools: options.tools,
+      toolChoice: options.toolChoice,
     });
     budget.recordTokens(state, response.tokensUsed, llmReason);
     return response;

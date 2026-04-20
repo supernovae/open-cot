@@ -22,7 +22,7 @@ export {
   resetStepCounter,
 } from "./trace-emitter.js";
 export { ToolRegistry } from "./tool-registry.js";
-export type { ToolHandler } from "./tool-registry.js";
+export type { ToolExecutionAuthority, ToolHandler } from "./tool-registry.js";
 export { checkPolicy, DEFAULT_LOOP_POLICY } from "./loop-policy.js";
 export type { LoopPolicy, PolicyViolation } from "./loop-policy.js";
 export {

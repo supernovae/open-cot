@@ -12,6 +12,16 @@
  *   npx tsx examples/governed-demo.ts "calculate 2+2"           # calculator (allowed)
  *   npx tsx examples/governed-demo.ts "search for open source"  # search (allowed)
  *   npx tsx examples/governed-demo.ts --deny "search for info"  # search (denied by policy)
+ *
+ * Policy engine selection via env:
+ *   POLICY_ENGINE=inprocess|opa
+ *
+ * OPA settings (when POLICY_ENGINE=opa):
+ *   OPA_BASE_URL=http://127.0.0.1:8181
+ *   OPA_POLICY_PATH=open_cot/delegation
+ *   OPA_BEARER_TOKEN=...
+ *   OPA_TIMEOUT_MS=2000
+ *   OPA_FALLBACK_INPROCESS=true|false
  */
 
 import { runGovernedAgent } from "../src/agents/governed-agent.js";
@@ -21,6 +31,11 @@ import { OpenAICompatBackend } from "../src/backends/openai-compat.js";
 import { createMockToolRegistry } from "../src/tools/mock-tools.js";
 import type { PolicySet } from "../src/governance/policy-evaluator.js";
 import type { LLMBackend } from "../src/backends/types.js";
+import {
+  InProcessPolicyEngine,
+  OpaPolicyEngine,
+  type DelegationPolicyEngine,
+} from "../src/governance/index.js";
 
 function pickBackend(): LLMBackend {
   if (process.env["OPENAI_BASE_URL"] || process.env["OPENAI_API_KEY"]) {
@@ -76,6 +91,56 @@ const NARROW_SEARCH_POLICY: PolicySet = {
   priority: 10,
 };
 
+interface PolicyEngineSelection {
+  engine: DelegationPolicyEngine;
+  engineLabel: string;
+  manifestPolicies: PolicySet[];
+}
+
+function parsePositiveInt(value: string | undefined): number | undefined {
+  if (!value) return undefined;
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) return undefined;
+  return parsed;
+}
+
+function pickPolicyEngine(
+  policies: PolicySet[],
+  policyMode: "allow" | "deny" | "narrow",
+): PolicyEngineSelection {
+  const engineChoice = (process.env["POLICY_ENGINE"] ?? "inprocess").toLowerCase();
+  if (engineChoice !== "opa") {
+    return {
+      engine: new InProcessPolicyEngine(policies),
+      engineLabel: "in-process",
+      manifestPolicies: policies,
+    };
+  }
+
+  const opaBaseUrl = process.env["OPA_BASE_URL"] ?? "http://127.0.0.1:8181";
+  const opaPolicyPath = process.env["OPA_POLICY_PATH"] ?? "open_cot/delegation";
+  const fallbackEnabled =
+    (process.env["OPA_FALLBACK_INPROCESS"] ?? "true").toLowerCase() !== "false";
+  const fallbackEngine = fallbackEnabled
+    ? new InProcessPolicyEngine(policies)
+    : undefined;
+
+  return {
+    engine: new OpaPolicyEngine({
+      baseUrl: opaBaseUrl,
+      policyPath: opaPolicyPath,
+      bearerToken: process.env["OPA_BEARER_TOKEN"],
+      timeoutMs: parsePositiveInt(process.env["OPA_TIMEOUT_MS"]),
+      inputContext: {
+        policy_mode: policyMode,
+      },
+      fallbackEngine,
+    }),
+    engineLabel: `opa (${opaBaseUrl}/v1/data/${opaPolicyPath})${fallbackEnabled ? " + fallback" : ""}`,
+    manifestPolicies: fallbackEnabled ? policies : [],
+  };
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const denyMode = args.includes("--deny");
@@ -85,24 +150,30 @@ async function main() {
 
   const policies: PolicySet[] = [ALLOW_ALL_POLICY];
   let mode = "ALLOW ALL";
+  let policyMode: "allow" | "deny" | "narrow" = "allow";
 
   if (denyMode) {
     policies.unshift(DENY_SEARCH_POLICY);
     mode = "DENY SEARCH";
+    policyMode = "deny";
   } else if (narrowMode) {
     policies.unshift(NARROW_SEARCH_POLICY);
     mode = "NARROW SEARCH";
+    policyMode = "narrow";
   }
+  const policyEngineSelection = pickPolicyEngine(policies, policyMode);
 
   console.log(`\n--- Governed Agent Demo ---`);
   console.log(`Policy mode: ${mode}`);
+  console.log(`Policy engine: ${policyEngineSelection.engineLabel}`);
   console.log(`Question: ${question}\n`);
 
   const config: GovernedAgentConfig = {
     objective: question,
     backend: pickBackend(),
     toolRegistry: createMockToolRegistry(),
-    policies,
+    policies: policyEngineSelection.manifestPolicies,
+    policyEngine: policyEngineSelection.engine,
     agentId: "demo-agent-01",
   };
 

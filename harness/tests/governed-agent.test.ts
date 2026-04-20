@@ -143,4 +143,81 @@ describe("runGovernedAgent (mock backend)", () => {
       result.state.delegationRequests.length,
     );
   });
+
+  it("enforces narrowed constraints at dispatch time", async () => {
+    const backend = new MockLLMBackend([
+      {
+        pattern: /./,
+        response: "I need to call search.",
+        toolCalls: [
+          {
+            toolName: "search",
+            arguments: { query: "tokyo", user_email: "user@example.com" },
+          },
+        ],
+      },
+    ]);
+    const narrowSearch: PolicySet = {
+      policy_id: "narrow-search",
+      policy_type: "compliance",
+      priority: 1,
+      rules: [
+        {
+          rule_id: "exclude-email",
+          action: "narrow",
+          resource: "tool:search",
+          narrowing: { excluded_fields: ["user_email"] },
+        },
+      ],
+    };
+
+    const result = await runGovernedAgent(
+      config({
+        objective: "Search records.",
+        backend,
+        policies: [narrowSearch],
+      }),
+    );
+
+    expect(result.state.toolExecutionReceipts.length).toBe(1);
+    expect(result.state.toolExecutionReceipts[0]?.status).toBe("error");
+    expect(result.state.toolExecutionReceipts[0]?.error_category).toBe(
+      "permission_denied",
+    );
+    const deniedObservation = result.trace.steps.find(
+      (step) =>
+        step.type === "observation" && step.content.includes("excluded_fields"),
+    );
+    expect(deniedObservation).toBeDefined();
+  });
+
+  it("enforces policy consultation hooks at finalize", async () => {
+    const denyFinalize: PolicySet = {
+      policy_id: "deny-finalize",
+      policy_type: "safety",
+      priority: 1,
+      rules: [
+        {
+          rule_id: "deny-finalize-phase",
+          action: "deny",
+          resource: "phase:finalize",
+          reason: "Final responses require explicit approval",
+        },
+      ],
+    };
+
+    const result = await runGovernedAgent(
+      config({
+        objective: "Explain this architecture in one paragraph.",
+        policies: [denyFinalize, allowAllTools],
+      }),
+    );
+
+    expect(result.state.completionStatus).toBe("denied");
+    expect(result.trace.final_answer).toContain("Request denied by policy");
+    const sawFinalizeDenial = result.trace.steps.some((step) =>
+      step.content.includes("Policy denied at phase finalize"),
+    );
+    expect(sawFinalizeDenial).toBe(true);
+  });
 });

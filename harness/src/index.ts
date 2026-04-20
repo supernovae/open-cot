@@ -17,6 +17,9 @@ export * from "./backends/index.js";
 // Tools
 export * from "./tools/index.js";
 
+// Governance
+export * from "./governance/index.js";
+
 // Adapters
 export * from "./adapters/index.js";
 

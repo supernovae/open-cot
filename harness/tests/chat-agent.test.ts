@@ -7,6 +7,7 @@ import {
   validateActionObservationPairing,
   validateTermination,
 } from "../src/core/validator.js";
+import type { PolicySet } from "../src/governance/policy-evaluator.js";
 
 describe("ChatAgent (mock backend)", () => {
   beforeEach(() => {
@@ -85,5 +86,33 @@ describe("ChatAgent (mock backend)", () => {
 
     const ids = trace.steps.map((s) => s.id);
     expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("routes tool calls through policy engine decisions", async () => {
+    const denySearch: PolicySet = {
+      policy_id: "deny-search",
+      policy_type: "safety",
+      priority: 1,
+      rules: [
+        {
+          rule_id: "deny-search-rule",
+          action: "deny",
+          resource: "tool:search",
+          reason: "Search denied for test",
+        },
+      ],
+    };
+    const trace = await runChatAgent(
+      new MockLLMBackend(),
+      "Search for weather alerts.",
+      createMockToolRegistry(),
+      undefined,
+      undefined,
+      undefined,
+      { policies: [denySearch] },
+    );
+
+    expect(trace.termination).toBe("denied");
+    expect(trace.final_answer).toContain("Search denied for test");
   });
 });

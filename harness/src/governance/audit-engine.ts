@@ -50,9 +50,12 @@ function toEnvelopeCompletion(state: AgentState): CompletionStatus {
 
 function delegationSummaryFromState(state: AgentState): DelegationSummary {
   const decisions = state.delegationDecisions;
+  const grantedCount = decisions.filter(
+    (d) => d.status === "approved" || d.status === "narrowed",
+  ).length;
   return {
     total_requested: state.delegationRequests.length,
-    total_granted: decisions.filter((d) => d.status === "approved").length,
+    total_granted: grantedCount,
     total_denied: decisions.filter((d) => d.status === "denied").length,
     total_narrowed: decisions.filter((d) => d.status === "narrowed").length,
     total_escalated: decisions.filter((d) => d.status === "escalated").length,

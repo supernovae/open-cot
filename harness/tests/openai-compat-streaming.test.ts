@@ -161,4 +161,75 @@ describe("OpenAICompatBackend streaming", () => {
     const body = JSON.parse(String(init.body));
     expect(body.max_tokens).toBe(32);
   });
+
+  it("serializes tool schemas and tool choice in requests", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          model: "buffered-model",
+          choices: [
+            {
+              message: { content: "ok" },
+              finish_reason: "stop",
+            },
+          ],
+          usage: { prompt_tokens: 2, completion_tokens: 1 },
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const backend = new OpenAICompatBackend({
+      baseUrl: "https://example.test/v1",
+      apiKey: "",
+      model: "buffered-model",
+      maxTokens: 4096,
+    });
+
+    await backend.chat(messages, {
+      tools: [
+        {
+          name: "search",
+          description: "Search records",
+          inputSchema: {
+            type: "object",
+            properties: {
+              query: { type: "string" },
+            },
+            required: ["query"],
+          },
+        },
+      ],
+      toolChoice: { name: "search" },
+    });
+
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    const body = JSON.parse(String(init.body));
+    expect(body.tools).toEqual([
+      {
+        type: "function",
+        function: {
+          name: "search",
+          description: "Search records",
+          parameters: {
+            type: "object",
+            properties: {
+              query: { type: "string" },
+            },
+            required: ["query"],
+          },
+        },
+      },
+    ]);
+    expect(body.tool_choice).toEqual({
+      type: "function",
+      function: {
+        name: "search",
+      },
+    });
+  });
 });

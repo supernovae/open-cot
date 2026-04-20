@@ -6,6 +6,8 @@ export type {
   LLMResponse,
   LLMResponseWithTools,
   LLMStreamChunk,
+  LLMToolChoice,
+  LLMToolDefinition,
   ToolCallRequest,
 } from "./types.js";
 export { MockLLMBackend } from "./mock.js";

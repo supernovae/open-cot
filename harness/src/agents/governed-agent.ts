@@ -12,10 +12,13 @@ import { createBudgetTracker } from "../core/budget-tracker.js";
 import { callLLMWithCircuitBreaker } from "../core/llm-circuit-breaker.js";
 import type { ToolRegistry } from "../core/tool-registry.js";
 import { PermissionManager } from "../governance/permission-manager.js";
-import { PolicyEvaluator } from "../governance/policy-evaluator.js";
 import type { PolicySet } from "../governance/policy-evaluator.js";
 import { AuthBroker } from "../governance/auth-broker.js";
 import { AuditEngine } from "../governance/audit-engine.js";
+import {
+  InProcessPolicyEngine,
+  type DelegationPolicyEngine,
+} from "../governance/policy-engine.js";
 import * as emit from "../core/trace-emitter.js";
 import type { Trace } from "../schemas/trace.js";
 import type { AuditEnvelope } from "../schemas/audit-envelope.js";
@@ -26,6 +29,8 @@ import type { BudgetPolicy } from "../schemas/budget.js";
 import type { SandboxConfig } from "../schemas/sandbox.js";
 import { buildManifest, serializeManifest } from "../governance/manifest-builder.js";
 import type { WireFormat } from "../governance/manifest-builder.js";
+import { toLLMToolDefinitions } from "../tools/llm-tools.js";
+import type { Phase } from "../schemas/agent-loop.js";
 
 function sha256(data: string): string {
   return createHash("sha256").update(data).digest("hex");
@@ -40,6 +45,7 @@ export interface GovernedAgentConfig {
   backend: LLMBackend;
   toolRegistry: ToolRegistry;
   policies?: PolicySet[];
+  policyEngine?: DelegationPolicyEngine;
   agentId?: string;
   budgetPolicy?: BudgetPolicy;
   sandbox?: SandboxConfig;
@@ -65,16 +71,22 @@ export async function runGovernedAgent(
   });
 
   const permissionMgr = new PermissionManager();
-  const policyEval = new PolicyEvaluator();
-  for (const p of config.policies ?? []) {
-    policyEval.addPolicy(p);
-  }
+  const policyEngine =
+    config.policyEngine ?? new InProcessPolicyEngine(config.policies ?? []);
   const broker = new AuthBroker(permissionMgr);
   const audit = new AuditEngine();
   let lastResponse: LLMResponseWithTools | undefined;
+  const toolContracts = config.toolRegistry.listTools();
+
+  const syncPermissionState = () => {
+    state.activePermissions = state.activePermissions.map(
+      (perm) => permissionMgr.get(perm.permission_id) ?? perm,
+    );
+  };
 
   const callLLM = async (
     messages: LLMMessage[],
+    tools?: ReturnType<typeof toLLMToolDefinitions>,
   ): Promise<LLMResponseWithTools> => {
     const response = await callLLMWithCircuitBreaker({
       backend: config.backend,
@@ -86,6 +98,8 @@ export async function runGovernedAgent(
       safety: {
         maxDecodedChars: 16_000,
       },
+      tools,
+      toolChoice: tools && tools.length > 0 ? "auto" : undefined,
     });
     lastResponse = response;
     return response;
@@ -93,6 +107,7 @@ export async function runGovernedAgent(
 
   const finish = (answer: string): GovernedAgentResult => {
     permissionMgr.revokeAll("run finalized");
+    syncPermissionState();
     emit.finalizeTrace(
       state,
       answer || state.trace.final_answer || String(state.completionStatus),
@@ -108,18 +123,82 @@ export async function runGovernedAgent(
    * the model always sees the current truth rather than stale context from an
    * earlier phase.
    */
-  const manifestHeartbeat = () => {
+  const consultPhase = async (
+    phase: Phase,
+    context?: Record<string, unknown>,
+  ): Promise<boolean> => {
+    if (!policyEngine.consultPhase) {
+      return true;
+    }
+    const decision = await policyEngine.consultPhase({
+      runId: state.runId,
+      agentId: state.telemetry.agent_id,
+      objective: config.objective,
+      phase,
+      context,
+    });
+    if (decision.status === "allowed") {
+      return true;
+    }
+    forceStop(
+      state,
+      "denied",
+      `Policy denied at phase ${phase}: ${decision.reason ?? "Denied by policy"}`,
+    );
+    return false;
+  };
+
+  const manifestHeartbeat = async () => {
+    let toolOverrides:
+      | Record<
+          string,
+          {
+            accessLevel: "pre_authorized" | "requires_delegation" | "blocked";
+            constraints?: Record<string, unknown>;
+            reason?: string;
+          }
+        >
+      | undefined;
+    if (policyEngine.previewToolAccess) {
+      const preview = await policyEngine.previewToolAccess({
+        runId: state.runId,
+        agentId: state.telemetry.agent_id,
+        objective: config.objective,
+        phase: state.phase,
+        tools: toolContracts,
+        sandbox: state.sandbox,
+        context: {
+          phase: state.phase,
+        },
+      });
+      toolOverrides = Object.fromEntries(
+        Object.entries(preview).map(([toolName, result]) => [
+          toolName,
+          {
+            accessLevel: result.accessLevel,
+            constraints: result.constraints,
+            reason: result.reason,
+          },
+        ]),
+      );
+    }
     const manifest = buildManifest({
       runId: state.runId,
       agentId: state.telemetry.agent_id,
       phase: state.phase,
-      toolContracts: config.toolRegistry.listTools(),
+      toolContracts,
       sandbox: state.sandbox,
       policies: config.policies ?? [],
       budget: state.budget,
+      toolOverrides,
     });
     state.capabilityManifest = manifest;
-    return serializeManifest(manifest, config.wireFormat);
+    const visibleTools = new Set(manifest.tools.available.map((tool) => tool.name));
+    const llmTools = toLLMToolDefinitions(toolContracts, visibleTools);
+    return {
+      text: serializeManifest(manifest, config.wireFormat),
+      llmTools,
+    };
   };
 
   // --- receive ---
@@ -129,13 +208,17 @@ export async function runGovernedAgent(
 
   // --- frame ---
   if (halted(state)) return finish("");
+  if (!(await consultPhase("frame"))) {
+    return finish("Request denied by policy.");
+  }
+  const frameHeartbeat = await manifestHeartbeat();
   const frameResp = await callLLM([
     {
       role: "system",
-      content: `Interpret and frame the user's task. Do not call tools.\n\n${manifestHeartbeat()}`,
+      content: `Interpret and frame the user's task. Do not call tools.\n\n${frameHeartbeat.text}`,
     },
     { role: "user", content: `[harness:frame]\n${config.objective}` },
-  ]);
+  ], frameHeartbeat.llmTools);
   if (halted(state)) return finish(frameResp.content);
   emit.emitThought(state, `[frame] ${frameResp.content}`);
   budget.recordStep(state, "frame");
@@ -143,13 +226,17 @@ export async function runGovernedAgent(
 
   // --- plan ---
   if (halted(state)) return finish("");
+  if (!(await consultPhase("plan"))) {
+    return finish("Request denied by policy.");
+  }
+  const planHeartbeat = await manifestHeartbeat();
   const planResp = await callLLM([
     {
       role: "system",
-      content: `Propose concrete actions. You may request tools via tool_calls when needed.\n\n${manifestHeartbeat()}`,
+      content: `Propose concrete actions. You may request tools via tool_calls when needed.\n\n${planHeartbeat.text}`,
     },
     { role: "user", content: `[harness:plan]\n${config.objective}` },
-  ]);
+  ], planHeartbeat.llmTools);
   if (halted(state)) return finish(planResp.content);
   const planStep = emit.emitPlan(state, planResp.content);
   budget.recordStep(state, "plan");
@@ -160,13 +247,20 @@ export async function runGovernedAgent(
   if (toolCalls.length === 0) {
     transition(state, "finalize", "No tools required");
     if (halted(state)) return finish(planResp.content);
+    if (!(await consultPhase("finalize"))) {
+      return finish("Request denied by policy.");
+    }
+    const noToolsFinalizeHeartbeat = await manifestHeartbeat();
     const fin = await callLLM([
-      { role: "system", content: `Produce the final user-facing answer.\n\n${manifestHeartbeat()}` },
+      {
+        role: "system",
+        content: `Produce the final user-facing answer.\n\n${noToolsFinalizeHeartbeat.text}`,
+      },
       {
         role: "user",
         content: `[harness:finalize]\n${config.objective}\n\nPlan:\n${planResp.content}`,
       },
-    ]);
+    ], noToolsFinalizeHeartbeat.llmTools);
     if (halted(state)) return finish(fin.content || planResp.content);
     transition(state, "audit_seal", "Run complete");
     return finish(fin.content || planResp.content);
@@ -211,7 +305,7 @@ export async function runGovernedAgent(
 
     // --- validate_authority ---
     transition(state, "validate_authority", `Validate ${tc.toolName}`);
-    const decision = policyEval.evaluate(
+    const decision = await policyEngine.evaluate(
       request,
       state.telemetry.agent_id,
     );
@@ -276,6 +370,13 @@ export async function runGovernedAgent(
         tc.toolName,
         tc.arguments,
         state.sandbox,
+        {
+          kind: "receipt",
+          permissionId: receipt.permission_id,
+          grantedScope: receipt.granted_scope,
+          isPermissionValid: (permissionId: string) =>
+            permissionMgr.isValid(permissionId),
+        },
       );
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -286,10 +387,19 @@ export async function runGovernedAgent(
     // Consume one-shot permission
     if (receipt.one_shot) {
       permissionMgr.consume(receipt.permission_id);
+      syncPermissionState();
     }
 
     // --- observe_result ---
     transition(state, "observe_result", "Tool returned");
+    if (
+      !(await consultPhase("observe_result", {
+        tool_name: tc.toolName,
+        result_status: toolResult.error ? "error" : "success",
+      }))
+    ) {
+      return finish("Request denied by policy.");
+    }
     const obsText = toolResult.error
       ? `Error: ${toolResult.error}`
       : JSON.stringify(toolResult.output);
@@ -323,16 +433,24 @@ export async function runGovernedAgent(
     // --- critique_verify ---
     transition(state, "critique_verify", "Evaluate tool output");
     if (halted(state)) return finish("");
+    if (
+      !(await consultPhase("critique_verify", {
+        tool_name: tc.toolName,
+      }))
+    ) {
+      return finish("Request denied by policy.");
+    }
+    const critiqueHeartbeat = await manifestHeartbeat();
     const critique = await callLLM([
       {
         role: "system",
-        content: `Critique tool results for correctness and safety.\n\n${manifestHeartbeat()}`,
+        content: `Critique tool results for correctness and safety.\n\n${critiqueHeartbeat.text}`,
       },
       {
         role: "user",
         content: `[harness:critique]\nTool: ${tc.toolName}\nObservation:\n${obsText}`,
       },
-    ]);
+    ], critiqueHeartbeat.llmTools);
     if (halted(state)) return finish(critique.content);
     emit.emitCritique(state, critique.content);
     budget.recordStep(state, "critique_verify");
@@ -341,13 +459,17 @@ export async function runGovernedAgent(
   // --- finalize ---
   if (halted(state)) return finish("");
   transition(state, "finalize", "Synthesize final answer");
+  if (!(await consultPhase("finalize"))) {
+    return finish("Request denied by policy.");
+  }
+  const finalizeHeartbeat = await manifestHeartbeat();
   const finalResp = await callLLM([
     {
       role: "system",
-      content: `Produce the final user-facing answer from the plan and observations.\n\n${manifestHeartbeat()}`,
+      content: `Produce the final user-facing answer from the plan and observations.\n\n${finalizeHeartbeat.text}`,
     },
     { role: "user", content: `[harness:finalize]\n${config.objective}` },
-  ]);
+  ], finalizeHeartbeat.llmTools);
   if (halted(state)) return finish(finalResp.content);
   transition(state, "audit_seal", "Governed run complete");
   return finish(finalResp.content);
