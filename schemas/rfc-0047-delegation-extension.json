@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://opencot.dev/schema/rfc0047/delegation-extension.json",
+  "$id": "https://opencot.dev/schema/rfc0047/delegation-extension-v0.2.json",
   "title": "Open CoT RFC 0047 — Delegation Extension",
   "type": "object",
   "additionalProperties": false,
@@ -34,7 +34,8 @@
           "type": "string"
         },
         "plan_version": {
-          "type": "string"
+          "type": "integer",
+          "minimum": 0
         }
       }
     },
@@ -45,7 +46,7 @@
         "schema_version": {
           "type": "string",
           "enum": [
-            "0.1"
+            "0.2"
           ]
         },
         "request_id": {
@@ -60,7 +61,7 @@
           "type": "string",
           "minLength": 1
         },
-        "timestamp": {
+        "observed_at": {
           "type": "string",
           "format": "date-time"
         },
@@ -78,11 +79,8 @@
           "minimum": 1
         },
         "preferred_audience": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
+          "type": "string",
+          "minLength": 1
         },
         "task_context_ref": {
           "type": "string"
@@ -97,7 +95,7 @@
         "requester",
         "run_id",
         "requested_scope",
-        "timestamp"
+        "observed_at"
       ]
     },
     "delegation_decision": {
@@ -107,7 +105,7 @@
         "schema_version": {
           "type": "string",
           "enum": [
-            "0.1"
+            "0.2"
           ]
         },
         "decision_id": {
@@ -166,7 +164,7 @@
         "escalation_target": {
           "type": "string"
         },
-        "timestamp": {
+        "decided_at": {
           "type": "string",
           "format": "date-time"
         }
@@ -178,7 +176,7 @@
         "status",
         "decided_by",
         "policy_refs",
-        "timestamp"
+        "decided_at"
       ]
     },
     "integrity": {
@@ -212,7 +210,7 @@
         "schema_version": {
           "type": "string",
           "enum": [
-            "0.1"
+            "0.2"
           ]
         },
         "receipt_id": {
@@ -234,7 +232,7 @@
         "granted_scope": {
           "$ref": "#/$defs/scope"
         },
-        "granted_at": {
+        "effective_at": {
           "type": "string",
           "format": "date-time"
         },
@@ -249,11 +247,8 @@
           "type": "boolean"
         },
         "audience": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "minLength": 1
-          }
+          "type": "string",
+          "minLength": 1
         },
         "integrity": {
           "$ref": "#/$defs/integrity"
@@ -266,7 +261,7 @@
         "request_id",
         "permission_id",
         "granted_scope",
-        "granted_at",
+        "effective_at",
         "expires_at",
         "one_shot",
         "forwardable",

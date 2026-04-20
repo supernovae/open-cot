@@ -52,7 +52,7 @@ function delegationSummaryFromState(state: AgentState): DelegationSummary {
   const decisions = state.delegationDecisions;
   return {
     total_requested: state.delegationRequests.length,
-    total_approved: decisions.filter((d) => d.status === "approved").length,
+    total_granted: decisions.filter((d) => d.status === "approved").length,
     total_denied: decisions.filter((d) => d.status === "denied").length,
     total_narrowed: decisions.filter((d) => d.status === "narrowed").length,
     total_escalated: decisions.filter((d) => d.status === "escalated").length,
@@ -71,14 +71,20 @@ function permissionSummaryFromState(state: AgentState): PermissionSummary {
 
 type AuditEventIntegrity = { hash_algorithm: "sha256"; content_hash: string };
 
+interface AuditEventOrdering {
+  event_seq: number;
+  causal_predecessors?: string[];
+}
+
 export interface AuditEvent {
   event_id: string;
   run_id: string;
   agent_id: string;
-  timestamp: string;
+  observed_at: string;
   event_type: string;
   details: Record<string, unknown>;
-  previous_event_id: string | null;
+  parent_event_id: string | null;
+  ordering: AuditEventOrdering;
   integrity: AuditEventIntegrity;
 }
 
@@ -95,19 +101,24 @@ export class AuditEngine {
     event_type: string;
     details: Record<string, unknown>;
   }): AuditEvent {
-    const timestamp = new Date().toISOString();
-    const previous_event_id =
+    const observed_at = new Date().toISOString();
+    const parent_event_id =
       this.events.length > 0 ? this.events[this.events.length - 1]!.event_id : null;
+    const ordering: AuditEventOrdering = {
+      event_seq: this.events.length,
+      causal_predecessors: parent_event_id ? [parent_event_id] : undefined,
+    };
     const event_id = randomUUID();
 
     const hashInput = stableStringify({
       event_id,
       run_id: args.run_id,
       agent_id: args.agent_id,
-      timestamp,
+      observed_at,
       event_type: args.event_type,
       details: args.details,
-      previous_event_id,
+      parent_event_id,
+      ordering,
     });
     const content_hash = sha256Hex(hashInput);
 
@@ -115,10 +126,11 @@ export class AuditEngine {
       event_id,
       run_id: args.run_id,
       agent_id: args.agent_id,
-      timestamp,
+      observed_at,
       event_type: args.event_type,
       details: args.details,
-      previous_event_id,
+      parent_event_id,
+      ordering,
       integrity: { hash_algorithm: "sha256", content_hash },
     };
     this.events.push(event);
@@ -126,7 +138,7 @@ export class AuditEngine {
   }
 
   seal(state: AgentState): AuditEnvelope {
-    const sealed_at = new Date().toISOString();
+    const completed_at = new Date().toISOString();
     const trace_hash = sha256Hex(stableStringify(state.trace));
     const task_hash = sha256Hex(
       stableStringify({ objective: state.objective, trace_task: state.trace.task }),
@@ -140,15 +152,16 @@ export class AuditEngine {
     const tail =
       this.events.length > 0 ? this.events[this.events.length - 1]!.event_id : undefined;
 
-    const started_at = state.telemetry.timestamp;
+    const started_at = state.telemetry.observed_at;
 
     const body: Omit<AuditEnvelope, "integrity"> = {
+      schema_version: "0.3",
       envelope_id,
       run_id: state.runId,
       agent_id: state.telemetry.agent_id,
       task_hash,
       started_at,
-      sealed_at,
+      completed_at,
       completion_status: toEnvelopeCompletion(state),
       trace_hash,
       event_chain_head: head,

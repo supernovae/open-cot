@@ -80,10 +80,11 @@ export class AuthBroker {
     const one_shot = readConstraintBool(granted_scope, "one_shot", false);
     const forwardable = readConstraintBool(granted_scope, "forwardable", false);
 
+    const audience = request.preferred_audience ?? granted_scope.resource;
     const grant = this.permissionManager.grant({
       granted_to: request.requester,
       scope: granted_scope,
-      audience: request.preferred_audience,
+      audience,
       ttl_seconds,
       one_shot,
       forwardable,
@@ -93,16 +94,17 @@ export class AuthBroker {
       decision_ref: decision.decision_id,
     });
 
-    const granted_at = grant.granted_at;
+    const effective_at = grant.effective_at;
     const expires_at = grant.expires_at;
 
     const receiptBody: Omit<AuthorityReceipt, "integrity"> = {
+      schema_version: "0.2",
       receipt_id: randomUUID(),
       decision_id: decision.decision_id,
       request_id: request.request_id,
       permission_id: grant.permission_id,
       granted_scope,
-      granted_at,
+      effective_at,
       expires_at,
       one_shot: grant.one_shot,
       forwardable: grant.forwardable,

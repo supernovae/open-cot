@@ -79,11 +79,11 @@ A multi‑agent system consists of:
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "OpenCoT Multi-Agent Protocol v0.1",
+  "title": "OpenCoT Multi-Agent Protocol v0.2",
   "type": "object",
 
   "properties": {
-    "version": { "type": "string", "enum": ["0.1"] },
+    "version": { "type": "string", "enum": ["0.2"] },
 
     "agents": {
       "type": "array",
@@ -106,11 +106,11 @@ A multi‑agent system consists of:
           "message_id": { "type": "string" },
           "sender": { "type": "string" },
           "receiver": { "type": "string" },
-          "timestamp": { "type": "string" },
+          "observed_at": { "type": "string", "format": "date-time" },
           "content": { "type": "string" },
           "metadata": { "type": "object" }
         },
-        "required": ["message_id", "sender", "receiver", "content"]
+        "required": ["message_id", "sender", "receiver", "observed_at", "content"]
       }
     },
 
@@ -138,6 +138,7 @@ A multi‑agent system consists of:
       "message_id": "m1",
       "sender": "planner",
       "receiver": "coder",
+      "observed_at": "2026-04-14T11:32:12Z",
       "content": "Implement function f(x)."
     }
   ]

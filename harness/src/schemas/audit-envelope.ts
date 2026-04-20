@@ -1,5 +1,5 @@
 /**
- * Audit envelope types — RFC 0043 v0.2 / RFC 0048.
+ * Audit envelope types — RFC 0043 v0.3 / RFC 0048 v0.2.
  *
  * Sealed summary of a complete governed execution run. Immutable after
  * creation — any modification is detectable via hash verification.
@@ -20,7 +20,7 @@ export type CompletionStatus =
 
 export interface DelegationSummary {
   total_requested: number;
-  total_approved: number;
+  total_granted: number;
   total_denied: number;
   total_narrowed: number;
   total_escalated: number;
@@ -38,17 +38,18 @@ export interface PolicyViolationRecord {
   policy_id: string;
   rule_id: string;
   description: string;
-  severity: "low" | "medium" | "high" | "critical";
-  timestamp: string;
+  severity: "info" | "low" | "medium" | "high" | "critical";
+  observed_at: string;
 }
 
 export interface AuditEnvelope {
+  schema_version: "0.2" | "0.3";
   envelope_id: string;
   run_id: string;
   agent_id: string;
   task_hash: string;
   started_at: string;
-  sealed_at: string;
+  completed_at: string;
   completion_status: CompletionStatus;
   trace_hash: string;
   event_chain_head?: string;

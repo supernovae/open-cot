@@ -104,8 +104,11 @@ export function emitSummary(
 export function finalizeTrace(state: AgentState, answer: string): Trace {
   state.trace.final_answer = answer;
   state.trace.termination = state.completionStatus;
-  state.telemetry.timestamp = new Date().toISOString();
-  state.telemetry.metrics.latency_ms = Date.now(); // caller can diff with start
+  const startedAt = Date.parse(state.telemetry.observed_at);
+  const endedAt = Date.now();
+  state.telemetry.metrics.latency_ms = Number.isFinite(startedAt)
+    ? Math.max(0, endedAt - startedAt)
+    : endedAt;
   return state.trace;
 }
 

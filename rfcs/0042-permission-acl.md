@@ -1,4 +1,4 @@
-# RFC 0042 — Permissions & Access Control (v0.2)
+# RFC 0042 — Permissions & Access Control (v0.3)
 
 **Status:** Draft  
 **Author:** Byron / Open CoT Community  
@@ -28,7 +28,7 @@ Open CoT is a **cognitive control plane**: reasoning, tools, memory, and policy 
 2. **Deny by default.** No matching active grant for `audience` + `scope` ⇒ execution MUST fail closed.  
 3. **Least privilege in the grant.** Persisted `scope` is the **post-policy** narrowed scope, not the model’s raw intent.  
 4. **Explicit binding.** `audience` ties the capability to a specific tool/service key.  
-5. **Time-bounded.** Every grant has `ttl_seconds` and `expires_at`; expired grants are unusable (`expired`).  
+5. **Time-bounded.** Every grant has `effective_at`, `ttl_seconds`, and `expires_at`; expired grants are unusable (`expired`).  
 6. **Observable transitions.** Every lifecycle change MUST emit a structured audit event (§9).
 
 ---
@@ -56,7 +56,7 @@ Open CoT is a **cognitive control plane**: reasoning, tools, memory, and policy 
 
 ## 6. TTL and expiry
 
-Every grant MUST have `ttl_seconds` (integer ≥ 1) and `expires_at` (RFC 3339). The harness sets `expires_at` from `granted_at` + TTL at issuance. The executor MUST check `now < expires_at` on the harness clock domain before each use. **Recommended defaults (non-normative):** 60s for tool calls; 300s for session-scoped reads/lists when policy allows. On expiry, set `expired` and log `permission_expired`.
+Every grant MUST have `effective_at`, `ttl_seconds` (integer >= 1), and `expires_at` (RFC 3339). The harness sets `expires_at` from `effective_at` + TTL at issuance. The executor MUST check `effective_at <= now < expires_at` on the harness clock domain before each use. **Recommended defaults (non-normative):** 60s for tool calls; 300s for session-scoped reads/lists when policy allows. On expiry, set `expired` and log `permission_expired`.
 
 ---
 
@@ -90,7 +90,7 @@ Every state change MUST log: **`permission_granted`** (scope, TTL, audience, `gr
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://opencot.dev/schema/permission-grant/0.2",
+  "$id": "https://opencot.dev/schema/permission-grant/0.3",
   "title": "Open CoT RFC 0042 — Permission Grant",
   "type": "object",
   "additionalProperties": false,
@@ -126,7 +126,7 @@ Every state change MUST log: **`permission_granted`** (scope, TTL, audience, `gr
     "policy_ref": { "type": "string", "minLength": 1 },
     "request_ref": { "type": "string", "minLength": 1 },
     "decision_ref": { "type": "string", "minLength": 1 },
-    "granted_at": { "type": "string", "format": "date-time" },
+    "effective_at": { "type": "string", "format": "date-time" },
     "consumed_at": { "type": "string", "format": "date-time" },
     "revoked_at": { "type": "string", "format": "date-time" },
     "revocation_reason": { "type": "string" },
@@ -134,7 +134,7 @@ Every state change MUST log: **`permission_granted`** (scope, TTL, audience, `gr
   },
   "required": [
     "permission_id", "granted_to", "scope", "audience", "ttl_seconds", "expires_at",
-    "one_shot", "granted_by", "policy_ref", "request_ref", "decision_ref", "granted_at", "status"
+    "one_shot", "granted_by", "policy_ref", "request_ref", "decision_ref", "effective_at", "status"
   ],
   "allOf": [
     { "if": { "properties": { "status": { "const": "consumed" } }, "required": ["status"] },
@@ -178,7 +178,7 @@ Before execution: verify `status == active`, audience match, not expired, `scope
   "policy_ref": "policy:org-contracts-v3",
   "request_ref": "deleg_req:7f2c9a1b-4d3e-4f5a-9b0c-111111111111",
   "decision_ref": "deleg_dec:88aa99bb-0cc1-4dd2-9ee3-222222222222",
-  "granted_at": "2026-04-18T14:30:22Z",
+  "effective_at": "2026-04-18T14:30:22Z",
   "status": "active"
 }
 ```
@@ -205,7 +205,7 @@ First committed `tool:filesystem` write ⇒ `consumed` + `permission_consumed`.
   "policy_ref": "policy:safe-search-v1",
   "request_ref": "deleg_req:aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
   "decision_ref": "deleg_dec:ffffffff-0000-1111-2222-333333333333",
-  "granted_at": "2026-04-18T14:35:00Z",
+  "effective_at": "2026-04-18T14:35:00Z",
   "status": "active"
 }
 ```
@@ -234,7 +234,7 @@ First committed `tool:filesystem` write ⇒ `consumed` + `permission_consumed`.
   "policy_ref": "policy:pii-minimize-v2",
   "request_ref": "deleg_req:11111111-2222-3333-4444-555555555555",
   "decision_ref": "deleg_dec:66666666-7777-8888-9999-aaaaaaaaaaaa",
-  "granted_at": "2026-04-18T15:00:05Z",
+  "effective_at": "2026-04-18T15:00:05Z",
   "status": "active"
 }
 ```
@@ -255,7 +255,7 @@ Executor MUST enforce headers-only regardless of model prompts.
 
 ## 15. Open questions resolution
 
-| Topic | Resolution (v0.2) |
+| Topic | Resolution (v0.3) |
 |-------|---------------------|
 | RBAC vs capabilities | Capabilities at execution; RBAC feeds policy only. |
 | Clock skew | `expires_at` authoritative; harness clock or documented skew budget. |
@@ -273,4 +273,4 @@ Conformant implementations: (1) issue grants only post-validated decision with i
 
 ## 17. Conclusion
 
-RFC 0042 v0.2 specifies **first-class permission grants** with audience binding, TTL, optional reuse, forwardability rules, and audited lifecycle—closing the loop from RFC 0026 / 0041 identity and policy to safe execution on the Open CoT control plane (RFC 0007, RFC 0047).
+RFC 0042 v0.3 specifies **first-class permission grants** with audience binding, canonical temporal validity (`effective_at`/`expires_at`), TTL, optional reuse, forwardability rules, and audited lifecycle—closing the loop from RFC 0026 / 0041 identity and policy to safe execution on the Open CoT control plane (RFC 0007, RFC 0047, RFC 0051).

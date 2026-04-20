@@ -3,7 +3,7 @@
 Canonical discussion threads for all Open CoT RFCs. Use these threads for normative feedback and design discussion.
 
 - Discussion policy: RFC feedback uses GitHub Discussions first; issues are for actionable tasks/bugs.
-- Source mapping: `docs/rfc-discussion-index.json` (46 RFCs)
+- Source mapping: `docs/rfc-discussion-index.json` (51 RFCs)
 
 | RFC | Topic | Discussion |
 |-----|-------|------------|
@@ -53,4 +53,9 @@ Canonical discussion threads for all Open CoT RFCs. Use these threads for normat
 | [`RFC 0044`](../rfcs/0044-governance-organizational-controls.md) | Governance & Organizational Controls | [Open thread](https://github.com/supernovae/open-cot/discussions/44) |
 | [`RFC 0045`](../rfcs/0045-ethical-risk-contraints-reasoning-agents.md) | Ethical & Risk Constraints for Reasoning Agents | [Open thread](https://github.com/supernovae/open-cot/discussions/45) |
 | [`RFC 0046`](../rfcs/0046-conformance-interoperability-protocol.md) | Conformance & Interoperability Protocol | [Open thread](https://github.com/supernovae/open-cot/discussions/46) |
+| [`RFC 0047`](../rfcs/0047-delegation-extension.md) | Delegation Extension | [Open thread](https://github.com/supernovae/open-cot/discussions/47) |
+| [`RFC 0048`](../rfcs/0048-execution-receipts-audit-envelopes.md) | Execution Receipts & Audit Envelopes | [Open thread](https://github.com/supernovae/open-cot/discussions/48) |
+| [`RFC 0049`](../rfcs/0049-capability-manifest.md) | Capability Manifest | [Open thread](https://github.com/supernovae/open-cot/discussions/49) |
+| [`RFC 0050`](../rfcs/0050-toon-adapter.md) | TOON Adapter: Token-Oriented Object Notation | [Open thread](https://github.com/supernovae/open-cot/discussions/50) |
+| [`RFC 0051`](../rfcs/0051-temporal-semantics-validity-extension.md) | Temporal Semantics & Validity Extension | [Open thread](https://github.com/supernovae/open-cot/discussions/51) |
 

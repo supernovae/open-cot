@@ -1,4 +1,4 @@
-# RFC 0047 — Delegation Extension (v0.1)
+# RFC 0047 — Delegation Extension (v0.2)
 **Status:** Draft  
 **Author:** Byron / Open CoT Community  
 **Created:** 2026-04-18  
@@ -27,7 +27,7 @@ This RFC defines three JSON objects:
 | Zone | Who writes | Guarantees |
 |------|------------|--------------|
 | Model-adjacent | Model output supplies **intent**, **justification**, **requested_scope** preferences, TTL/audience **preferences**, and **task_context_ref** only. | Untrusted text and structure proposals. |
-| Harness | Fills `request_id`, `requester`, `run_id`, `timestamp`, `provenance`; merges model fields after validation. | `requester` MUST match verified identity ([RFC 0026](0026-agent-identity-auth.md)). |
+| Harness | Fills `request_id`, `requester`, `run_id`, `observed_at`, `provenance`; merges model fields after validation. | `requester` MUST match verified identity ([RFC 0026](0026-agent-identity-auth.md)). |
 | Policy | Emits **`delegation_decision`** exclusively. | Model MUST NOT emit or alter decisions. |
 | Auth broker | Emits **`authority_receipt`**; computes **integrity** over all other receipt fields. | Receipt is **tamper-evident**; executors verify hash (and signature when configured) before dispatch. |
 
@@ -39,9 +39,9 @@ This RFC defines three JSON objects:
 
 **Model-provided (merged by harness):** `intent`, `justification`, `requested_scope`, `preferred_ttl_seconds`, `preferred_audience`, `task_context_ref`.
 
-**Harness-provided:** `request_id`, `requester` (verified `agent_id`), `run_id`, `timestamp`, `provenance` (`trace_step_id`, `plan_version`).
+**Harness-provided:** `request_id`, `requester` (verified `agent_id`), `run_id`, `observed_at`, `provenance` (`trace_step_id`, `plan_version`).
 
-**Required fields:** `request_id`, `requester`, `run_id`, `requested_scope`, `timestamp`.
+**Required fields:** `request_id`, `requester`, `run_id`, `requested_scope`, `observed_at`.
 
 `requested_scope` is an object with:
 
@@ -63,7 +63,7 @@ All fields are **harness/policy-provided**. The model does not participate in au
 | `narrowed_scope` | Present when `status` is `narrowed` (or when approved but scope reduced—see §7). |
 | `denial_reason` | Present when `status` is `denied`. |
 | `escalation_target` | Present when `status` is `escalated` (queue, role, ticket system ref). |
-| `timestamp` | RFC 3339 decision time. |
+| `decided_at` | RFC 3339 decision time. |
 
 ### 3.3 `authority_receipt`
 
@@ -108,7 +108,7 @@ Implementers integrating with OAuth2-style systems MAY map fields as follows. Th
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://opencot.dev/schema/rfc0047/delegation-extension.json",
+  "$id": "https://opencot.dev/schema/rfc0047/delegation-extension-v0.2.json",
   "title": "Open CoT RFC 0047 — Delegation Extension",
   "type": "object",
   "additionalProperties": false,
@@ -128,33 +128,33 @@ Implementers integrating with OAuth2-style systems MAY map fields as follows. Th
       "additionalProperties": false,
       "properties": {
         "trace_step_id": { "type": "string" },
-        "plan_version": { "type": "string" }
+        "plan_version": { "type": "integer", "minimum": 0 }
       }
     },
     "delegation_request": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "schema_version": { "type": "string", "enum": ["0.1"] },
+        "schema_version": { "type": "string", "enum": ["0.2"] },
         "request_id": { "type": "string", "minLength": 1 },
         "requester": { "type": "string", "minLength": 1 },
         "run_id": { "type": "string", "minLength": 1 },
-        "timestamp": { "type": "string", "format": "date-time" },
+        "observed_at": { "type": "string", "format": "date-time" },
         "intent": { "type": "string" },
         "justification": { "type": "string" },
         "requested_scope": { "$ref": "#/$defs/scope" },
         "preferred_ttl_seconds": { "type": "integer", "minimum": 1 },
-        "preferred_audience": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "preferred_audience": { "type": "string", "minLength": 1 },
         "task_context_ref": { "type": "string" },
         "provenance": { "$ref": "#/$defs/provenance" }
       },
-      "required": ["schema_version", "request_id", "requester", "run_id", "requested_scope", "timestamp"]
+      "required": ["schema_version", "request_id", "requester", "run_id", "requested_scope", "observed_at"]
     },
     "delegation_decision": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "schema_version": { "type": "string", "enum": ["0.1"] },
+        "schema_version": { "type": "string", "enum": ["0.2"] },
         "decision_id": { "type": "string", "minLength": 1 },
         "request_id": { "type": "string", "minLength": 1 },
         "status": {
@@ -175,9 +175,9 @@ Implementers integrating with OAuth2-style systems MAY map fields as follows. Th
         "narrowed_scope": { "$ref": "#/$defs/scope" },
         "denial_reason": { "type": "string" },
         "escalation_target": { "type": "string" },
-        "timestamp": { "type": "string", "format": "date-time" }
+        "decided_at": { "type": "string", "format": "date-time" }
       },
-      "required": ["schema_version", "decision_id", "request_id", "status", "decided_by", "policy_refs", "timestamp"]
+      "required": ["schema_version", "decision_id", "request_id", "status", "decided_by", "policy_refs", "decided_at"]
     },
     "integrity": {
       "type": "object",
@@ -194,20 +194,20 @@ Implementers integrating with OAuth2-style systems MAY map fields as follows. Th
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "schema_version": { "type": "string", "enum": ["0.1"] },
+        "schema_version": { "type": "string", "enum": ["0.2"] },
         "receipt_id": { "type": "string", "minLength": 1 },
         "decision_id": { "type": "string", "minLength": 1 },
         "request_id": { "type": "string", "minLength": 1 },
         "permission_id": { "type": "string", "minLength": 1 },
         "granted_scope": { "$ref": "#/$defs/scope" },
-        "granted_at": { "type": "string", "format": "date-time" },
+        "effective_at": { "type": "string", "format": "date-time" },
         "expires_at": { "type": "string", "format": "date-time" },
         "one_shot": { "type": "boolean" },
         "forwardable": { "type": "boolean" },
-        "audience": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "audience": { "type": "string", "minLength": 1 },
         "integrity": { "$ref": "#/$defs/integrity" }
       },
-      "required": ["schema_version", "receipt_id", "decision_id", "request_id", "permission_id", "granted_scope", "granted_at", "expires_at", "one_shot", "forwardable", "audience", "integrity"]
+      "required": ["schema_version", "receipt_id", "decision_id", "request_id", "permission_id", "granted_scope", "effective_at", "expires_at", "one_shot", "forwardable", "audience", "integrity"]
     }
   },
   "properties": {
@@ -229,11 +229,11 @@ The model asks to read full messages; policy narrows to **headers only**; broker
 
 ```json
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "request_id": "dr_email_9f3a",
   "requester": "agent:org/acme/exec-worker-07",
   "run_id": "run_20260418_0412",
-  "timestamp": "2026-04-18T04:12:01Z",
+  "observed_at": "2026-04-18T04:12:01Z",
   "intent": "Summarize unread customer threads for Q2 report",
   "justification": "User approved inbox analysis task in session ctx-88",
   "requested_scope": {
@@ -242,9 +242,9 @@ The model asks to read full messages; policy narrows to **headers only**; broker
     "constraints": { "folders": ["INBOX"], "max_messages": 50 }
   },
   "preferred_ttl_seconds": 900,
-  "preferred_audience": ["api://mail.acme.internal"],
+  "preferred_audience": "api://mail.acme.internal",
   "task_context_ref": "ctx://sessions/88/plan_step_4",
-  "provenance": { "trace_step_id": "ts_4412", "plan_version": "pv_12" }
+  "provenance": { "trace_step_id": "ts_4412", "plan_version": 12 }
 }
 ```
 
@@ -252,7 +252,7 @@ The model asks to read full messages; policy narrows to **headers only**; broker
 
 ```json
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "decision_id": "dd_email_9f3a_01",
   "request_id": "dr_email_9f3a",
   "status": "narrowed",
@@ -263,7 +263,7 @@ The model asks to read full messages; policy narrows to **headers only**; broker
     "action": "email.read_headers",
     "constraints": { "folders": ["INBOX"], "max_messages": 50, "strip": ["body", "attachments"] }
   },
-  "timestamp": "2026-04-18T04:12:01Z"
+  "decided_at": "2026-04-18T04:12:01Z"
 }
 ```
 
@@ -271,7 +271,7 @@ The model asks to read full messages; policy narrows to **headers only**; broker
 
 ```json
 {
-  "schema_version": "0.1",
+  "schema_version": "0.2",
   "receipt_id": "ar_email_9f3a_01",
   "decision_id": "dd_email_9f3a_01",
   "request_id": "dr_email_9f3a",
@@ -281,11 +281,11 @@ The model asks to read full messages; policy narrows to **headers only**; broker
     "action": "email.read_headers",
     "constraints": { "folders": ["INBOX"], "max_messages": 50, "strip": ["body", "attachments"] }
   },
-  "granted_at": "2026-04-18T04:12:02Z",
+  "effective_at": "2026-04-18T04:12:02Z",
   "expires_at": "2026-04-18T04:27:02Z",
   "one_shot": false,
   "forwardable": false,
-  "audience": ["api://mail.acme.internal"],
+  "audience": "api://mail.acme.internal",
   "integrity": {
     "hash_algorithm": "sha256",
     "content_hash": "sha256:canonical_payload_hex_omitted_for_brevity"
@@ -317,4 +317,4 @@ The model asks to read full messages; policy narrows to **headers only**; broker
 
 ## 10. Conclusion
 
-RFC 0047 v0.1 formalizes **delegation as data**: requests capture intent, decisions capture policy outcomes, and receipts capture brokered grants with tamper-evident integrity—preserving the invariant that **only the harness ecosystem authorizes**, while remaining mappable to familiar token-exchange deployments.
+RFC 0047 v0.2 formalizes **delegation as data** with canonical temporal semantics (`observed_at`, `decided_at`, `effective_at`/`expires_at`): requests capture intent, decisions capture policy outcomes, and receipts capture brokered grants with tamper-evident integrity.

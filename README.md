@@ -35,7 +35,7 @@ If reasoning, tool intent, provenance, budgets, state transitions, and delegatio
 
 | Area | Role |
 |------|------|
-| [`rfcs/`](./rfcs/) | **49 RFCs** — normative definitions for reasoning traces, tool invocation, the governed FSM, sandboxing, budgets, permissions, policy, delegation, provenance, identity, org governance, receipts, audit, and capability manifests |
+| [`rfcs/`](./rfcs/) | **51 RFCs** — normative definitions for reasoning traces, tool invocation, the governed FSM, sandboxing, budgets, permissions, policy, delegation, provenance, identity, org governance, receipts, audit, and capability manifests |
 | [`schemas/`](./schemas/) | Versioned JSON Schemas per RFC (`registry.json`, `rfc-*-*.json`) |
 | [`harness/`](./harness/) | **Reference harness** (TypeScript) — governed FSM, validation, tools, budgets, trace emission |
 | [`examples/`](./examples/) | Validated instance fixtures keyed by registry shortname |
@@ -50,7 +50,7 @@ If reasoning, tool intent, provenance, budgets, state transitions, and delegatio
 
 For a concise layout of control plane vs data plane, see [`docs/architecture.md`](./docs/architecture.md).
 
-**If you are evaluating quickly:** (1) read [`docs/eli5_guide.md`](./docs/eli5_guide.md), (2) run the harness tests above, (3) run `python tools/validate.py`, (4) skim RFC 0007 plus RFCs 0041, 0042, 0047, and 0048 for the governance spine.
+**If you are evaluating quickly:** (1) read [`docs/eli5_guide.md`](./docs/eli5_guide.md), (2) run the harness tests above, (3) run `python tools/validate.py`, (4) skim RFC 0007 plus RFCs 0041, 0042, 0047, 0048, and 0051 for the governance and temporal spine.
 
 ## The governed execution model
 
@@ -126,10 +126,11 @@ Reasoning **patterns** (plan–verify, debate, and similar) remain documented fo
 
 ## Current status
 
-- **49 RFCs** and a versioned JSON Schema registry with CI validation.
+- **51 RFCs** and a versioned JSON Schema registry with CI validation.
 - Reference harness implements the governed FSM, delegation and receipt types, budgets, sandboxed tools, and trace validation (see table above).
 - Cross-language checks: TypeScript-emitted traces validate under Python tooling.
 - Tiered examples, synthetic seed data, and experiment runbooks under [`experiments/`](./experiments/).
+- Breaking temporal normalization landed in RFC 0051 (`observed_at` / `decided_at` / `effective_at` / `completed_at`); migration guide: [`docs/temporal-migration-rfc0051.md`](./docs/temporal-migration-rfc0051.md).
 
 ## Experiment cards
 

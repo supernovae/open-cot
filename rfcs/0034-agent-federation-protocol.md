@@ -1,5 +1,7 @@
 # RFC 0034 — Agent Federation Protocol, Status: Draft, Author: Open CoT Community, Created: 2026-04-14
 
+**Discussion:** https://github.com/supernovae/open-cot/discussions/34
+
 ## 1. Summary
 
 This RFC defines how **independent Open-CoT deployments** (“peers”) interoperate when agents must delegate work across organizational or network boundaries while **retaining local policy sovereignty**. Each peer runs its own policy engine and identity plane; federation adds a **trust framework** for verifying peers, constraining accepted delegation scopes, and exchanging **`federation_request`** / **`federation_response`** messages that embed the standard **`delegation_request`** and **`delegation_decision`** objects from [RFC 0047](0047-delegation-extension.md). The result is cross-tenant collaboration without a single global “god” policy service—only negotiated trust and cryptographic verification.
@@ -67,7 +69,7 @@ Multi-cluster and multi-company agent workflows are inevitable (support handoffs
         "source_peer_id": { "type": "string", "minLength": 1 },
         "target_peer_id": { "type": "string", "minLength": 1 },
         "delegation_request": {
-          "$ref": "https://opencot.dev/schema/rfc0047/delegation-extension.json#/$defs/delegation_request"
+          "$ref": "https://opencot.dev/schema/rfc0047/delegation-extension-v0.2.json#/$defs/delegation_request"
         },
         "trust_chain": { "type": "array", "items": { "type": "string", "minLength": 1 }, "minItems": 1 }
       },
@@ -84,7 +86,7 @@ Multi-cluster and multi-company agent workflows are inevitable (support handoffs
           "enum": ["accepted", "rejected", "narrowed"]
         },
         "delegation_decision": {
-          "$ref": "https://opencot.dev/schema/rfc0047/delegation-extension.json#/$defs/delegation_decision"
+          "$ref": "https://opencot.dev/schema/rfc0047/delegation-extension-v0.2.json#/$defs/delegation_decision"
         },
         "response_integrity": { "$ref": "#/$defs/integrity" }
       },

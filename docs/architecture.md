@@ -24,6 +24,8 @@ Picture data moving left to right on the **happy path**:
 
 Side channels include **budget** enforcement (RFC 0038) and **sandbox** allow/deny lists (RFC 0017), which can pre-empt a transition or force `fail_safe` without giving unsafe payloads back to the model.
 
+Temporal validity and ordering semantics (RFC 0051) are now part of the control-plane contract: governance artifacts use canonical fields (`observed_at`, `decided_at`, `effective_at`, `expires_at`, `started_at`, `completed_at`, `superseded_at`) and SHOULD carry non-wall-clock ordering metadata for replay stability.
+
 For streamed decoding, deployments should treat budget control as an active circuit-breaker (preflight budget gate + mid-stream cancellation), not a post-hoc accounting report. The reference harness now supports this runtime pattern; see [Model adaptation for budget control](./model-adaptation-budget-control.md).
 
 ## Major components
@@ -103,6 +105,7 @@ Implementers usually traverse these in order after RFC 0001 (reasoning / trace):
 - **RFC 0047** — Delegation requests and decisions that precede narrowed authority.
 - **RFC 0048** — Execution receipts plus integrity linkage into audit envelopes.
 - **RFC 0043** — Auditing and compliance log shapes that consume the above identifiers.
+- **RFC 0051** — Cross-cutting temporal semantics, validity windows, freshness, replay handling, and supersession behavior.
 
 Additional RFCs cover identity (**RFC 0026**), provenance (**RFC 0035**), org governance (**RFC 0044**), federation, and economics; they extend the same spine rather than replacing it.
 

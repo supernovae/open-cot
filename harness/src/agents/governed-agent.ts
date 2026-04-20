@@ -192,13 +192,14 @@ export async function runGovernedAgent(
 
     // --- request_authority ---
     const request: DelegationRequest = {
+      schema_version: "0.2",
       request_id: `req-${randomUUID().slice(0, 8)}`,
       requester: state.telemetry.agent_id,
       run_id: state.runId,
       intent: `Execute tool ${tc.toolName}`,
       justification: planResp.content.slice(0, 500),
       requested_scope: { resource: `tool:${tc.toolName}`, action: "execute" },
-      timestamp: new Date().toISOString(),
+      observed_at: new Date().toISOString(),
       provenance: {
         trace_step_id: planStep.id,
         plan_version: state.planVersion,
@@ -269,6 +270,7 @@ export async function runGovernedAgent(
     budget.recordToolCall(state, `tool:${tc.toolName}`);
 
     let toolResult;
+    const executionStartedAt = new Date().toISOString();
     try {
       toolResult = await config.toolRegistry.call(
         tc.toolName,
@@ -295,6 +297,7 @@ export async function runGovernedAgent(
     budget.recordStep(state, "observe_result");
 
     const execReceipt: ToolExecutionReceipt = {
+      schema_version: "0.2",
       execution_id: `exec-${randomUUID().slice(0, 8)}`,
       run_id: state.runId,
       tool_name: tc.toolName,
@@ -302,12 +305,14 @@ export async function runGovernedAgent(
       authority_receipt_id: receipt.receipt_id,
       input_hash: sha256(JSON.stringify(tc.arguments)),
       output_hash: sha256(obsText),
-      started_at: new Date().toISOString(),
+      output_size_bytes: Buffer.byteLength(obsText, "utf8"),
+      started_at: executionStartedAt,
       completed_at: new Date().toISOString(),
-      duration_ms: toolResult.latencyMs,
+      duration_ms: toolResult.latencyMs ?? 0,
       status: toolResult.error ? "error" : "success",
       error_category: toolResult.errorCategory,
       postcondition_check: "skipped",
+      sandbox_state_hash: sha256(JSON.stringify(state.sandbox)),
       integrity: {
         hash_algorithm: "sha256",
         content_hash: sha256(`${actionStep.id}|${obsText}`),

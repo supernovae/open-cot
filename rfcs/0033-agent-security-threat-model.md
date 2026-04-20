@@ -1,5 +1,7 @@
 # RFC 0033 — Agent Security & Threat Model, Status: Draft, Author: Open CoT Community, Created: 2026-04-14
 
+**Discussion:** https://github.com/supernovae/open-cot/discussions/33
+
 ## 1. Summary
 
 This RFC documents the **security threat landscape** for governed agents on the Open-CoT cognitive control plane and explains how architectural choices—especially the separation of **proposal** (model) from **authorization** (harness, policy, brokers)—reduce impact for each major threat class. It introduces a machine-readable **`threat_catalog`**: a versioned collection of **`threat_entry`** records linking each threat to severities, mitigations (by RFC or mechanism), and honest **residual risk** statements for security reviewers and auditors.

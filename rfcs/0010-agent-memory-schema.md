@@ -125,7 +125,7 @@ Examples:
   "properties": {
     "version": {
       "type": "string",
-      "enum": ["0.1"],
+      "enum": ["0.2"],
       "description": "Schema version."
     },
 
@@ -143,7 +143,7 @@ Examples:
           "key": { "type": "string" },
           "value": {},
           "type": { "type": "string" },
-          "expires_at": { "type": "string" }
+          "expires_at": { "type": "string", "format": "date-time" }
         },
         "required": ["key", "value"]
       }
@@ -158,7 +158,8 @@ Examples:
           "key": { "type": "string" },
           "value": {},
           "type": { "type": "string" },
-          "updated_at": { "type": "string" },
+          "observed_at": { "type": "string", "format": "date-time" },
+          "superseded_at": { "type": "string", "format": "date-time" },
           "confidence": { "type": "number" }
         },
         "required": ["key", "value"]
@@ -172,11 +173,11 @@ Examples:
         "type": "object",
         "properties": {
           "episode_id": { "type": "string" },
-          "timestamp": { "type": "string" },
+          "observed_at": { "type": "string", "format": "date-time" },
           "summary": { "type": "string" },
           "metadata": { "type": "object" }
         },
-        "required": ["episode_id", "timestamp"]
+        "required": ["episode_id", "observed_at"]
       }
     },
 
@@ -187,7 +188,7 @@ Examples:
         "type": "object",
         "properties": {
           "state": { "type": "object" },
-          "last_used": { "type": "string" }
+          "observed_at": { "type": "string", "format": "date-time" }
         }
       }
     }
@@ -225,7 +226,7 @@ Examples:
       "key": "preferred_units",
       "value": "metric",
       "type": "preference",
-      "updated_at": "2026-04-10T09:00:00Z",
+      "observed_at": "2026-04-10T09:00:00Z",
       "confidence": 0.95
     }
   ]
@@ -244,7 +245,7 @@ Examples:
         "cached_city": "Austin",
         "cached_result": "Clear skies, 72F"
       },
-      "last_used": "2026-04-14T11:30:00Z"
+      "observed_at": "2026-04-14T11:30:00Z"
     }
   }
 }

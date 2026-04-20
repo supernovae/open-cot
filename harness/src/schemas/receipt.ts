@@ -1,5 +1,5 @@
 /**
- * Execution receipt types — RFC 0048.
+ * Execution receipt types — RFC 0048 v0.2.
  *
  * Tamper-evident records proving what happened during tool execution.
  * Receipts contain hashes, not raw data — safe for compliance sharing.
@@ -13,6 +13,7 @@ export type ReceiptStatus = "success" | "error" | "timeout" | "quarantined";
 export type PostconditionResult = "passed" | "failed" | "skipped";
 
 export interface ToolExecutionReceipt {
+  schema_version: "0.2";
   execution_id: string;
   run_id: string;
   tool_name: string;
@@ -20,14 +21,14 @@ export interface ToolExecutionReceipt {
   authority_receipt_id: string;
   input_hash: string;
   output_hash: string;
-  output_size_bytes?: number;
+  output_size_bytes: number;
   started_at: string;
-  completed_at?: string;
-  duration_ms?: number;
+  completed_at: string;
+  duration_ms: number;
   status: ReceiptStatus;
   error_category?: ErrorCategory;
   postcondition_check: PostconditionResult;
   postcondition_violation?: string;
-  sandbox_state_hash?: string;
+  sandbox_state_hash: string;
   integrity: ReceiptIntegrity;
 }

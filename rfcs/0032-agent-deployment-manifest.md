@@ -1,5 +1,7 @@
 # RFC 0032 — Agent Deployment Manifest, Status: Draft, Author: Open CoT Community, Created: 2026-04-14
 
+**Discussion:** https://github.com/supernovae/open-cot/discussions/32
+
 ## 1. Summary
 
 This RFC defines the **`deployment_manifest`**: a declarative document for running Open-CoT–governed agents with fixed runtime, resources, policy bindings, governance reference, sandbox ([RFC 0017](0017-agent-safety-sandboxing.md)), default budgets ([RFC 0038](0038-cost-aware-reasoning-budget.md)), tools, dependencies, health checks, and scaling. It is **infrastructure-as-code** for governed agents so rollouts are reproducible and provably aligned with org policy before the FSM ([RFC 0007](0007-agent-loop-protocol.md)) starts.

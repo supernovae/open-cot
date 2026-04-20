@@ -1,0 +1,53 @@
+{
+  "schema_version": "0.2",
+  "envelope_id": "11111111-2222-4333-8444-555555555555",
+  "run_id": "run-e5f6g7h8",
+  "agent_id": "agent-planner-01",
+  "task_hash": "3c9e2a1f7b0d6e5c8a4f2b1d9e8c7a6f5b4d3e2c1a0f9e8d7c6b5a4f3e2d1c0b",
+  "started_at": "2026-04-18T14:30:00Z",
+  "completed_at": "2026-04-18T14:30:05Z",
+  "completion_status": "succeeded",
+  "trace_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "delegation_requests": [
+    "req-a1b2c3d4"
+  ],
+  "delegation_decisions": [
+    "dec-i9j0k1l2"
+  ],
+  "authority_receipts": [
+    "rcpt-m3n4o5p6"
+  ],
+  "tool_execution_receipts": [
+    "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+  ],
+  "delegation_summary": {
+    "total_requested": 1,
+    "total_granted": 1,
+    "total_denied": 0,
+    "total_narrowed": 1,
+    "total_escalated": 0
+  },
+  "permission_summary": {
+    "total_granted": 1,
+    "total_consumed": 1,
+    "total_expired": 0,
+    "total_revoked": 0
+  },
+  "budget_final": {
+    "tokens_used": 4250,
+    "tokens_remaining": 95750,
+    "cost_used": 0.085,
+    "cost_remaining": 9.915,
+    "steps_used": 8,
+    "steps_remaining": 42,
+    "tool_calls_used": 1,
+    "tool_calls_remaining": 19,
+    "retries_used": 0,
+    "retries_remaining": 5
+  },
+  "policy_violations": [],
+  "integrity": {
+    "hash_algorithm": "sha256",
+    "content_hash": "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"
+  }
+}

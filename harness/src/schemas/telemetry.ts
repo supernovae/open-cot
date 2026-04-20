@@ -13,18 +13,27 @@ export interface TelemetryMetrics {
   [key: string]: number;
 }
 
+export interface TelemetryOrdering {
+  event_seq: number;
+  parent_event_id?: string;
+}
+
 export interface TelemetryRecord {
   version: string;
   agent_id: string;
-  timestamp: string;
+  observed_at: string;
+  ordering: TelemetryOrdering;
   metrics: TelemetryMetrics;
 }
 
 export function createInitialTelemetry(agentId: string): TelemetryRecord {
   return {
-    version: "0.1",
+    version: "0.2",
     agent_id: agentId,
-    timestamp: new Date().toISOString(),
+    observed_at: new Date().toISOString(),
+    ordering: {
+      event_seq: 0,
+    },
     metrics: {
       steps: 0,
       tool_calls: 0,

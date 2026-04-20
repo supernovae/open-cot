@@ -1,5 +1,7 @@
 # RFC 0023 — Human-in-the-Loop Interaction Schema, Status: Draft, Author: Open CoT Community, Created: 2026-04-14
 
+**Discussion:** https://github.com/supernovae/open-cot/discussions/23
+
 ## 1. Summary
 
 This RFC defines the **Human-in-the-Loop (HITL) Interaction Schema** for Open-CoT, the cognitive control plane for governed agent execution. It standardizes how agents **request** human judgment (`approval`, `clarification`, `review`, `override`), how supervisors **respond**, and how responses **resume** execution. Payloads are transport-agnostic (UIs, tickets, chatops, async queues).

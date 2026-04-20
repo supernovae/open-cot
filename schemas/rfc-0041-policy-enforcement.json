@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://opencot.dev/schema/policy/v0.2",
+  "$id": "https://opencot.dev/schema/policy/v0.3",
   "title": "Open CoT RFC 0041 — Policy Document",
   "type": "object",
   "additionalProperties": false,
@@ -8,7 +8,7 @@
     "version": {
       "type": "string",
       "enum": [
-        "0.2"
+        "0.3"
       ]
     },
     "policy_id": {
@@ -39,11 +39,11 @@
       },
       "minItems": 1
     },
-    "effective_from": {
+    "effective_at": {
       "type": "string",
       "format": "date-time"
     },
-    "effective_until": {
+    "expires_at": {
       "type": "string",
       "format": "date-time"
     }
@@ -73,22 +73,22 @@
         "require_approval"
       ]
     },
-    "timeWindow": {
+    "validityWindow": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "start": {
+        "effective_at": {
           "type": "string",
           "format": "date-time"
         },
-        "end": {
+        "expires_at": {
           "type": "string",
           "format": "date-time"
         }
       },
       "required": [
-        "start",
-        "end"
+        "effective_at",
+        "expires_at"
       ]
     },
     "conditions": {
@@ -101,8 +101,8 @@
         "require_justification": {
           "type": "boolean"
         },
-        "time_window": {
-          "$ref": "#/definitions/timeWindow"
+        "validity_window": {
+          "$ref": "#/definitions/validityWindow"
         },
         "budget_remaining_min": {
           "type": "number"

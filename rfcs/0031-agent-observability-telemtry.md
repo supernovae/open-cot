@@ -1,4 +1,4 @@
-# RFC 0031 — Agent Observability & Telemetry (v0.1)
+# RFC 0031 — Agent Observability & Telemetry (v0.2)
 **Status:** Draft  
 **Author:** Byron / Open CoT Community  
 **Created:** 2026-04-14  
@@ -35,9 +35,18 @@ It extends:
   "title": "Open CoT RFC 0031 — Agent Observability and Telemetry",
   "type": "object",
   "properties": {
-    "version": { "type": "string", "enum": ["0.1"] },
+    "version": { "type": "string", "enum": ["0.2"] },
     "agent_id": { "type": "string" },
-    "timestamp": { "type": "string", "format": "date-time" },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "ordering": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "event_seq": { "type": "integer", "minimum": 0 },
+        "parent_event_id": { "type": "string" }
+      },
+      "required": ["event_seq"]
+    },
     "metrics": {
       "type": "object",
       "properties": {
@@ -50,7 +59,7 @@ It extends:
       "additionalProperties": true
     }
   },
-  "required": ["version", "agent_id", "timestamp", "metrics"]
+  "required": ["version", "agent_id", "observed_at", "ordering", "metrics"]
 }
 ```
 
@@ -60,9 +69,12 @@ It extends:
 
 ```json
 {
-  "version": "0.1",
+  "version": "0.2",
   "agent_id": "planner",
-  "timestamp": "2026-04-14T11:30:00Z",
+  "observed_at": "2026-04-14T11:30:00Z",
+  "ordering": {
+    "event_seq": 1042
+  },
   "metrics": {
     "steps": 42,
     "tool_calls": 5,
