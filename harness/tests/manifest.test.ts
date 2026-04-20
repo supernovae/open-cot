@@ -195,6 +195,36 @@ describe("buildManifest", () => {
     expect(manifest.manifest_id).toBeTruthy();
     expect(manifest.timestamp).toBeTruthy();
   });
+
+  it("applies tool overrides from policy engine previews", () => {
+    const manifest = buildManifest({
+      runId: "run-override",
+      agentId: "agent-preview",
+      phase: "plan",
+      toolContracts: [searchContract, calcContract],
+      sandbox: DEFAULT_SANDBOX_CONFIG,
+      policies: [],
+      budget,
+      toolOverrides: {
+        search: {
+          accessLevel: "blocked",
+          reason: "Denied by external policy engine",
+        },
+        calculator: {
+          accessLevel: "requires_delegation",
+          constraints: { max_results: 1 },
+          reason: "Requires narrowed delegation",
+        },
+      },
+    });
+
+    expect(manifest.tools.blocked).toContain("search");
+    const calc = manifest.tools.available.find((tool) => tool.name === "calculator");
+    expect(calc).toBeDefined();
+    expect(calc?.access_level).toBe("requires_delegation");
+    expect(calc?.constraints).toEqual({ max_results: 1 });
+    expect(manifest.active_constraints.some((line) => line.includes("Denied by external policy engine"))).toBe(true);
+  });
 });
 
 describe("manifestToCompactText", () => {

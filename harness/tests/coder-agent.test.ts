@@ -10,6 +10,7 @@ import {
   validateActionObservationPairing,
   validateTermination,
 } from "../src/core/validator.js";
+import type { PolicySet } from "../src/governance/policy-evaluator.js";
 
 describe("CoderAgent (mock backend)", () => {
   beforeEach(() => {
@@ -115,5 +116,33 @@ describe("CoderAgent (mock backend)", () => {
     const stoppedEarly =
       trace.final_answer.includes("not allowlisted") || trace.final_answer.includes("blocked");
     expect(blocked || stoppedEarly || trace.termination === "succeeded").toBe(true);
+  });
+
+  it("routes coder tool calls through policy engine decisions", async () => {
+    const denyWrite: PolicySet = {
+      policy_id: "deny-write",
+      policy_type: "safety",
+      priority: 1,
+      rules: [
+        {
+          rule_id: "deny-write-rule",
+          action: "deny",
+          resource: "tool:writeFile",
+          reason: "Write access disabled in test",
+        },
+      ],
+    };
+    const trace = await runCoderAgent(
+      new MockLLMBackend(),
+      "Modify src/main.ts to add a greeting.",
+      createMockToolRegistry(),
+      undefined,
+      undefined,
+      undefined,
+      { policies: [denyWrite] },
+    );
+
+    expect(trace.termination).toBe("denied");
+    expect(trace.final_answer).toContain("Write access disabled in test");
   });
 });

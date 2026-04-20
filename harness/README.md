@@ -32,8 +32,9 @@ src/
   tools/
     mock-tools.ts   search, calculator, readFile, writeFile, runTests
   agents/
-    chat-agent.ts   LangGraph-style conversational agent (plan -> act -> verify)
-    coder-agent.ts  Plan-do-act coder (plan -> inspect -> act -> verify -> repair -> summarize)
+    chat-agent.ts   Conversational loop with policy-mediated authority checks
+    coder-agent.ts  Coder loop with policy-mediated authority + repair
+    governed-agent.ts Full RFC 0007 governed flow with receipts + audit sealing
 ```
 
 ## Quick start
@@ -57,6 +58,73 @@ npx tsx examples/chat-demo.ts
 ```bash
 npx tsx examples/coder-demo.ts
 ```
+
+### Run the governed agent demo
+
+```bash
+npx tsx examples/governed-demo.ts
+```
+
+Policy modes:
+
+```bash
+npx tsx examples/governed-demo.ts --deny "search for info"
+npx tsx examples/governed-demo.ts --narrow "search for info"
+```
+
+### Choose a policy engine for governed demo
+
+Use `POLICY_ENGINE`:
+
+- `inprocess` (default): uses the built-in evaluator
+- `opa`: sends delegation requests to OPA and maps decisions into Open CoT objects
+
+```bash
+POLICY_ENGINE=inprocess npx tsx examples/governed-demo.ts
+```
+
+```bash
+POLICY_ENGINE=opa \
+OPA_BASE_URL=http://127.0.0.1:8181 \
+OPA_POLICY_PATH=open_cot/delegation \
+npx tsx examples/governed-demo.ts
+```
+
+Optional OPA env vars:
+
+- `OPA_BEARER_TOKEN`
+- `OPA_TIMEOUT_MS` (default `2000`)
+- `OPA_FALLBACK_INPROCESS` (`true` by default)
+
+Starter OPA policy package: `examples/opa/README.md`
+
+Live OPA integration test (targets `http://127.0.0.1:8181` by default):
+
+```bash
+npm run test:opa-live
+```
+
+Override defaults if needed:
+
+```bash
+OPA_BASE_URL=http://127.0.0.1:8181 \
+OPA_POLICY_PATH=open_cot/delegation \
+OPA_LIVE_POLICY_MODE=allow \
+npm run test:opa-live
+```
+
+`npm test` still auto-skips the live OPA suite when `OPA_BASE_URL` is not set.
+
+## Runtime governance guarantees
+
+Current harness behavior (runtime, not just schema/docs):
+
+- **Policy mediation for all shipped agents**: `chat-agent`, `coder-agent`, and `governed-agent` route tool execution through a `DelegationPolicyEngine` before dispatch.
+- **Dispatch-time least privilege enforcement**: tool arguments are schema-validated and checked against delegated scope constraints (`allowed_fields`, `excluded_fields`, `max_results`) in `ToolRegistry`.
+- **Phase consultation checks**: policy consultation hooks are enforced at `frame`, `plan`, `observe_result`, `critique_verify`, and `finalize`.
+- **Manifest/policy reconciliation**: capability manifests can be compiled from policy-engine tool previews (including OPA-backed decisions), so model-visible tool posture reflects live policy outcomes.
+
+`chat-agent` and `coder-agent` default to an in-process policy derived from sandbox allow/block lists. You can override this by passing explicit `policies` and/or a custom `policyEngine`.
 
 ### Use a real LLM (Ollama example)
 

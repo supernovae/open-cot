@@ -20,6 +20,12 @@ import type { Phase } from "../schemas/agent-loop.js";
 
 export type WireFormat = "json" | "compact-text" | "toon";
 
+export interface ManifestToolOverride {
+  accessLevel: ToolAccessLevel | "blocked";
+  constraints?: Record<string, unknown>;
+  reason?: string;
+}
+
 export interface ManifestInput {
   runId: string;
   agentId: string;
@@ -29,6 +35,7 @@ export interface ManifestInput {
   policies: PolicySet[];
   budget: BudgetSnapshot;
   trustLevel?: "untrusted" | "low" | "medium" | "high";
+  toolOverrides?: Record<string, ManifestToolOverride>;
 }
 
 function isBlocked(toolName: string, sandbox: SandboxConfig): boolean {
@@ -129,21 +136,31 @@ export function buildManifest(input: ManifestInput): CapabilityManifest {
   const activeConstraints: string[] = [];
 
   for (const contract of input.toolContracts) {
-    const level = determineAccessLevel(
-      contract.name,
-      input.sandbox,
-      input.policies,
-    );
+    const override = input.toolOverrides?.[contract.name];
+    const level =
+      override?.accessLevel ??
+      determineAccessLevel(contract.name, input.sandbox, input.policies);
 
     if (level === "blocked") {
       blocked.push(contract.name);
+      if (override?.reason) {
+        activeConstraints.push(`${contract.name}: ${override.reason}`);
+      }
       continue;
     }
 
-    const { constraints, descriptions } = collectConstraints(
-      contract.name,
-      input.policies,
-    );
+    const {
+      constraints,
+      descriptions,
+    } = override?.constraints
+      ? {
+          constraints: override.constraints,
+          descriptions: describeConstraints(contract.name, override.constraints),
+        }
+      : collectConstraints(contract.name, input.policies);
+    if (override?.reason) {
+      descriptions.push(`${contract.name}: ${override.reason}`);
+    }
     activeConstraints.push(...descriptions);
 
     available.push({
@@ -171,6 +188,31 @@ export function buildManifest(input: ManifestInput): CapabilityManifest {
     trust_level: input.trustLevel ?? "medium",
     active_constraints: activeConstraints,
   };
+}
+
+function describeConstraints(
+  toolName: string,
+  constraints: Record<string, unknown>,
+): string[] {
+  const descriptions: string[] = [];
+  const allowedFields = constraints["allowed_fields"];
+  if (Array.isArray(allowedFields) && allowedFields.every((item) => typeof item === "string")) {
+    descriptions.push(`${toolName}: fields limited to ${allowedFields.join(", ")}`);
+  }
+  const excludedFields = constraints["excluded_fields"];
+  if (
+    Array.isArray(excludedFields) &&
+    excludedFields.every((item) => typeof item === "string")
+  ) {
+    descriptions.push(`${toolName}: ${excludedFields.join(", ")} excluded`);
+  }
+  if (typeof constraints["max_results"] === "number") {
+    descriptions.push(`${toolName}: max ${constraints["max_results"]} results`);
+  }
+  if (descriptions.length === 0) {
+    descriptions.push(`${toolName}: constrained by policy`);
+  }
+  return descriptions;
 }
 
 /**

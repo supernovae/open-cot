@@ -24,6 +24,20 @@ export interface ToolCallRequest {
   arguments: Record<string, unknown>;
 }
 
+export interface LLMToolDefinition {
+  name: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+}
+
+export type LLMToolChoice =
+  | "auto"
+  | "none"
+  | "required"
+  | {
+      name: string;
+    };
+
 export interface LLMResponseWithTools extends LLMResponse {
   toolCalls?: ToolCallRequest[];
 }
@@ -66,6 +80,14 @@ export interface LLMChatOptions {
    * Stream callback invoked for each content/tool delta.
    */
   onChunk?: (chunk: LLMStreamChunk) => void | Promise<void>;
+  /**
+   * Optional tool definitions exposed to the model for native tool-calling.
+   */
+  tools?: LLMToolDefinition[];
+  /**
+   * Optional tool choice policy for providers that support it.
+   */
+  toolChoice?: LLMToolChoice;
 }
 
 export interface LLMBackend {

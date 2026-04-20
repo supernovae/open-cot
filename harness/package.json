@@ -8,6 +8,7 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
+    "test:opa-live": "OPA_BASE_URL=${OPA_BASE_URL:-http://127.0.0.1:8181} OPA_POLICY_PATH=${OPA_POLICY_PATH:-open_cot/delegation} OPA_LIVE_POLICY_MODE=${OPA_LIVE_POLICY_MODE:-allow} vitest run tests/policy-engine-live.test.ts",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "chat-demo": "tsx examples/chat-demo.ts",

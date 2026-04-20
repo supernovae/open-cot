@@ -1,0 +1,115 @@
+{
+  "cases": [
+    {
+      "name": "approved decision maps policy refs and decided_by",
+      "request": {
+        "requested_scope": {
+          "resource": "tool:search",
+          "action": "execute"
+        }
+      },
+      "opa_result": {
+        "status": "approved",
+        "policy_refs": ["opa.allow.search"],
+        "decided_by": {
+          "kind": "policy",
+          "policy_id": "opa.allow.search"
+        }
+      },
+      "expected": {
+        "status": "approved",
+        "policy_refs": ["opa.allow.search"],
+        "decided_by": {
+          "kind": "policy",
+          "policy_id": "opa.allow.search"
+        }
+      }
+    },
+    {
+      "name": "narrowed decision preserves narrowed scope constraints",
+      "request": {
+        "requested_scope": {
+          "resource": "tool:search",
+          "action": "execute"
+        }
+      },
+      "opa_result": {
+        "status": "narrowed",
+        "policy_refs": ["opa.narrow.search"],
+        "narrowed_scope": {
+          "resource": "tool:search",
+          "action": "execute",
+          "constraints": {
+            "max_results": 3,
+            "excluded_fields": ["raw_html"]
+          }
+        }
+      },
+      "expected": {
+        "status": "narrowed",
+        "policy_refs": ["opa.narrow.search"],
+        "narrowed_scope": {
+          "resource": "tool:search",
+          "action": "execute",
+          "constraints": {
+            "max_results": 3,
+            "excluded_fields": ["raw_html"]
+          }
+        }
+      }
+    },
+    {
+      "name": "denied decision defaults denial reason",
+      "request": {
+        "requested_scope": {
+          "resource": "tool:search",
+          "action": "execute"
+        }
+      },
+      "opa_result": {
+        "status": "denied",
+        "policy_refs": ["opa.deny.search"]
+      },
+      "expected": {
+        "status": "denied",
+        "policy_refs": ["opa.deny.search"],
+        "denial_reason": "Denied by OPA policy"
+      }
+    },
+    {
+      "name": "missing status fails closed",
+      "request": {
+        "requested_scope": {
+          "resource": "tool:search",
+          "action": "execute"
+        }
+      },
+      "opa_result": {
+        "policy_refs": ["opa.invalid"]
+      },
+      "expected": {
+        "status": "denied",
+        "denial_reason_contains": "OPA policy evaluation failed"
+      }
+    },
+    {
+      "name": "malformed policy_refs are normalized to empty list",
+      "request": {
+        "requested_scope": {
+          "resource": "tool:search",
+          "action": "execute"
+        }
+      },
+      "opa_result": {
+        "status": "approved",
+        "policy_refs": {
+          "id": "opa.bad"
+        }
+      },
+      "expected": {
+        "status": "approved",
+        "policy_refs": []
+      }
+    }
+  ]
+}

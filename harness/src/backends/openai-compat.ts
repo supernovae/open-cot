@@ -70,12 +70,20 @@ export class OpenAICompatBackend implements LLMBackend {
     options?: LLMChatOptions,
   ): Promise<LLMResponseWithTools> {
     const url = `${this.config.baseUrl}/chat/completions`;
-    const body = {
+    const body: Record<string, unknown> = {
       model: this.config.model,
       messages,
       temperature: this.config.temperature,
       max_tokens: this.resolveMaxTokens(options?.maxOutputTokens),
     };
+    const mappedTools = mapTools(options?.tools);
+    if (mappedTools) {
+      body.tools = mappedTools;
+    }
+    const mappedToolChoice = mapToolChoice(options?.toolChoice);
+    if (mappedToolChoice) {
+      body.tool_choice = mappedToolChoice;
+    }
 
     const res = await fetch(url, {
       method: "POST",
@@ -119,7 +127,7 @@ export class OpenAICompatBackend implements LLMBackend {
     options: LLMChatOptions,
   ): Promise<LLMResponseWithTools> {
     const url = `${this.config.baseUrl}/chat/completions`;
-    const body = {
+    const body: Record<string, unknown> = {
       model: this.config.model,
       messages,
       temperature: this.config.temperature,
@@ -127,6 +135,14 @@ export class OpenAICompatBackend implements LLMBackend {
       stream: true,
       stream_options: { include_usage: true },
     };
+    const mappedTools = mapTools(options.tools);
+    if (mappedTools) {
+      body.tools = mappedTools;
+    }
+    const mappedToolChoice = mapToolChoice(options.toolChoice);
+    if (mappedToolChoice) {
+      body.tool_choice = mappedToolChoice;
+    }
 
     const res = await fetch(url, {
       method: "POST",
@@ -239,6 +255,26 @@ interface OpenAIStreamChunk {
     completion_tokens?: number;
   };
 }
+
+interface OpenAIToolDefinition {
+  type: "function";
+  function: {
+    name: string;
+    description: string;
+    parameters: Record<string, unknown>;
+  };
+}
+
+type OpenAIToolChoice =
+  | "auto"
+  | "none"
+  | "required"
+  | {
+      type: "function";
+      function: {
+        name: string;
+      };
+    };
 
 interface OpenAIToolCallDelta {
   index?: number;
@@ -441,4 +477,35 @@ async function consumeSseEvent(
   });
 
   return next;
+}
+
+function mapTools(tools?: LLMChatOptions["tools"]): OpenAIToolDefinition[] | undefined {
+  if (!tools || tools.length === 0) {
+    return undefined;
+  }
+  return tools.map((tool) => ({
+    type: "function",
+    function: {
+      name: tool.name,
+      description: tool.description,
+      parameters: tool.inputSchema,
+    },
+  }));
+}
+
+function mapToolChoice(
+  choice?: LLMChatOptions["toolChoice"],
+): OpenAIToolChoice | undefined {
+  if (!choice) {
+    return undefined;
+  }
+  if (typeof choice === "string") {
+    return choice;
+  }
+  return {
+    type: "function",
+    function: {
+      name: choice.name,
+    },
+  };
 }
