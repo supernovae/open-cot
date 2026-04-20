@@ -8,6 +8,7 @@ import type { AgentState } from "../core/state.js";
 import { createAgentState } from "../core/state.js";
 import { transition, forceStop } from "../core/transitions.js";
 import { createBudgetTracker } from "../core/budget-tracker.js";
+import { callLLMWithCircuitBreaker } from "../core/llm-circuit-breaker.js";
 import type { ToolRegistry } from "../core/tool-registry.js";
 import {
   emitPlan,
@@ -56,19 +57,19 @@ export async function runChatAgent(
   let lastResponse: LLMResponseWithTools | undefined;
 
   const callLLM = async (messages: LLMMessage[]): Promise<LLMResponseWithTools> => {
-    if (halted(state)) {
-      return { content: "", tokensUsed: 0, model: "noop", finishReason: "stop" };
-    }
-    try {
-      const response = await backend.chat(messages);
-      budget.recordTokens(state, response.tokensUsed, `LLM (${backend.name})`);
-      lastResponse = response;
-      return response;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      forceStop(state, "fail_safe", msg);
-      return { content: "", tokensUsed: 0, model: "error", finishReason: "stop" };
-    }
+    const response = await callLLMWithCircuitBreaker({
+      backend,
+      messages,
+      state,
+      budget,
+      llmReason: `LLM (${backend.name})`,
+      stream: true,
+      safety: {
+        maxDecodedChars: 12_000,
+      },
+    });
+    lastResponse = response;
+    return response;
   };
 
   const end = (answer: string): Trace => {

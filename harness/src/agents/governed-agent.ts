@@ -9,6 +9,7 @@ import type { AgentState } from "../core/state.js";
 import { createAgentState } from "../core/state.js";
 import { transition, forceStop } from "../core/transitions.js";
 import { createBudgetTracker } from "../core/budget-tracker.js";
+import { callLLMWithCircuitBreaker } from "../core/llm-circuit-breaker.js";
 import type { ToolRegistry } from "../core/tool-registry.js";
 import { PermissionManager } from "../governance/permission-manager.js";
 import { PolicyEvaluator } from "../governance/policy-evaluator.js";
@@ -75,23 +76,19 @@ export async function runGovernedAgent(
   const callLLM = async (
     messages: LLMMessage[],
   ): Promise<LLMResponseWithTools> => {
-    if (halted(state)) {
-      return { content: "", tokensUsed: 0, model: "noop", finishReason: "stop" };
-    }
-    try {
-      const response = await config.backend.chat(messages);
-      budget.recordTokens(
-        state,
-        response.tokensUsed,
-        `LLM (${config.backend.name})`,
-      );
-      lastResponse = response;
-      return response;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      forceStop(state, "fail_safe", `LLM failure: ${msg}`);
-      return { content: "", tokensUsed: 0, model: "error", finishReason: "stop" };
-    }
+    const response = await callLLMWithCircuitBreaker({
+      backend: config.backend,
+      messages,
+      state,
+      budget,
+      llmReason: `LLM (${config.backend.name})`,
+      stream: true,
+      safety: {
+        maxDecodedChars: 16_000,
+      },
+    });
+    lastResponse = response;
+    return response;
   };
 
   const finish = (answer: string): GovernedAgentResult => {

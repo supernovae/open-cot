@@ -24,6 +24,8 @@ Picture data moving left to right on the **happy path**:
 
 Side channels include **budget** enforcement (RFC 0038) and **sandbox** allow/deny lists (RFC 0017), which can pre-empt a transition or force `fail_safe` without giving unsafe payloads back to the model.
 
+For streamed decoding, deployments should treat budget control as an active circuit-breaker (preflight budget gate + mid-stream cancellation), not a post-hoc accounting report. The reference harness now supports this runtime pattern; see [Model adaptation for budget control](./model-adaptation-budget-control.md).
+
 ## Major components
 
 These names describe responsibilities; a single deployment may fold multiple roles into one service, but the boundaries stay conceptually distinct.
