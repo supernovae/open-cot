@@ -58,4 +58,5 @@ Canonical discussion threads for all Open CoT RFCs. Use these threads for normat
 | [`RFC 0049`](../rfcs/0049-capability-manifest.md) | Capability Manifest | [Open thread](https://github.com/supernovae/open-cot/discussions/49) |
 | [`RFC 0050`](../rfcs/0050-toon-adapter.md) | TOON Adapter: Token-Oriented Object Notation | [Open thread](https://github.com/supernovae/open-cot/discussions/50) |
 | [`RFC 0051`](../rfcs/0051-temporal-semantics-validity-extension.md) | Temporal Semantics & Validity Extension | [Open thread](https://github.com/supernovae/open-cot/discussions/51) |
-
+| [`RFC 0052`](../rfcs/0052-cognitive-artifact-and-capability-snapshot.md) | Cognitive Artifact & Capability Snapshot | [Open thread](https://github.com/supernovae/open-cot/discussions/52) |
+| [`RFC 0053`](../rfcs/0053-reconciliation-result.md) | Reconciliation Result & Error Taxonomy | [Open thread](https://github.com/supernovae/open-cot/discussions/53) |

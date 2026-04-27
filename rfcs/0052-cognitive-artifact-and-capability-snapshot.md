@@ -4,6 +4,7 @@
 **Author:** Open CoT Community  
 **Created:** 2026-04-27  
 **Target Version:** Schema v0.10
+**Discussion:** https://github.com/supernovae/open-cot/discussions/52
 
 ---
 
@@ -45,4 +46,3 @@ model provider, or TypeScript implementation. Those are implementation choices.
 ## 5. Schema
 
 Machine-readable schema: `schemas/rfc-0052-cognitive-artifact.json`.
-

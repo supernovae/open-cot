@@ -4,6 +4,7 @@
 **Author:** Open CoT Community  
 **Created:** 2026-04-27  
 **Target Version:** Schema v0.10
+**Discussion:** https://github.com/supernovae/open-cot/discussions/53
 
 ---
 
@@ -54,4 +55,3 @@ The portable taxonomy includes:
 ## 5. Schema
 
 Machine-readable schema: `schemas/rfc-0053-reconciliation-result.json`.
-
