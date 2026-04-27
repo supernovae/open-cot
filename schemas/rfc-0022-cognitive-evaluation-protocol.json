@@ -1,0 +1,123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Open CoT RFC 0022 — Cognitive pipeline Evaluation Protocol",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": [
+        "0.1"
+      ]
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "model": {
+      "type": "string"
+    },
+    "dataset_version": {
+      "type": "string"
+    },
+    "harness_version": {
+      "type": "string"
+    },
+    "reproducibility": {
+      "type": "object",
+      "properties": {
+        "seed": {
+          "type": "integer"
+        },
+        "temperature": {
+          "type": "number"
+        },
+        "top_p": {
+          "type": "number"
+        },
+        "max_tokens": {
+          "type": "integer"
+        },
+        "prompt_hash": {
+          "type": "string"
+        },
+        "output_hash": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "seed",
+        "temperature",
+        "top_p",
+        "max_tokens"
+      ]
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "final_answer_exact": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "schema_validity_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "step_validity_proxy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "safety_violations": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "final_answer_exact",
+        "schema_validity_rate",
+        "step_validity_proxy"
+      ]
+    },
+    "statistics": {
+      "type": "object",
+      "properties": {
+        "num_tasks": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "confidence_interval_95": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "stddev": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "num_tasks"
+      ]
+    }
+  },
+  "required": [
+    "version",
+    "run_id",
+    "model",
+    "dataset_version",
+    "harness_version",
+    "reproducibility",
+    "metrics",
+    "statistics"
+  ],
+  "$id": "https://opencot.dev/schemas/rfc-0022-cognitive-evaluation-protocol.json",
+  "x-opencot": {
+    "rfc": "0022",
+    "shortname": "cognitive_evaluation_protocol",
+    "source_rfc": "rfcs/0022-cognitive-evaluation-protocol.md"
+  }
+}

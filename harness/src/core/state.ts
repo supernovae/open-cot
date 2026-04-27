@@ -1,12 +1,12 @@
 /**
- * Agent state — the single mutable object that an agent loop carries through
+ * Cognitive pipeline state - the single mutable object carried through
  * every transition. Designed so the full state can be serialized for
  * checkpointing and replay (RFC 0007).
  */
 
 import { randomUUID } from "node:crypto";
-import type { Phase } from "../schemas/agent-loop.js";
-import { VALID_TRANSITIONS } from "../schemas/agent-loop.js";
+import type { Phase } from "../schemas/cognitive-pipeline.js";
+import { VALID_TRANSITIONS } from "../schemas/cognitive-pipeline.js";
 import type { BudgetPolicy, BudgetSnapshot } from "../schemas/budget.js";
 import {
   createInitialSnapshot,
@@ -22,7 +22,7 @@ import type { PermissionGrant } from "../schemas/permission.js";
 import type { ToolExecutionReceipt } from "../schemas/receipt.js";
 import type { CapabilityManifest } from "../schemas/capability-manifest.js";
 
-export interface AgentState {
+export interface PipelineState {
   runId: string;
   objective: string;
   currentSubtask: string | null;
@@ -47,16 +47,16 @@ export interface AgentState {
   capabilityManifest?: CapabilityManifest;
 }
 
-export interface AgentStateInit {
+export interface PipelineStateInit {
   objective: string;
   budgetPolicy?: BudgetPolicy;
   sandbox?: SandboxConfig;
-  agentId?: string;
+  requesterId?: string;
 }
 
-export function createAgentState(init: AgentStateInit): AgentState {
+export function createPipelineState(init: PipelineStateInit): PipelineState {
   const policy = init.budgetPolicy ?? DEFAULT_BUDGET_POLICY;
-  const agentId = init.agentId ?? `agent-${randomUUID().slice(0, 8)}`;
+  const requesterId = init.requesterId ?? `cognitive-runtime-${randomUUID().slice(0, 8)}`;
   return {
     runId: randomUUID(),
     objective: init.objective,
@@ -77,7 +77,7 @@ export function createAgentState(init: AgentStateInit): AgentState {
       steps: [],
       final_answer: "",
     },
-    telemetry: createInitialTelemetry(agentId),
+    telemetry: createInitialTelemetry(requesterId),
     delegationRequests: [],
     delegationDecisions: [],
     authorityReceipts: [],

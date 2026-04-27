@@ -8,7 +8,7 @@ If models hide internal reasoning, enforcing RFC0001 structured traces with veri
 
 - `schemas/rfc-0001-reasoning.json`
 - `schemas/rfc-0002-verifier.json`
-- `schemas/rfc-0007-agent-loop.json`
+- `schemas/rfc-0007-cognitive-pipeline.json`
 
 ## Run command
 

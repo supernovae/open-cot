@@ -18,7 +18,7 @@
     "source": {
       "type": "string"
     },
-    "agent_id": {
+    "requester_id": {
       "type": "string"
     },
     "tool_id": {

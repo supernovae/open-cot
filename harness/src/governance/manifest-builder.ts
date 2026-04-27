@@ -16,7 +16,7 @@ import type { ToolContract } from "../schemas/tool-invocation.js";
 import type { BudgetSnapshot } from "../schemas/budget.js";
 import type { SandboxConfig } from "../schemas/sandbox.js";
 import type { PolicySet, PolicyRule } from "./policy-evaluator.js";
-import type { Phase } from "../schemas/agent-loop.js";
+import type { Phase } from "../schemas/cognitive-pipeline.js";
 
 export type WireFormat = "json" | "compact-text" | "toon";
 
@@ -28,7 +28,7 @@ export interface ManifestToolOverride {
 
 export interface ManifestInput {
   runId: string;
-  agentId: string;
+  requesterId: string;
   phase: Phase;
   toolContracts: ToolContract[];
   sandbox: SandboxConfig;
@@ -175,7 +175,7 @@ export function buildManifest(input: ManifestInput): CapabilityManifest {
   return {
     manifest_id: randomUUID(),
     run_id: input.runId,
-    agent_id: input.agentId,
+    requester_id: input.requesterId,
     timestamp: new Date().toISOString(),
     phase: input.phase,
     tools: { available, blocked },

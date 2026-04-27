@@ -1,45 +1,45 @@
 # RFC 0014 — Memory Conflict Resolution (v0.1)
-**Status:** Draft  
-**Author:** Byron / Open CoT Community  
-**Created:** 2026‑04‑14  
-**Target Version:** Schema v0.4  
+**Status:** Draft
+**Author:** Byron / Open CoT Community
+**Created:** 2026‑04‑14
+**Target Version:** Schema v0.4
 **Discussion:** https://github.com/supernovae/open-cot/discussions/14
 ---
 
 ## 1. Summary
 
-This RFC defines the **Memory Conflict Resolution Standard**, a unified mechanism for resolving conflicting entries in agent memory, including:
+This RFC defines the **Memory Conflict Resolution Standard**, a unified mechanism for resolving conflicting entries in cognitive pipeline memory, including:
 
-- short‑term memory (STM)  
-- long‑term memory (LTM)  
-- episodic memory  
-- tool memory  
+- short‑term memory (STM)
+- long‑term memory (LTM)
+- episodic memory
+- tool memory
 - compressed/embedded memory (RFC 0013)
 
 It extends:
 
-- RFC 0010 — Agent Memory Schema  
-- RFC 0013 — Memory Compression & Embedding  
+- RFC 0010 — Cognitive pipeline Memory Schema
+- RFC 0013 — Memory Compression & Embedding
 
 ---
 
 ## 2. Motivation
 
-Agents accumulate memory from:
+Pipelines accumulate memory from:
 
-- multiple tools  
-- multiple agents (RFC 0011)  
-- multiple episodes  
-- multiple verifiers  
-- multiple reward signals  
+- multiple tools
+- multiple pipelines (RFC 0011)
+- multiple episodes
+- multiple verifiers
+- multiple reward signals
 
 Conflicts arise when:
 
-- two entries have the same key  
-- two entries disagree  
-- two entries differ in confidence  
-- two entries differ in provenance  
-- two entries differ in timestamp  
+- two entries have the same key
+- two entries disagree
+- two entries differ in confidence
+- two entries differ in provenance
+- two entries differ in timestamp
 
 This RFC defines a **deterministic, reproducible conflict resolution algorithm**.
 
@@ -47,12 +47,12 @@ This RFC defines a **deterministic, reproducible conflict resolution algorithm**
 
 ## 3. Design Goals
 
-- Deterministic conflict resolution  
-- Support for confidence‑weighted merging  
-- Support for timestamp‑based precedence  
-- Support for provenance‑aware resolution  
-- Support for lossy and lossless merging  
-- Support for multi‑agent memory isolation  
+- Deterministic conflict resolution
+- Support for confidence‑weighted merging
+- Support for timestamp‑based precedence
+- Support for provenance‑aware resolution
+- Support for lossy and lossless merging
+- Support for multi‑cognitive pipeline memory isolation
 
 ---
 
@@ -157,4 +157,4 @@ User‑defined logic.
 
 ## 8. Conclusion
 
-This RFC defines deterministic, reproducible memory conflict resolution for all agent memory types.
+This RFC defines deterministic, reproducible memory conflict resolution for all cognitive pipeline memory types.

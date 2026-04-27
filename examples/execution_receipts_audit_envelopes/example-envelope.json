@@ -2,7 +2,7 @@
   "schema_version": "0.2",
   "envelope_id": "11111111-2222-4333-8444-555555555555",
   "run_id": "run-e5f6g7h8",
-  "agent_id": "agent-planner-01",
+  "requester_id": "cognitive-pipeline-planner-01",
   "task_hash": "3c9e2a1f7b0d6e5c8a4f2b1d9e8c7a6f5b4d3e2c1a0f9e8d7c6b5a4f3e2d1c0b",
   "started_at": "2026-04-18T14:30:00Z",
   "completed_at": "2026-04-18T14:30:05Z",

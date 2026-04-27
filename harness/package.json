@@ -1,7 +1,7 @@
 {
-  "name": "@open-cot/harness",
+  "name": "@open-cot/core",
   "version": "0.1.0",
-  "description": "Reference harness implementation for the Open CoT standard — emits, consumes, and validates RFC-compliant reasoning traces",
+  "description": "Reference core package for Open CoT cognitive artifacts, interfaces, policy boundaries, and reconciliation traces",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -11,15 +11,17 @@
     "test:opa-live": "OPA_BASE_URL=${OPA_BASE_URL:-http://127.0.0.1:8181} OPA_POLICY_PATH=${OPA_POLICY_PATH:-open_cot/delegation} OPA_LIVE_POLICY_MODE=${OPA_LIVE_POLICY_MODE:-allow} vitest run tests/policy-engine-live.test.ts",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "chat-demo": "tsx examples/chat-demo.ts",
-    "coder-demo": "tsx examples/coder-demo.ts"
+    "chat-pipeline-demo": "tsx examples/chat-pipeline-demo.ts",
+    "coder-pipeline-demo": "tsx examples/coder-pipeline-demo.ts",
+    "governed-pipeline-demo": "tsx examples/governed-pipeline-demo.ts"
   },
   "keywords": [
     "open-cot",
     "chain-of-thought",
     "reasoning",
-    "agent",
-    "harness"
+    "cognitive-runtime",
+    "policy",
+    "reconciliation"
   ],
   "license": "MIT",
   "devDependencies": {

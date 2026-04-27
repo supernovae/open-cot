@@ -262,7 +262,7 @@
           "type": "string",
           "minLength": 1
         },
-        "agent_id": {
+        "requester_id": {
           "type": "string",
           "minLength": 1
         },
@@ -400,7 +400,7 @@
         "schema_version",
         "envelope_id",
         "run_id",
-        "agent_id",
+        "requester_id",
         "task_hash",
         "started_at",
         "completed_at",

@@ -8,7 +8,7 @@
 
 ## 1. Summary
 
-Open-CoT is a cognitive control plane. **Execution receipts** are tamper-evident records that prove what happened during governed agent execution, linking each tool call to the authorizing permission, policy path, and delegation context. **Audit envelopes** seal a full run: trace hash, artifact IDs, summaries, final budget (RFC 0038), and optional signatures. Receipts are per tool call; envelopes are emitted once per run in `audit_seal`. Neither object carries raw tool I/O—only **SHA-256** hashes of canonical serialized payloads—so artifacts can be shared for compliance without exposing secrets. Integrity blocks mirror RFC 0035. This RFC normatively defines `tool_execution_receipt` and `audit_envelope` for Schema v0.8.
+Open-CoT is a cognitive control plane. **Execution receipts** are tamper-evident records that prove what happened during governed cognitive pipeline execution, linking each tool call to the authorizing permission, policy path, and delegation context. **Audit envelopes** seal a full run: trace hash, artifact IDs, summaries, final budget (RFC 0038), and optional signatures. Receipts are per tool call; envelopes are emitted once per run in `audit_seal`. Neither object carries raw tool I/O—only **SHA-256** hashes of canonical serialized payloads—so artifacts can be shared for compliance without exposing secrets. Integrity blocks mirror RFC 0035. This RFC normatively defines `tool_execution_receipt` and `audit_envelope` for Schema v0.8.
 
 ## 2. `tool_execution_receipt`
 
@@ -16,7 +16,7 @@ Produced by the tool executor after every tool call. Fields: `execution_id` (uui
 
 ## 3. `audit_envelope`
 
-Sealed summary of a governed run (RFC 0043 introduces auditing; this RFC specifies the envelope schema and lifecycle). Fields: `envelope_id` (uuid), `run_id`, `agent_id`, `task_hash`, `started_at`, `completed_at`, `completion_status` ∈ {`succeeded`,`failed`,`denied`,`budget_exhausted`,`external_stop`,`escalation_timeout`,`fail_safe`}, `trace_hash`, `delegation_requests` / `delegation_decisions` (string IDs), `authority_receipts` / `tool_execution_receipts` (ID arrays), `delegation_summary` (`total_requested`, `total_granted`, `total_denied`, `total_narrowed`, `total_escalated`), `permission_summary` (`total_granted`, `total_consumed`, `total_expired`, `total_revoked`), `budget_final` (RFC 0038 `BudgetSnapshot`), `policy_violations` (`violation_id`, `policy_id`, `rule_id`, `description`, `severity`, `observed_at`), `integrity` (`hash_algorithm`, `content_hash`, optional `signature`, `signing_key_id`). `content_hash` covers all fields **except** `integrity`.
+Sealed summary of a governed run (RFC 0043 introduces auditing; this RFC specifies the envelope schema and lifecycle). Fields: `envelope_id` (uuid), `run_id`, `requester_id`, `task_hash`, `started_at`, `completed_at`, `completion_status` ∈ {`succeeded`,`failed`,`denied`,`budget_exhausted`,`external_stop`,`escalation_timeout`,`fail_safe`}, `trace_hash`, `delegation_requests` / `delegation_decisions` (string IDs), `authority_receipts` / `tool_execution_receipts` (ID arrays), `delegation_summary` (`total_requested`, `total_granted`, `total_denied`, `total_narrowed`, `total_escalated`), `permission_summary` (`total_granted`, `total_consumed`, `total_expired`, `total_revoked`), `budget_final` (RFC 0038 `BudgetSnapshot`), `policy_violations` (`violation_id`, `policy_id`, `rule_id`, `description`, `severity`, `observed_at`), `integrity` (`hash_algorithm`, `content_hash`, optional `signature`, `signing_key_id`). `content_hash` covers all fields **except** `integrity`.
 
 ## 4. JSON Schema — receipt and envelope bundle (normative)
 
@@ -104,7 +104,7 @@ Sealed summary of a governed run (RFC 0043 introduces auditing; this RFC specifi
         "schema_version": { "type": "string", "enum": ["0.2"] },
         "envelope_id": { "type": "string", "format": "uuid" },
         "run_id": { "type": "string", "minLength": 1 },
-        "agent_id": { "type": "string", "minLength": 1 },
+        "requester_id": { "type": "string", "minLength": 1 },
         "task_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
         "started_at": { "type": "string", "format": "date-time" },
         "completed_at": { "type": "string", "format": "date-time" },
@@ -135,7 +135,7 @@ Sealed summary of a governed run (RFC 0043 introduces auditing; this RFC specifi
         "policy_violations": { "type": "array", "items": { "$ref": "#/$defs/policy_violation_entry" } },
         "integrity": { "$ref": "#/$defs/integrity" }
       },
-      "required": ["schema_version", "envelope_id", "run_id", "agent_id", "task_hash", "started_at", "completed_at", "completion_status", "trace_hash", "delegation_requests", "delegation_decisions", "authority_receipts", "tool_execution_receipts", "delegation_summary", "permission_summary", "budget_final", "policy_violations", "integrity"]
+      "required": ["schema_version", "envelope_id", "run_id", "requester_id", "task_hash", "started_at", "completed_at", "completion_status", "trace_hash", "delegation_requests", "delegation_decisions", "authority_receipts", "tool_execution_receipts", "delegation_summary", "permission_summary", "budget_final", "policy_violations", "integrity"]
     }
   }
 }
@@ -230,7 +230,7 @@ Synthetic 64-char lowercase hex stands in for real SHA-256; conforming `content_
   "schema_version": "0.2",
   "envelope_id": "11111111-2222-4333-8444-555555555555",
   "run_id": "run_20260418_03",
-  "agent_id": "planner-alpha",
+  "requester_id": "planner-alpha",
   "task_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
   "started_at": "2026-04-18T11:59:00.000Z",
   "completed_at": "2026-04-18T12:10:00.000Z",

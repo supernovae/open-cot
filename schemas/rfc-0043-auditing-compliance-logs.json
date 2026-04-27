@@ -18,7 +18,7 @@
       "type": "string",
       "minLength": 1
     },
-    "agent_id": {
+    "requester_id": {
       "type": "string",
       "minLength": 1
     },
@@ -106,7 +106,7 @@
     "schema_version",
     "event_id",
     "run_id",
-    "agent_id",
+    "requester_id",
     "observed_at",
     "event_type",
     "details",

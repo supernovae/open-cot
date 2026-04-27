@@ -1,17 +1,17 @@
-# Open CoT Reference Harness
+# Open CoT Core Reference Package
 
-A TypeScript reference implementation that **proves the Open CoT standard is executable, testable, and operational**. The harness emits, consumes, and validates RFC-compliant reasoning traces — making the schema feel like a contract, not just documentation.
+A TypeScript reference implementation that **proves the Open CoT standard is executable, testable, and operational**. The core package emits, consumes, and validates RFC-compliant reasoning traces — making the schema feel like a contract, not just documentation.
 
 ## Bidirectional verification
 
-The harness and the schema verify each other:
+The core package and the schema verify each other:
 
 | Direction | What it proves |
 |-----------|----------------|
-| **Schema verifies harness** | Forces valid event structure, consistent state transitions, budget accounting, tool result shape, completion criteria, and replayability |
-| **Harness verifies schema** | Proves the schema is sufficient, ergonomic, debuggable, and works under real agent loops |
+| **Schema verifies package output** | Forces valid event structure, consistent state transitions, budget accounting, tool result shape, completion criteria, and replayability |
+| **Package verifies schema** | Proves the schema is sufficient, ergonomic, debuggable, and works under real cognitive pipelines |
 
-This feedback loop catches schema gaps early — if the harness can't express a real-world pattern, the schema needs updating.
+This feedback loop catches schema gaps early — if the core package can't express a real-world pattern, the schema needs updating.
 
 ## Architecture
 
@@ -19,7 +19,7 @@ This feedback loop catches schema gaps early — if the harness can't express a 
 src/
   schemas/        TypeScript types mirroring the JSON Schemas (RFC 0001, 0003, 0007, 0017, 0031, 0038)
   core/
-    state.ts        Agent state: objective, phase, budgets, evidence, trace
+    state.ts        Cognitive pipeline state: objective, phase, budgets, evidence, trace
     transitions.ts  FSM engine: plan -> inspect -> act -> verify -> repair -> summarize -> stop
     budget-tracker   Token, cost, step, tool-call, retry budgets with exhaustion handling
     trace-emitter    Structured step emission for every transition and action
@@ -31,10 +31,10 @@ src/
     openai-compat   Any OpenAI-compatible API: OpenAI, Ollama, vLLM, LiteLLM
   tools/
     mock-tools.ts   search, calculator, readFile, writeFile, runTests
-  agents/
-    chat-agent.ts   Conversational loop with policy-mediated authority checks
-    coder-agent.ts  Coder loop with policy-mediated authority + repair
-    governed-agent.ts Full RFC 0007 governed flow with receipts + audit sealing
+  pipelines/
+    chat-pipeline.ts   Conversational loop with policy-mediated authority checks
+    coder-pipeline.ts  Coder loop with policy-mediated authority + repair
+    governed-pipeline.ts Full RFC 0007 governed flow with receipts + audit sealing
 ```
 
 ## Quick start
@@ -47,29 +47,29 @@ npm install
 npm test
 ```
 
-### Run the chat agent demo
+### Run the chat cognitive pipeline demo
 
 ```bash
-npx tsx examples/chat-demo.ts
+npx tsx examples/chat-pipeline-demo.ts
 ```
 
-### Run the coder agent demo
+### Run the coder cognitive pipeline demo
 
 ```bash
-npx tsx examples/coder-demo.ts
+npx tsx examples/coder-pipeline-demo.ts
 ```
 
-### Run the governed agent demo
+### Run the governed cognitive pipeline demo
 
 ```bash
-npx tsx examples/governed-demo.ts
+npx tsx examples/governed-pipeline-demo.ts
 ```
 
 Policy modes:
 
 ```bash
-npx tsx examples/governed-demo.ts --deny "search for info"
-npx tsx examples/governed-demo.ts --narrow "search for info"
+npx tsx examples/governed-pipeline-demo.ts --deny "search for info"
+npx tsx examples/governed-pipeline-demo.ts --narrow "search for info"
 ```
 
 ### Choose a policy engine for governed demo
@@ -80,14 +80,14 @@ Use `POLICY_ENGINE`:
 - `opa`: sends delegation requests to OPA and maps decisions into Open CoT objects
 
 ```bash
-POLICY_ENGINE=inprocess npx tsx examples/governed-demo.ts
+POLICY_ENGINE=inprocess npx tsx examples/governed-pipeline-demo.ts
 ```
 
 ```bash
 POLICY_ENGINE=opa \
 OPA_BASE_URL=http://127.0.0.1:8181 \
 OPA_POLICY_PATH=open_cot/delegation \
-npx tsx examples/governed-demo.ts
+npx tsx examples/governed-pipeline-demo.ts
 ```
 
 Optional OPA env vars:
@@ -117,14 +117,14 @@ npm run test:opa-live
 
 ## Runtime governance guarantees
 
-Current harness behavior (runtime, not just schema/docs):
+Current core package behavior (runtime, not just schema/docs):
 
-- **Policy mediation for all shipped agents**: `chat-agent`, `coder-agent`, and `governed-agent` route tool execution through a `DelegationPolicyEngine` before dispatch.
+- **Policy mediation for all shipped pipelines**: `chat-pipeline`, `coder-pipeline`, and `governed-pipeline` route tool execution through a `DelegationPolicyEngine` before dispatch.
 - **Dispatch-time least privilege enforcement**: tool arguments are schema-validated and checked against delegated scope constraints (`allowed_fields`, `excluded_fields`, `max_results`) in `ToolRegistry`.
 - **Phase consultation checks**: policy consultation hooks are enforced at `frame`, `plan`, `observe_result`, `critique_verify`, and `finalize`.
 - **Manifest/policy reconciliation**: capability manifests can be compiled from policy-engine tool previews (including OPA-backed decisions), so model-visible tool posture reflects live policy outcomes.
 
-`chat-agent` and `coder-agent` default to an in-process policy derived from sandbox allow/block lists. You can override this by passing explicit `policies` and/or a custom `policyEngine`.
+`chat-pipeline` and `coder-pipeline` default to an in-process policy derived from sandbox allow/block lists. You can override this by passing explicit `policies` and/or a custom `policyEngine`.
 
 ### Use a real LLM (Ollama example)
 
@@ -133,19 +133,19 @@ Current harness behavior (runtime, not just schema/docs):
 ollama serve &
 ollama pull qwen2.5:1.5b
 
-# Point the harness at Ollama
-OPENAI_BASE_URL=http://localhost:11434/v1 npx tsx examples/chat-demo.ts "What is the capital of France?"
+# Point the core package at Ollama
+OPENAI_BASE_URL=http://localhost:11434/v1 npx tsx examples/chat-pipeline-demo.ts "What is the capital of France?"
 ```
 
 ### Use OpenAI
 
 ```bash
-OPENAI_API_KEY=sk-... OPENAI_MODEL=gpt-4o-mini npx tsx examples/chat-demo.ts "Explain recursion"
+OPENAI_API_KEY=sk-... OPENAI_MODEL=gpt-4o-mini npx tsx examples/chat-pipeline-demo.ts "Explain recursion"
 ```
 
 ## FSM transition map
 
-Every agent follows this finite state machine. Every transition emits a trace event.
+Every cognitive pipeline follows this finite state machine. Every transition emits a trace event.
 
 ```
 plan ──┬──> inspect ──┬──> act ──> verify ──┬──> summarize ──> plan (loop)
@@ -177,18 +177,18 @@ The budget tracker (RFC 0038) enforces:
 - **Tool-call budget** — maximum tool invocations
 - **Retry budget** — maximum repair attempts
 
-When any hard-enforced budget hits zero, the agent is force-stopped with `budget_exhausted` status and the trace records why.
+When any hard-enforced budget hits zero, the cognitive pipeline is force-stopped with `budget_exhausted` status and the trace records why.
 
 ### Streaming decode circuit breaker
 
-The harness now enforces token/safety limits during streamed decoding (not only after full responses):
+The core package now enforces token/safety limits during streamed decoding (not only after full responses):
 
 - **Preflight budget gate**: estimate prompt token cost before each model call; if insufficient remaining budget, stop before decode starts.
 - **Mid-stream token breaker**: stream callbacks track emitted completion tokens and abort decode once the remaining completion allowance is exhausted.
 - **Mid-stream safety breaker**: stream callbacks can stop runaway or unsafe output patterns and route to `fail_safe`.
 - **FSM-first shutdown**: on breaker trip, the run is forced into terminal state (`budget_exhausted`, `fail_safe`, or `external_stop`) before any subsequent tool side effects.
 
-This keeps authority in the harness FSM even when a model ignores budget instructions.
+This keeps authority in the core package FSM even when a model ignores budget instructions.
 
 ## Tool contracts
 
@@ -212,7 +212,7 @@ Sandbox policy (RFC 0017) controls which tools are allowed/blocked at runtime.
 ## Adding new tools
 
 ```typescript
-import { ToolRegistry, defineToolContract } from "@open-cot/harness";
+import { ToolRegistry, defineToolContract } from "@open-cot/core";
 
 const registry = new ToolRegistry();
 registry.register(
@@ -227,11 +227,11 @@ registry.register(
 );
 ```
 
-## Adding new agents
+## Adding new pipelines
 
-Create a new file in `src/agents/` that:
+Create a new file in `src/pipelines/` that:
 
-1. Creates state with `createAgentState()`
+1. Creates state with `createPipelineState()`
 2. Uses `transition()` to move through FSM phases
 3. Uses `emitPlan/emitAction/emitObservation/emitVerify/emitSummary` to build the trace
 4. Uses `createBudgetTracker()` to track resource usage
@@ -241,11 +241,11 @@ The FSM engine prevents invalid transitions and the validator confirms the outpu
 
 ## Cross-language validation
 
-Traces emitted by the TypeScript harness can be validated by the Python tooling:
+Traces emitted by the TypeScript core package can be validated by the Python tooling:
 
 ```bash
-# Save a trace from the harness
-npx tsx examples/chat-demo.ts > trace.json
+# Save a trace from the core package
+npx tsx examples/chat-pipeline-demo.ts > trace.json
 
 # Validate with the Python validator
 python tools/validate.py --trace trace.json
@@ -253,7 +253,7 @@ python tools/validate.py --trace trace.json
 
 This proves the schema contract works across implementations.
 
-## What the harness demonstrates
+## What the core package demonstrates
 
 - Standard-compliant trace emission (RFC 0001 + RFC 0007)
 - Tool call / observation pairing (RFC 0003)

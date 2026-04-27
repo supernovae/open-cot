@@ -7,7 +7,7 @@ import type {
   LLMToolDefinition,
 } from "../backends/types.js";
 import type { BudgetTracker } from "./budget-tracker.js";
-import type { AgentState } from "./state.js";
+import type { PipelineState } from "./state.js";
 import { forceStop } from "./transitions.js";
 import type { CompletionStatus } from "../schemas/audit-envelope.js";
 
@@ -35,7 +35,7 @@ export interface StreamSafetyConfig {
 export interface CircuitBreakerOptions {
   backend: LLMBackend;
   messages: LLMMessage[];
-  state: AgentState;
+  state: PipelineState;
   budget: BudgetTracker;
   llmReason?: string;
   stream?: boolean;

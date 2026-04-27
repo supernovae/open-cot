@@ -36,7 +36,7 @@ Modern reasoning models increasingly rely on **verifiable intermediate steps**:
 - Qwen‑R1 uses step‑level reward shaping.  
 - “Let’s Verify Step by Step” shows verification dramatically improves accuracy.  
 - Math and logic tasks require symbolic correctness.  
-- Agent frameworks need to validate tool outputs and reasoning transitions.
+- Cognitive pipeline frameworks need to validate tool outputs and reasoning transitions.
 
 However, there is **no open standard** for representing verifier outputs.
 

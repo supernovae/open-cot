@@ -8,7 +8,7 @@ Explicit token/step budgets improve predictability and cost control while mainta
 
 - `schemas/rfc-0038-cost-aware-reasoning-budget.json`
 - `schemas/rfc-0039-tool-cost-modeling.json`
-- `schemas/rfc-0040-multi-agent-economic-incentives.json`
+- `schemas/rfc-0040-multi-party-economic-incentives.json`
 
 ## Run command
 

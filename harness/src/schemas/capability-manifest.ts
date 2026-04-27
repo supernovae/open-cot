@@ -26,7 +26,7 @@ export interface ManifestBudget {
 export interface CapabilityManifest {
   manifest_id: string;
   run_id: string;
-  agent_id: string;
+  requester_id: string;
   timestamp: string;
   phase: string;
   tools: {

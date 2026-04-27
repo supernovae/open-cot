@@ -2,7 +2,7 @@
  * Budget tracker — RFC 0038 (Cost-Aware Reasoning Budget).
  *
  * Maintains running totals for token, cost, step, tool-call, and retry budgets.
- * When any hard-enforced budget is exhausted the tracker signals that the agent
+ * When any hard-enforced budget is exhausted the tracker signals that the cognitive pipeline
  * must stop.
  */
 
@@ -11,15 +11,15 @@ import type {
   BudgetSnapshot,
   BudgetChangeEvent,
 } from "../schemas/budget.js";
-import type { AgentState } from "./state.js";
+import type { PipelineState } from "./state.js";
 import { forceStop } from "./transitions.js";
 
 export interface BudgetTracker {
-  recordTokens(state: AgentState, count: number, reason: string): void;
-  recordCost(state: AgentState, amount: number, reason: string): void;
-  recordStep(state: AgentState, reason: string): void;
-  recordToolCall(state: AgentState, reason: string): void;
-  recordRetry(state: AgentState, reason: string): void;
+  recordTokens(state: PipelineState, count: number, reason: string): void;
+  recordCost(state: PipelineState, amount: number, reason: string): void;
+  recordStep(state: PipelineState, reason: string): void;
+  recordToolCall(state: PipelineState, reason: string): void;
+  recordRetry(state: PipelineState, reason: string): void;
   isExhausted(snapshot: BudgetSnapshot, policy: BudgetPolicy): string | null;
   getEvents(): readonly BudgetChangeEvent[];
 }
@@ -42,7 +42,7 @@ export function createBudgetTracker(): BudgetTracker {
     });
   }
 
-  function checkExhaustion(state: AgentState): void {
+  function checkExhaustion(state: PipelineState): void {
     const reason = isExhausted(state.budget, state.budgetPolicy);
     if (reason && state.budgetPolicy.enforcement === "hard") {
       forceStop(state, "budget_exhausted", reason);

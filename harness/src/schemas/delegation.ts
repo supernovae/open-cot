@@ -24,10 +24,10 @@ export interface DelegationProvenance {
 export interface DelegationRequest {
   schema_version: "0.2";
   request_id: string;
-  /** Harness-verified agent identity — never model-provided. */
+  /** Harness-verified cognitive pipeline identity — never model-provided. */
   requester: string;
   run_id: string;
-  /** Model-provided: what the agent wants to accomplish. */
+  /** Model-provided: what the cognitive pipeline wants to accomplish. */
   intent: string;
   /** Model-provided: why this capability is needed. */
   justification: string;

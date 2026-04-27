@@ -1,8 +1,8 @@
 # RFC 0009 — Reward Fusion Specification (v0.1)
-**Status:** Draft  
-**Author:** Byron / Open CoT Community  
-**Created:** 2026‑04‑14  
-**Target Version:** Schema v0.3  
+**Status:** Draft
+**Author:** Byron / Open CoT Community
+**Created:** 2026‑04‑14
+**Target Version:** Schema v0.3
 **Discussion:** https://github.com/supernovae/open-cot/discussions/9
 ---
 
@@ -12,18 +12,18 @@ This RFC defines the **Reward Fusion Specification**, a standard for combining m
 
 It extends:
 
-- RFC 0005 — RL Reward Trace Schema  
-- RFC 0006 — Multi‑Verifier Ensemble Schema  
-- RFC 0007 — Agent Loop Protocol  
+- RFC 0005 — RL Reward Trace Schema
+- RFC 0006 — Multi‑Verifier Ensemble Schema
+- RFC 0007 — Cognitive Pipeline Protocol
 
 The goal is to provide a **consistent, transparent, and reproducible** method for merging:
 
-- verifier‑based rewards  
-- heuristic rewards  
-- human feedback rewards  
-- branch‑level rewards  
-- trajectory‑level rewards  
-- ensemble‑derived rewards  
+- verifier‑based rewards
+- heuristic rewards
+- human feedback rewards
+- branch‑level rewards
+- trajectory‑level rewards
+- ensemble‑derived rewards
 
 into a single, fused reward signal.
 
@@ -33,39 +33,39 @@ into a single, fused reward signal.
 
 Modern reasoning models (DeepSeek‑R1, Qwen‑R1, etc.) rely on **multiple reward sources**, including:
 
-- symbolic verifiers  
-- neural verifiers  
-- rule‑based heuristics  
-- human preference models  
-- branch‑level search scores  
-- trajectory‑level correctness signals  
+- symbolic verifiers
+- neural verifiers
+- rule‑based heuristics
+- human preference models
+- branch‑level search scores
+- trajectory‑level correctness signals
 
 However:
 
-- Reward signals often conflict.  
-- Pipelines use incompatible fusion strategies.  
-- RL training requires a single scalar reward per step or trajectory.  
-- Datasets cannot share fused reward traces without a standard.  
-- Ensemble verifiers (RFC 0006) require downstream fusion.  
+- Reward signals often conflict.
+- Pipelines use incompatible fusion strategies.
+- RL training requires a single scalar reward per step or trajectory.
+- Datasets cannot share fused reward traces without a standard.
+- Ensemble verifiers (RFC 0006) require downstream fusion.
 
-This RFC defines a **unified reward fusion standard** to ensure interoperability across datasets, RL pipelines, and agent frameworks.
+This RFC defines a **unified reward fusion standard** to ensure interoperability across datasets, RL pipelines, and cognitive pipeline frameworks.
 
 ---
 
 ## 3. Design Goals
 
 ### 3.1 Must‑Have Goals
-- Support step‑level, branch‑level, and trajectory‑level reward fusion.  
-- Support multiple fusion strategies.  
-- Support weighted and confidence‑weighted fusion.  
-- Support deterministic and reproducible fusion.  
-- Integrate cleanly with RFC 0005 and RFC 0006.  
+- Support step‑level, branch‑level, and trajectory‑level reward fusion.
+- Support multiple fusion strategies.
+- Support weighted and confidence‑weighted fusion.
+- Support deterministic and reproducible fusion.
+- Integrate cleanly with RFC 0005 and RFC 0006.
 - Support RL‑ready scalar reward outputs.
 
 ### 3.2 Non‑Goals
-- Defining a universal reward function.  
-- Mandating a specific RL algorithm.  
-- Encoding model weights or training logs.  
+- Defining a universal reward function.
+- Mandating a specific RL algorithm.
+- Encoding model weights or training logs.
 - Replacing verifier outputs or ensemble outputs.
 
 ---
@@ -74,13 +74,13 @@ This RFC defines a **unified reward fusion standard** to ensure interoperability
 
 Reward fusion operates over three levels:
 
-1. **Step‑level fusion**  
+1. **Step‑level fusion**
    Combine rewards for individual reasoning steps.
 
-2. **Branch‑level fusion**  
+2. **Branch‑level fusion**
    Combine rewards for alternative reasoning paths (ToT/GoT).
 
-3. **Trajectory‑level fusion**  
+3. **Trajectory‑level fusion**
    Combine global rewards for the entire reasoning trace.
 
 Each level may use different fusion strategies.
@@ -283,9 +283,9 @@ User‑defined fusion logic (metadata required).
 
 This RFC will be accepted when:
 
-- At least 3 maintainers approve it.  
-- A reference implementation performs reward fusion.  
-- At least one RL pipeline consumes fused rewards.  
+- At least 3 maintainers approve it.
+- A reference implementation performs reward fusion.
+- At least one RL pipeline consumes fused rewards.
 - At least one dataset includes fused reward traces.
 
 ---
@@ -294,8 +294,8 @@ This RFC will be accepted when:
 
 This RFC defines the **Reward Fusion Specification**, enabling:
 
-- unified reward signals  
-- multi‑verifier integration  
-- RL‑ready reward traces  
-- consistent evaluation  
-- reproducible training  
+- unified reward signals
+- multi‑verifier integration
+- RL‑ready reward traces
+- consistent evaluation
+- reproducible training

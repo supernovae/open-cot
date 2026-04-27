@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { VALID_TRANSITIONS, ALL_PHASES } from "../src/schemas/agent-loop.js";
+import { VALID_TRANSITIONS, ALL_PHASES } from "../src/schemas/cognitive-pipeline.js";
 import {
   canTransition,
   assertTransition,
@@ -7,7 +7,7 @@ import {
   forceStop,
   InvalidTransitionError,
   TerminalStateError,
-  createAgentState,
+  createPipelineState,
 } from "../src/core/index.js";
 
 describe("FSM transitions", () => {
@@ -51,7 +51,7 @@ describe("FSM transitions", () => {
 
   describe("transition()", () => {
     it("moves state to the target phase", () => {
-      const state = createAgentState({ objective: "test" });
+      const state = createPipelineState({ objective: "test" });
       expect(state.phase).toBe("receive");
       transition(state, "frame", "start");
       transition(state, "plan", "ready");
@@ -60,7 +60,7 @@ describe("FSM transitions", () => {
     });
 
     it("appends a trace step", () => {
-      const state = createAgentState({ objective: "test" });
+      const state = createPipelineState({ objective: "test" });
       const before = state.trace.steps.length;
       transition(state, "frame", "starting work");
       expect(state.trace.steps.length).toBe(before + 1);
@@ -68,13 +68,13 @@ describe("FSM transitions", () => {
     });
 
     it("updates nextAllowedPhases", () => {
-      const state = createAgentState({ objective: "test" });
+      const state = createPipelineState({ objective: "test" });
       transition(state, "frame", "go");
       expect(state.nextAllowedPhases).toEqual(expect.arrayContaining(["plan"]));
     });
 
     it("sets completionStatus to succeeded when sealing normally", () => {
-      const state = createAgentState({ objective: "test" });
+      const state = createPipelineState({ objective: "test" });
       transition(state, "frame", "go");
       transition(state, "plan", "go");
       transition(state, "finalize", "wrap");
@@ -86,7 +86,7 @@ describe("FSM transitions", () => {
 
   describe("forceStop()", () => {
     it("forces state to audit_seal with the given status", () => {
-      const state = createAgentState({ objective: "test" });
+      const state = createPipelineState({ objective: "test" });
       forceStop(state, "budget_exhausted", "tokens ran out");
       expect(state.phase).toBe("audit_seal");
       expect(state.completionStatus).toBe("budget_exhausted");
@@ -94,7 +94,7 @@ describe("FSM transitions", () => {
     });
 
     it("is idempotent on already-stopped state", () => {
-      const state = createAgentState({ objective: "test" });
+      const state = createPipelineState({ objective: "test" });
       forceStop(state, "external_stop", "user abort");
       const stepCount = state.trace.steps.length;
       forceStop(state, "failed", "double stop");
@@ -105,9 +105,9 @@ describe("FSM transitions", () => {
 
   describe("full FSM path", () => {
     it("supports receive -> frame -> plan -> finalize -> audit_seal", () => {
-      const state = createAgentState({ objective: "full path" });
+      const state = createPipelineState({ objective: "full path" });
       transition(state, "frame", "gather context");
-      transition(state, "plan", "decide");
+      transition(state, "plan", "reconcile");
       transition(state, "finalize", "wrap up");
       transition(state, "audit_seal", "done");
       expect(state.phase).toBe("audit_seal");
@@ -115,7 +115,7 @@ describe("FSM transitions", () => {
     });
 
     it("supports critique_verify -> plan -> execute_tool -> observe_result loop", () => {
-      const state = createAgentState({ objective: "repair loop" });
+      const state = createPipelineState({ objective: "repair loop" });
       transition(state, "frame", "f");
       transition(state, "plan", "p");
       transition(state, "execute_tool", "run");

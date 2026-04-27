@@ -20,9 +20,9 @@ That split—verbose canonical JSON off the hot path, terse briefing on the hot 
 
 **Where this meets code:** the governed execution loop, transitions, and trace/state plumbing live under [`harness/`](../harness/README.md). Useful entry points:
 
-- [`harness/src/agents/governed-agent.ts`](../harness/src/agents/governed-agent.ts) — end-to-end governed FSM with delegation and receipts
+- [`harness/src/pipelines/governed-pipeline.ts`](../harness/src/pipelines/governed-pipeline.ts) — end-to-end governed FSM with delegation and receipts
 - [`harness/src/core/transitions.ts`](../harness/src/core/transitions.ts) — phase changes and harness-driven state
-- [`harness/src/core/state.ts`](../harness/src/core/state.ts) — `AgentState` and trace accumulation
+- [`harness/src/core/state.ts`](../harness/src/core/state.ts) — `PipelineState` and trace accumulation
 - [`harness/src/core/tool-registry.ts`](../harness/src/core/tool-registry.ts) — registered tools and contracts feeding compilation
 
 Manifest compilation should draw from the same sources the enforcement path trusts (registry, sandbox config, active policies, budget tracker), not from prose the model invented. That keeps the briefing aligned with what will actually happen when a tool call is attempted.
@@ -56,7 +56,7 @@ TOON sits between Tier 2 (ad-hoc markers) and Tier 3 (new serialization language
 - **JSON Schema stays normative.** TOON is a serialization adapter, not a schema language. All validation, audit, and interchange remain JSON.
 - **Round-trip fidelity.** `fromToon(toToon(obj, schema), schema)` must produce the same validated object. The adapter is not a trust boundary.
 - **Inline guardrails.** The `[N]` length marker and `{fields}` header tell the model exactly how many items to generate and which keys to use, reducing hallucinated structure.
-- **Opt-in via `wire_format`.** Set `wire_format: "toon"` on agent config; default remains `"compact-text"` for backward compatibility.
+- **Opt-in via `wire_format`.** Set `wire_format: "toon"` on cognitive pipeline config; default remains `"compact-text"` for backward compatibility.
 
 Example — the capability manifest in TOON vs compact text:
 
@@ -75,7 +75,7 @@ constraints: max 5 results per search; no raw HTML
 
 The TOON form for this manifest uses roughly 30–40% fewer tokens than the equivalent JSON, and is comparable or slightly more compact than the hand-coded compact text — with the advantage that the adapter is reusable across any schema, not just manifests.
 
-**Implementation:** [`harness/src/adapters/toon-adapter.ts`](../harness/src/adapters/toon-adapter.ts) provides `toToon`, `fromToon`, and `schemaToToonHeader`. The manifest builder ([`harness/src/governance/manifest-builder.ts`](../harness/src/governance/manifest-builder.ts)) adds `manifestToToon` and a `serializeManifest` dispatcher. Both the governed agent and chat agent accept a `wireFormat` config option.
+**Implementation:** [`harness/src/adapters/toon-adapter.ts`](../harness/src/adapters/toon-adapter.ts) provides `toToon`, `fromToon`, and `schemaToToonHeader`. The manifest builder ([`harness/src/governance/manifest-builder.ts`](../harness/src/governance/manifest-builder.ts)) adds `manifestToToon` and a `serializeManifest` dispatcher. Both the governed cognitive pipeline and chat cognitive pipeline accept a `wireFormat` config option.
 
 **Research backing:**
 
@@ -105,7 +105,7 @@ Models often reason better with room to be verbose. Control-plane metadata does 
 Concrete directions:
 
 - **Observation summarization.** A search tool might return hundreds of tokens of noisy HTML. The harness could extract entities, numbers, and citations into a short fact list before `observe_result` reaches the model, while the full payload remains attached to the trace step or external object storage for auditors. Summarization could be heuristic (strip tags), model-based (a cheap summarizer), or policy-driven (only whitelisted fields).
-- **Trace windowing.** `AgentState` can retain the full run; the model-facing context might show only the last *N* tool cycles or the last *M* tokens of narration. Long multi-tool runs otherwise drown in their own history; windowing is likely mandatory for hour-scale tasks even when total context fits in theory.
+- **Trace windowing.** `PipelineState` can retain the full run; the model-facing context might show only the last *N* tool cycles or the last *M* tokens of narration. Long multi-tool runs otherwise drown in their own history; windowing is likely mandatory for hour-scale tasks even when total context fits in theory.
 - **Metadata stripping.** Delegation request ids, integrity hashes, receipt fields, and other audit-only columns need not be echoed back to the model. Keep them in structured state and in sealed envelopes, not in the prompt loop. The model needs *enough* correlation to refer to “the last search,” not the full cryptographic tail.
 - **Phase-aware injection.** At `plan`, surface the objective plus a fresh capability manifest so proposals stay feasible. At `critique_verify`, bias toward the latest observation, the manifest refresh (budget and revocation changes), and a compact summary of prior conclusions—rather than replaying the entire thread from `receive`.
 - **Deterministic replay vs model context.** Anything you strip from the prompt must still be reconstructable for debugging. Document whether summarization is **reversible** (lossless compression) or **interpretive** (lossy), because critique quality depends on which you chose.
@@ -162,7 +162,7 @@ These are not homework problems with known answers; they are gaps we expect to c
 - Can observation summarization preserve enough detail for accurate `critique_verify`, or does summarization systematically hide the faults reviewers need to catch?
 - What is the **minimum** viable context for a `critique_verify` step on your tasks—objective only, last observation only, manifest refresh only?
 - When native `tool_calls` are available, does switching away from JSON-in-prose materially change **total** tokens once system prompts and tool schemas are included?
-- For multi-agent or delegated subgraphs, which metadata is safe to strip without breaking the child’s correlation to parent receipts?
+- For multi-party or delegated subgraphs, which metadata is safe to strip without breaking the child’s correlation to parent receipts?
 
 ---
 
@@ -170,7 +170,7 @@ These are not homework problems with known answers; they are gaps we expect to c
 
 If you run small models locally, your measurements matter more than our guesses.
 
-- Run the governed agent demo paths in [`harness/examples/`](../harness/examples/) and capture token usage (`prompt_tokens`, `completion_tokens`, and per-phase estimates if your wrapper exposes them).
+- Run the governed cognitive pipeline demo paths in [`harness/examples/`](../harness/examples/) and capture token usage (`prompt_tokens`, `completion_tokens`, and per-phase estimates if your wrapper exposes them).
 - Try context compilation ideas—summaries, windowing, stripped metadata—and report what broke and what held. Attach redacted prompts if you can.
 - Benchmark structured text markers vs JSON for **your** model and tool set; share model id, quantization, temperature, and rough numbers—not just one cherry-picked success.
 - Propose compact formats with a clear mapping to existing schemas and an estimate of token savings **including** failure cases.

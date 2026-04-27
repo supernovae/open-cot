@@ -56,14 +56,14 @@ function stableStringify(value: unknown): string {
   return `{${keys.map((k) => `${JSON.stringify(k)}:${stableStringify(obj[k])}`).join(",")}}`;
 }
 
-function subjectMatches(agentId: string, pattern: string): boolean {
+function subjectMatches(requesterId: string, pattern: string): boolean {
   if (pattern === "*") {
     return true;
   }
-  if (agentId === pattern) {
+  if (requesterId === pattern) {
     return true;
   }
-  return agentId.startsWith(`${pattern}:`);
+  return requesterId.startsWith(`${pattern}:`);
 }
 
 function resourceMatches(scopeResource: string, pattern: string): boolean {
@@ -90,12 +90,12 @@ function isWithinHalfOpenWindow(
 
 function ruleMatches(
   rule: PolicyRule,
-  agentId: string,
+  requesterId: string,
   requestedScope: RequestedScope,
   nowIso: string,
 ): boolean {
   const subjectPattern = rule.subject ?? "*";
-  if (!subjectMatches(agentId, subjectPattern)) {
+  if (!subjectMatches(requesterId, subjectPattern)) {
     return false;
   }
   if (!resourceMatches(requestedScope.resource, rule.resource)) {
@@ -172,7 +172,7 @@ export class PolicyEvaluator {
     this.policies = this.policies.filter((p) => p.policy_id !== policyId);
   }
 
-  evaluate(request: DelegationRequest, agent_id: string): DelegationDecision {
+  evaluate(request: DelegationRequest, requester_id: string): DelegationDecision {
     const nowIso = new Date().toISOString();
     const sorted = [...this.policies]
       .filter((p) => isWithinHalfOpenWindow(nowIso, p.effective_at, p.expires_at))
@@ -184,7 +184,7 @@ export class PolicyEvaluator {
 
     for (const policy of sorted) {
       const rule = policy.rules.find((r) =>
-        ruleMatches(r, agent_id, request.requested_scope, nowIso),
+        ruleMatches(r, requester_id, request.requested_scope, nowIso),
       );
       if (!rule) {
         continue;
@@ -193,7 +193,7 @@ export class PolicyEvaluator {
       if (rule.action === "deny") {
         return this.buildDecision({
           request,
-          agent_id,
+          requester_id,
           status: "denied",
           decidedBy: { kind: "policy", policy_id: policy.policy_id },
           policyRefs: [policy.policy_id],
@@ -228,7 +228,7 @@ export class PolicyEvaluator {
       );
       return this.buildDecision({
         request,
-        agent_id,
+        requester_id,
         status: "narrowed",
         decidedBy: { kind: "policy", policy_id: firstNarrow.policy.policy_id },
         policyRefs: [firstNarrow.policy.policy_id],
@@ -244,7 +244,7 @@ export class PolicyEvaluator {
     if (firstEscalation) {
       return this.buildDecision({
         request,
-        agent_id,
+        requester_id,
         status: "escalated",
         decidedBy: {
           kind: "policy",
@@ -265,7 +265,7 @@ export class PolicyEvaluator {
     if (firstAllow) {
       return this.buildDecision({
         request,
-        agent_id,
+        requester_id,
         status: "approved",
         decidedBy: { kind: "policy", policy_id: firstAllow.policy.policy_id },
         policyRefs: [firstAllow.policy.policy_id],
@@ -280,7 +280,7 @@ export class PolicyEvaluator {
 
     return this.buildDecision({
       request,
-      agent_id,
+      requester_id,
       status: "denied",
       decidedBy: { kind: "harness" },
       policyRefs: [],
@@ -295,7 +295,7 @@ export class PolicyEvaluator {
 
   private buildDecision(args: {
     request: DelegationRequest;
-    agent_id: string;
+    requester_id: string;
     status: DelegationStatus;
     decidedBy: DecidedBy;
     policyRefs: string[];
@@ -308,7 +308,7 @@ export class PolicyEvaluator {
   }): DelegationDecision {
     const basis = stableStringify({
       request_id: args.request.request_id,
-      agent_id: args.agent_id,
+      requester_id: args.requester_id,
       scope: args.request.requested_scope,
       status: args.status,
       decided_by: args.decidedBy,

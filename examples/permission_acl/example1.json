@@ -1,6 +1,6 @@
 {
   "permission_id": "perm-q7r8s9t0",
-  "granted_to": "agent-planner-01",
+  "granted_to": "cognitive-pipeline-planner-01",
   "scope": {
     "resource": "tool:email",
     "action": "read",

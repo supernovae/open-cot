@@ -1,9 +1,9 @@
 # RFC 0042 — Permissions & Access Control (v0.3)
 
-**Status:** Draft  
-**Author:** Byron / Open CoT Community  
-**Created:** 2026-04-14  
-**Target Version:** Schema v0.7  
+**Status:** Draft
+**Author:** Byron / Open CoT Community
+**Created:** 2026-04-14
+**Target Version:** Schema v0.7
 **Discussion:** https://github.com/supernovae/open-cot/discussions/42
 
 ---
@@ -12,23 +12,23 @@
 
 This RFC defines **capability-based permission grants** for Open CoT: typed, scoped, time-limited objects that materialize authority *after* the policy engine approves a delegation request. The harness creates grants; the tool executor validates and consumes them. The language model **requests** access; it **never** self-authorizes.
 
-This specification extends **RFC 0026** (Agent Identity — `granted_to`) and **RFC 0041** (Policy Enforcement — issuance and narrowing). It aligns with **RFC 0007** (permissions at `execute_tool`, revocation in finalize), **RFC 0047** (Delegation — `request_ref` / `decision_ref`), and **RFC 0043** (audit mapping for lifecycle events).
+This specification extends **RFC 0026** (Cognitive pipeline Identity — `granted_to`) and **RFC 0041** (Policy Enforcement — issuance and narrowing). It aligns with **RFC 0007** (permissions at `execute_tool`, revocation in finalize), **RFC 0047** (Delegation — `request_ref` / `decision_ref`), and **RFC 0043** (audit mapping for lifecycle events).
 
 ---
 
 ## 2. Context
 
-Open CoT is a **cognitive control plane**: reasoning, tools, memory, and policy compose into inspectable runs. Permissions bridge **policy approval** and **side-effecting execution**. First-class grants are required so that (a) tool endpoints are not confused deputies for ambient authority, (b) auditors can reconstruct what was allowed, for whom, for how long, and under which policy lineage, and (c) sub-agents do not silently inherit parent capabilities. A **permission grant** is a durable record with a strict lifecycle—not a static role matrix embedded in agent config.
+Open CoT is a **cognitive control plane**: reasoning, tools, memory, and policy compose into inspectable runs. Permissions bridge **policy approval** and **side-effecting execution**. First-class grants are required so that (a) tool endpoints are not confused deputies for ambient authority, (b) auditors can reconstruct what was allowed, for whom, for how long, and under which policy lineage, and (c) sub-pipelines do not silently inherit parent capabilities. A **permission grant** is a durable record with a strict lifecycle—not a static role matrix embedded in cognitive pipeline config.
 
 ---
 
 ## 3. Design principles
 
-1. **No self-authorization.** `granted_by`, `policy_ref`, `decision_ref`, and narrowed `scope` MUST be harness/policy-populated; the model MUST NOT supply values treated as issuance authority.  
-2. **Deny by default.** No matching active grant for `audience` + `scope` ⇒ execution MUST fail closed.  
-3. **Least privilege in the grant.** Persisted `scope` is the **post-policy** narrowed scope, not the model’s raw intent.  
-4. **Explicit binding.** `audience` ties the capability to a specific tool/service key.  
-5. **Time-bounded.** Every grant has `effective_at`, `ttl_seconds`, and `expires_at`; expired grants are unusable (`expired`).  
+1. **No self-authorization.** `granted_by`, `policy_ref`, `decision_ref`, and narrowed `scope` MUST be harness/policy-populated; the model MUST NOT supply values treated as issuance authority.
+2. **Deny by default.** No matching active grant for `audience` + `scope` ⇒ execution MUST fail closed.
+3. **Least privilege in the grant.** Persisted `scope` is the **post-policy** narrowed scope, not the model’s raw intent.
+4. **Explicit binding.** `audience` ties the capability to a specific tool/service key.
+5. **Time-bounded.** Every grant has `effective_at`, `ttl_seconds`, and `expires_at`; expired grants are unusable (`expired`).
 6. **Observable transitions.** Every lifecycle change MUST emit a structured audit event (§9).
 
 ---
@@ -74,7 +74,7 @@ Every grant MUST have `effective_at`, `ttl_seconds` (integer >= 1), and `expires
 
 ## 9. Forwardability
 
-**`forwardable`** defaults **`false`**; sub-agents MUST request their own grants. **`forwardable: true`** only via explicit policy; implementations SHOULD require an **authority_receipt** chain (RFC 0047) for attributable inheritance.
+**`forwardable`** defaults **`false`**; sub-pipelines MUST request their own grants. **`forwardable: true`** only via explicit policy; implementations SHOULD require an **authority_receipt** chain (RFC 0047) for attributable inheritance.
 
 ---
 
@@ -190,7 +190,7 @@ First committed `tool:filesystem` write ⇒ `consumed` + `permission_consumed`.
 ```json
 {
   "permission_id": "b2c3d4e5-f6a7-4b8c-9d0e-123456789abc",
-  "granted_to": "agent:researcher-prod-east",
+  "granted_to": "cognitive-pipeline:researcher-prod-east",
   "scope": {
     "resource": "tool:search",
     "action": "read",
@@ -245,10 +245,10 @@ Executor MUST enforce headers-only regardless of model prompts.
 
 ## 14. Cross-references
 
-- **RFC 0007 — Governed FSM** — consume in `execute_tool`; revoke in finalize.  
-- **RFC 0026 — Agent Identity** — `granted_to` binding.  
-- **RFC 0041 — Policy Enforcement** — decisions create grants; optional audience aliases.  
-- **RFC 0043 — Auditing** — canonical audit stream for §10.  
+- **RFC 0007 — Governed FSM** — consume in `execute_tool`; revoke in finalize.
+- **RFC 0026 — Cognitive pipeline Identity** — `granted_to` binding.
+- **RFC 0041 — Policy Enforcement** — decisions create grants; optional audience aliases.
+- **RFC 0043 — Auditing** — canonical audit stream for §10.
 - **RFC 0047 — Delegation** — `request_ref` / `decision_ref`; authority receipts when `forwardable`.
 
 ---

@@ -1,36 +1,36 @@
 # RFC 0013 — Memory Compression & Embedding (v0.1)
-**Status:** Draft  
-**Author:** Byron / Open CoT Community  
-**Created:** 2026‑04‑14  
-**Target Version:** Schema v0.4  
+**Status:** Draft
+**Author:** Byron / Open CoT Community
+**Created:** 2026‑04‑14
+**Target Version:** Schema v0.4
 **Discussion:** https://github.com/supernovae/open-cot/discussions/13
 ---
 
 ## 1. Summary
 
-This RFC defines standards for **compressing, embedding, and summarizing agent memory** to support scalable long‑term memory (LTM) and efficient retrieval.
+This RFC defines standards for **compressing, embedding, and summarizing cognitive pipeline memory** to support scalable long‑term memory (LTM) and efficient retrieval.
 
 It extends:
 
-- RFC 0010 — Agent Memory Schema  
-- RFC 0007 — Agent Loop Protocol  
+- RFC 0010 — Cognitive pipeline Memory Schema
+- RFC 0007 — Cognitive Pipeline Protocol
 
 ---
 
 ## 2. Motivation
 
-Agents accumulate:
+Pipelines accumulate:
 
-- thousands of STM entries  
-- millions of LTM entries  
-- episodic logs  
-- tool state  
+- thousands of STM entries
+- millions of LTM entries
+- episodic logs
+- tool state
 
 Without compression:
 
-- memory becomes unbounded  
-- retrieval becomes slow  
-- serialization becomes expensive  
+- memory becomes unbounded
+- retrieval becomes slow
+- serialization becomes expensive
 
 This RFC defines **compression, summarization, and embedding formats**.
 
@@ -38,11 +38,11 @@ This RFC defines **compression, summarization, and embedding formats**.
 
 ## 3. Design Goals
 
-- Support lossy and lossless compression  
-- Support embedding‑based memory  
-- Support summarization chains  
-- Support provenance tracking  
-- Support deterministic replay  
+- Support lossy and lossless compression
+- Support embedding‑based memory
+- Support summarization chains
+- Support provenance tracking
+- Support deterministic replay
 
 ---
 
@@ -50,11 +50,11 @@ This RFC defines **compression, summarization, and embedding formats**.
 
 Memory entries may include:
 
-- `raw_value`  
-- `compressed_value`  
-- `embedding`  
-- `summary`  
-- `provenance`  
+- `raw_value`
+- `compressed_value`
+- `embedding`
+- `summary`
+- `provenance`
 
 ---
 
@@ -82,7 +82,7 @@ Memory entries may include:
 ```json
 {
   "key": "project_history",
-  "summary": "Agent completed 12 tasks related to GPU provisioning.",
+  "summary": "Cognitive pipeline completed 12 tasks related to GPU provisioning.",
   "embedding": { "vector": [0.12, 0.44], "dim": 2 }
 }
 ```

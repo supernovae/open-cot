@@ -1,7 +1,7 @@
 {
   "manifest_id": "cm_01jqzexample0001",
   "run_id": "run_8f3c2a",
-  "agent_id": "agent_researcher_eu",
+  "requester_id": "agent_researcher_eu",
   "timestamp": "2026-04-18T14:22:05Z",
   "phase": "frame",
   "tools": {

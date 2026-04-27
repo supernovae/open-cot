@@ -25,6 +25,9 @@ any side effect.
 - `cognitive_artifact`: typed proposal emitted from the cognitive step.
 - `execution_intent`: requested endpoint execution tied to a snapshot and
   capability digest.
+- `reasoning_trace`: cognitive evidence explaining the path from objective to
+  proposal. It can carry detailed evidence, an audit-safe summary, or a
+  redacted evidence record.
 - `observation`: structured evidence recorded during reconciliation.
 
 ## 3. Normative requirements
@@ -35,8 +38,14 @@ any side effect.
   before execution.
 - A runtime MUST validate arguments against the original capability input
   schema.
-- Reasoning traces are explanatory audit material only. They are not proof,
+- Reasoning traces are evidentiary audit material. They help reviewers
+  understand how the cognitive step reached a proposal, but they are not proof,
   authorization, or trusted state.
+- A reasoning trace SHOULD declare whether it contains detailed evidence,
+  audit-safe summary material, or redacted evidence. Redaction metadata SHOULD
+  explain why detail is unavailable.
+- A runtime MUST NOT infer permission from reasoning content. Permission comes
+  only from policy gates, validated capability snapshots, and reconciliation.
 
 ## 4. Runtime neutrality
 

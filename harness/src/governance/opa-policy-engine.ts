@@ -49,17 +49,17 @@ export class OpaPolicyEngine implements DelegationPolicyEngine {
 
   async evaluate(
     request: DelegationRequest,
-    agentId: string,
+    requesterId: string,
   ): Promise<DelegationDecision> {
     try {
-      const result = await this.queryOpa(request, agentId);
-      return this.toDecision(request, agentId, result);
+      const result = await this.queryOpa(request, requesterId);
+      return this.toDecision(request, requesterId, result);
     } catch (err) {
       if (this.config.fallbackEngine) {
-        return this.config.fallbackEngine.evaluate(request, agentId);
+        return this.config.fallbackEngine.evaluate(request, requesterId);
       }
       const message = err instanceof Error ? err.message : String(err);
-      return createDelegationDecision(request, agentId, {
+      return createDelegationDecision(request, requesterId, {
         status: "denied",
         decidedBy: { kind: "harness" },
         policyRefs: [],
@@ -75,7 +75,7 @@ export class OpaPolicyEngine implements DelegationPolicyEngine {
     const decision = await this.evaluate(
       createSyntheticRequest({
         runId: input.runId,
-        requester: input.agentId,
+        requester: input.requesterId,
         scope: {
           resource: `phase:${input.phase}`,
           action: "read",
@@ -84,7 +84,7 @@ export class OpaPolicyEngine implements DelegationPolicyEngine {
         intent: `Consult policy hook for phase ${input.phase}`,
         justification: `Runtime policy consultation at ${input.phase}`,
       }),
-      input.agentId,
+      input.requesterId,
     );
     if (decision.status === "denied" || decision.status === "escalated") {
       return {
@@ -120,7 +120,7 @@ export class OpaPolicyEngine implements DelegationPolicyEngine {
         const decision = await this.evaluate(
           createSyntheticRequest({
             runId: input.runId,
-            requester: input.agentId,
+            requester: input.requesterId,
             scope: {
               resource: `tool:${tool.name}`,
               action: "execute",
@@ -129,7 +129,7 @@ export class OpaPolicyEngine implements DelegationPolicyEngine {
             intent: `Preview tool access for ${tool.name}`,
             justification: `Manifest compilation for phase ${input.phase}`,
           }),
-          input.agentId,
+          input.requesterId,
         );
         return [tool.name, toToolAccessPreview(decision)] as const;
       }),
@@ -139,7 +139,7 @@ export class OpaPolicyEngine implements DelegationPolicyEngine {
 
   private async queryOpa(
     request: DelegationRequest,
-    agentId: string,
+    requesterId: string,
   ): Promise<OpaResult> {
     const controller = new AbortController();
     const timeoutMs = this.config.timeoutMs ?? DEFAULT_TIMEOUT_MS;
@@ -158,7 +158,7 @@ export class OpaPolicyEngine implements DelegationPolicyEngine {
         body: JSON.stringify({
           input: {
             request,
-            agent_id: agentId,
+            requester_id: requesterId,
             context: this.config.inputContext ?? {},
           },
         }),
@@ -182,7 +182,7 @@ export class OpaPolicyEngine implements DelegationPolicyEngine {
 
   private toDecision(
     request: DelegationRequest,
-    agentId: string,
+    requesterId: string,
     result: OpaResult,
   ): DelegationDecision {
     if (!result.status) {
@@ -196,7 +196,7 @@ export class OpaPolicyEngine implements DelegationPolicyEngine {
         ? result.denial_reason ?? "Denied by OPA policy"
         : result.denial_reason;
 
-    return createDelegationDecision(request, agentId, {
+    return createDelegationDecision(request, requesterId, {
       status: result.status,
       decidedBy,
       policyRefs,

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { createAgentState } from "../src/core/state.js";
+import { createPipelineState } from "../src/core/state.js";
 import {
   emitThought,
   emitPlan,
@@ -18,7 +18,7 @@ describe("TraceEmitter", () => {
   });
 
   it("emitThought appends a thought step", () => {
-    const state = createAgentState({ objective: "test" });
+    const state = createPipelineState({ objective: "test" });
     const step = emitThought(state, "thinking...");
     expect(step.type).toBe("thought");
     expect(step.content).toBe("thinking...");
@@ -26,7 +26,7 @@ describe("TraceEmitter", () => {
   });
 
   it("emitPlan increments planVersion", () => {
-    const state = createAgentState({ objective: "test" });
+    const state = createPipelineState({ objective: "test" });
     expect(state.planVersion).toBe(0);
     emitPlan(state, "plan v1");
     expect(state.planVersion).toBe(1);
@@ -35,7 +35,7 @@ describe("TraceEmitter", () => {
   });
 
   it("emitAction records tool invocation and sets lastAction", () => {
-    const state = createAgentState({ objective: "test" });
+    const state = createPipelineState({ objective: "test" });
     const step = emitAction(state, "call:search", {
       tool_name: "search",
       arguments: { query: "test" },
@@ -47,7 +47,7 @@ describe("TraceEmitter", () => {
   });
 
   it("emitObservation sets parent and adds to evidence", () => {
-    const state = createAgentState({ objective: "test" });
+    const state = createPipelineState({ objective: "test" });
     const action = emitAction(state, "call:search", {
       tool_name: "search",
       arguments: {},
@@ -59,25 +59,25 @@ describe("TraceEmitter", () => {
   });
 
   it("emitCritique adds a critique step", () => {
-    const state = createAgentState({ objective: "test" });
+    const state = createPipelineState({ objective: "test" });
     const step = emitCritique(state, "something is wrong");
     expect(step.type).toBe("critique");
   });
 
   it("emitVerify sets verification_status", () => {
-    const state = createAgentState({ objective: "test" });
+    const state = createPipelineState({ objective: "test" });
     const step = emitVerify(state, "looks good", "verified");
     expect(step.verification_status).toBe("verified");
   });
 
   it("emitSummary adds a summarize step", () => {
-    const state = createAgentState({ objective: "test" });
+    const state = createPipelineState({ objective: "test" });
     const step = emitSummary(state, "done with everything");
     expect(step.type).toBe("summarize");
   });
 
   it("finalizeTrace sets final_answer and termination", () => {
-    const state = createAgentState({ objective: "test" });
+    const state = createPipelineState({ objective: "test" });
     state.completionStatus = "succeeded";
     const trace = finalizeTrace(state, "42");
     expect(trace.final_answer).toBe("42");
@@ -85,7 +85,7 @@ describe("TraceEmitter", () => {
   });
 
   it("step IDs are unique and monotonically increasing", () => {
-    const state = createAgentState({ objective: "test" });
+    const state = createPipelineState({ objective: "test" });
     const s1 = emitThought(state, "a");
     const s2 = emitThought(state, "b");
     const s3 = emitThought(state, "c");

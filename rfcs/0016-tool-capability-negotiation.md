@@ -1,24 +1,24 @@
 # RFC 0016 — Tool Capability Negotiation (v0.1)
-**Status:** Draft  
-**Author:** Byron / Open CoT Community  
-**Created:** 2026‑04‑14  
-**Target Version:** Schema v0.4  
+**Status:** Draft
+**Author:** Byron / Open CoT Community
+**Created:** 2026‑04‑14
+**Target Version:** Schema v0.4
 **Discussion:** https://github.com/supernovae/open-cot/discussions/16
 ---
 
 ## 1. Summary
 
-This RFC defines the **Tool Capability Negotiation Standard**, enabling agents to:
+This RFC defines the **Tool Capability Negotiation Standard**, enabling pipelines to:
 
-- discover tool capabilities  
-- negotiate tool parameters  
-- validate tool compatibility  
-- adapt reasoning based on tool constraints  
+- discover tool capabilities
+- negotiate tool parameters
+- validate tool compatibility
+- adapt reasoning based on tool constraints
 
 It extends:
 
-- RFC 0003 — Tool Invocation Schema  
-- RFC 0007 — Agent Loop Protocol  
+- RFC 0003 — Tool Invocation Schema
+- RFC 0007 — Cognitive Pipeline Protocol
 
 ---
 
@@ -26,14 +26,14 @@ It extends:
 
 Tools vary in:
 
-- input formats  
-- output formats  
-- rate limits  
-- supported operations  
-- authentication requirements  
-- cost models  
+- input formats
+- output formats
+- rate limits
+- supported operations
+- authentication requirements
+- cost models
 
-Agents must negotiate capabilities before invoking tools.
+Pipelines must negotiate capabilities before invoking tools.
 
 This RFC defines a **structured negotiation protocol**.
 
@@ -41,13 +41,13 @@ This RFC defines a **structured negotiation protocol**.
 
 ## 3. Capability Types
 
-- `input_schema`  
-- `output_schema`  
-- `supported_operations`  
-- `cost_per_call`  
-- `max_batch_size`  
-- `authentication_required`  
-- `version`  
+- `input_schema`
+- `output_schema`
+- `supported_operations`
+- `cost_per_call`
+- `max_batch_size`
+- `authentication_required`
+- `version`
 
 ---
 
@@ -56,7 +56,7 @@ This RFC defines a **structured negotiation protocol**.
 ```json
 {
   "tool_name": "string",
-  "agent_id": "string",
+  "requester_id": "string",
   "requested_capabilities": ["input_schema", "supported_operations"],
   "tool_response": {
     "input_schema": {},

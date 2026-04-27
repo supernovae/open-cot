@@ -1,4 +1,4 @@
-"""Deterministic mock LLM for agent loop integration tests."""
+"""Deterministic mock LLM for cognitive pipeline integration tests."""
 
 from __future__ import annotations
 

@@ -12,7 +12,7 @@ function makeRequest(overrides?: Partial<DelegationRequest>): DelegationRequest 
   return {
     schema_version: "0.2",
     request_id: "req-policy-test",
-    requester: "agent-test",
+    requester: "cognitive-pipeline-test",
     run_id: "run-test",
     intent: "Search for data",
     justification: "Need external evidence",
@@ -46,7 +46,7 @@ describe("InProcessPolicyEngine", () => {
     };
     const engine = new InProcessPolicyEngine([allowSearch]);
 
-    const decision = await engine.evaluate(makeRequest(), "agent-1");
+    const decision = await engine.evaluate(makeRequest(), "cognitive-pipeline-1");
     expect(decision.status).toBe("approved");
     expect(decision.policy_refs).toEqual(["allow-search"]);
   });
@@ -55,7 +55,7 @@ describe("InProcessPolicyEngine", () => {
     const engine = new InProcessPolicyEngine([]);
     const decision = await engine.consultPhase?.({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       objective: "Summarize docs",
       phase: "frame",
     });
@@ -82,7 +82,7 @@ describe("InProcessPolicyEngine", () => {
     const engine = new InProcessPolicyEngine([denyFinalize]);
     const decision = await engine.consultPhase?.({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       objective: "Complete task",
       phase: "finalize",
     });
@@ -112,7 +112,7 @@ describe("InProcessPolicyEngine", () => {
     const engine = new InProcessPolicyEngine([policy]);
     const preview = await engine.previewToolAccess?.({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       objective: "Research and compute",
       phase: "plan",
       tools: [
@@ -190,7 +190,7 @@ describe("OpaPolicyEngine", () => {
       baseUrl: "https://opa.example",
       policyPath: "open_cot/delegation",
     });
-    const decision = await engine.evaluate(makeRequest(), "agent-1");
+    const decision = await engine.evaluate(makeRequest(), "cognitive-pipeline-1");
 
     expect(decision.status).toBe("narrowed");
     expect(decision.policy_refs).toEqual(["opa.search.policy"]);
@@ -199,7 +199,7 @@ describe("OpaPolicyEngine", () => {
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(url).toBe("https://opa.example/v1/data/open_cot/delegation");
     const body = JSON.parse(String(init.body));
-    expect(body.input.agent_id).toBe("agent-1");
+    expect(body.input.requester_id).toBe("cognitive-pipeline-1");
     expect(body.input.request.request_id).toBe("req-policy-test");
   });
 
@@ -216,7 +216,7 @@ describe("OpaPolicyEngine", () => {
       baseUrl: "https://opa.example",
       policyPath: "open_cot/delegation",
     });
-    const decision = await engine.evaluate(makeRequest(), "agent-1");
+    const decision = await engine.evaluate(makeRequest(), "cognitive-pipeline-1");
 
     expect(decision.status).toBe("denied");
     expect(decision.denial_reason).toContain("OPA policy evaluation failed");
@@ -228,8 +228,8 @@ describe("OpaPolicyEngine", () => {
 
     const fallback: DelegationPolicyEngine = {
       name: "fallback",
-      evaluate: async (request, agentId) =>
-        createDelegationDecision(request, agentId, {
+      evaluate: async (request, requesterId) =>
+        createDelegationDecision(request, requesterId, {
           status: "approved",
           decidedBy: { kind: "harness" },
           policyRefs: ["fallback-policy"],
@@ -242,7 +242,7 @@ describe("OpaPolicyEngine", () => {
       policyPath: "open_cot/delegation",
       fallbackEngine: fallback,
     });
-    const decision = await engine.evaluate(makeRequest(), "agent-1");
+    const decision = await engine.evaluate(makeRequest(), "cognitive-pipeline-1");
 
     expect(decision.status).toBe("approved");
     expect(decision.policy_refs).toEqual(["fallback-policy"]);
@@ -270,7 +270,7 @@ describe("OpaPolicyEngine", () => {
       policyPath: "open_cot/delegation",
       inputContext: { policy_mode: "deny", request_source: "demo" },
     });
-    await engine.evaluate(makeRequest(), "agent-1");
+    await engine.evaluate(makeRequest(), "cognitive-pipeline-1");
 
     const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     const body = JSON.parse(String(init.body));

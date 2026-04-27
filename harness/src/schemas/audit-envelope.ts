@@ -46,7 +46,7 @@ export interface AuditEnvelope {
   schema_version: "0.2" | "0.3";
   envelope_id: string;
   run_id: string;
-  agent_id: string;
+  requester_id: string;
   task_hash: string;
   started_at: string;
   completed_at: string;

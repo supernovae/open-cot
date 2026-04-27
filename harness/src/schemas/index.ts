@@ -1,4 +1,4 @@
-export * from "./agent-loop.js";
+export * from "./cognitive-pipeline.js";
 export * from "./budget.js";
 export * from "./sandbox.js";
 export * from "./telemetry.js";

@@ -1,5 +1,5 @@
 /**
- * Trace emitter — structured event logging for every agent action.
+ * Trace emitter — structured event logging for every cognitive pipeline action.
  *
  * Every transition, budget change, tool call, and completion decision appends
  * a Step to the running trace. The emitter guarantees monotonically increasing
@@ -7,7 +7,7 @@
  */
 
 import type { Step, StepType, Trace, ToolInvocation } from "../schemas/trace.js";
-import type { AgentState } from "./state.js";
+import type { PipelineState } from "./state.js";
 
 let _counter = 0;
 
@@ -21,7 +21,7 @@ export function resetStepCounter(): void {
 }
 
 export function emitThought(
-  state: AgentState,
+  state: PipelineState,
   content: string,
   parent?: string,
 ): Step {
@@ -31,7 +31,7 @@ export function emitThought(
 }
 
 export function emitPlan(
-  state: AgentState,
+  state: PipelineState,
   content: string,
   parent?: string,
 ): Step {
@@ -42,7 +42,7 @@ export function emitPlan(
 }
 
 export function emitAction(
-  state: AgentState,
+  state: PipelineState,
   content: string,
   toolInvocation: ToolInvocation,
   parent?: string,
@@ -57,7 +57,7 @@ export function emitAction(
 }
 
 export function emitObservation(
-  state: AgentState,
+  state: PipelineState,
   content: string,
   parentActionId: string,
 ): Step {
@@ -68,7 +68,7 @@ export function emitObservation(
 }
 
 export function emitCritique(
-  state: AgentState,
+  state: PipelineState,
   content: string,
   parent?: string,
 ): Step {
@@ -78,7 +78,7 @@ export function emitCritique(
 }
 
 export function emitVerify(
-  state: AgentState,
+  state: PipelineState,
   content: string,
   verificationStatus: "verified" | "failed" | "unknown",
   parent?: string,
@@ -92,7 +92,7 @@ export function emitVerify(
 }
 
 export function emitSummary(
-  state: AgentState,
+  state: PipelineState,
   content: string,
   parent?: string,
 ): Step {
@@ -101,7 +101,7 @@ export function emitSummary(
   return step;
 }
 
-export function finalizeTrace(state: AgentState, answer: string): Trace {
+export function finalizeTrace(state: PipelineState, answer: string): Trace {
   state.trace.final_answer = answer;
   state.trace.termination = state.completionStatus;
   const startedAt = Date.parse(state.telemetry.observed_at);

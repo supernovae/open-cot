@@ -1,8 +1,9 @@
 /**
- * @open-cot/harness — Reference implementation of the Open CoT standard.
+ * @open-cot/core - Reference package for the Open CoT standard.
  *
  * This package proves the standard is executable, testable, and operational
- * by implementing agents that emit and consume RFC-compliant traces.
+ * by exposing cognitive artifact, policy boundary, and reconciliation helpers
+ * that emit and consume RFC-compliant traces.
  */
 
 // Schema types
@@ -23,5 +24,5 @@ export * from "./governance/index.js";
 // Adapters
 export * from "./adapters/index.js";
 
-// Agents
-export * from "./agents/index.js";
+// Pipelines
+export * from "./pipelines/index.js";

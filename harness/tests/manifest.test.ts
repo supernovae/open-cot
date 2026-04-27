@@ -52,7 +52,7 @@ describe("buildManifest", () => {
   it("classifies sandbox-allowed tools as pre_authorized", () => {
     const manifest = buildManifest({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       phase: "frame",
       toolContracts: allTools,
       sandbox: DEFAULT_SANDBOX_CONFIG,
@@ -75,7 +75,7 @@ describe("buildManifest", () => {
 
     const manifest = buildManifest({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       phase: "frame",
       toolContracts: allTools,
       sandbox,
@@ -105,7 +105,7 @@ describe("buildManifest", () => {
 
     const manifest = buildManifest({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       phase: "frame",
       toolContracts: allTools,
       sandbox: DEFAULT_SANDBOX_CONFIG,
@@ -135,7 +135,7 @@ describe("buildManifest", () => {
 
     const manifest = buildManifest({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       phase: "frame",
       toolContracts: allTools,
       sandbox: DEFAULT_SANDBOX_CONFIG,
@@ -150,7 +150,7 @@ describe("buildManifest", () => {
   it("includes budget snapshot", () => {
     const manifest = buildManifest({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       phase: "frame",
       toolContracts: allTools,
       sandbox: DEFAULT_SANDBOX_CONFIG,
@@ -166,7 +166,7 @@ describe("buildManifest", () => {
   it("uses provided trust level", () => {
     const manifest = buildManifest({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       phase: "frame",
       toolContracts: allTools,
       sandbox: DEFAULT_SANDBOX_CONFIG,
@@ -181,7 +181,7 @@ describe("buildManifest", () => {
   it("stores phase and IDs correctly", () => {
     const manifest = buildManifest({
       runId: "run-42",
-      agentId: "agent-planner",
+      requesterId: "cognitive-pipeline-planner",
       phase: "critique_verify",
       toolContracts: allTools,
       sandbox: DEFAULT_SANDBOX_CONFIG,
@@ -190,7 +190,7 @@ describe("buildManifest", () => {
     });
 
     expect(manifest.run_id).toBe("run-42");
-    expect(manifest.agent_id).toBe("agent-planner");
+    expect(manifest.requester_id).toBe("cognitive-pipeline-planner");
     expect(manifest.phase).toBe("critique_verify");
     expect(manifest.manifest_id).toBeTruthy();
     expect(manifest.timestamp).toBeTruthy();
@@ -199,7 +199,7 @@ describe("buildManifest", () => {
   it("applies tool overrides from policy engine previews", () => {
     const manifest = buildManifest({
       runId: "run-override",
-      agentId: "agent-preview",
+      requesterId: "cognitive-pipeline-preview",
       phase: "plan",
       toolContracts: [searchContract, calcContract],
       sandbox: DEFAULT_SANDBOX_CONFIG,
@@ -231,7 +231,7 @@ describe("manifestToCompactText", () => {
   it("produces readable text with markers", () => {
     const manifest = buildManifest({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       phase: "frame",
       toolContracts: [searchContract, calcContract],
       sandbox: DEFAULT_SANDBOX_CONFIG,
@@ -258,7 +258,7 @@ describe("manifestToCompactText", () => {
 
     const manifest = buildManifest({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       phase: "frame",
       toolContracts: allTools,
       sandbox,
@@ -287,7 +287,7 @@ describe("manifestToCompactText", () => {
 
     const manifest = buildManifest({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       phase: "frame",
       toolContracts: [searchContract],
       sandbox: DEFAULT_SANDBOX_CONFIG,
@@ -303,7 +303,7 @@ describe("manifestToCompactText", () => {
   it("compact text is reasonably token-efficient", () => {
     const manifest = buildManifest({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       phase: "frame",
       toolContracts: allTools,
       sandbox: { ...DEFAULT_SANDBOX_CONFIG, blockedTools: ["shell"] },

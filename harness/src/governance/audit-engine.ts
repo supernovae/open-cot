@@ -5,7 +5,7 @@ import type {
   DelegationSummary,
   PermissionSummary,
 } from "../schemas/audit-envelope.js";
-import type { AgentState } from "../core/state.js";
+import type { PipelineState } from "../core/state.js";
 
 function sha256Hex(input: string): string {
   return createHash("sha256").update(input, "utf8").digest("hex");
@@ -33,7 +33,7 @@ const ENVELOPE_COMPLETION: ReadonlySet<CompletionStatus> = new Set([
   "fail_safe",
 ]);
 
-function toEnvelopeCompletion(state: AgentState): CompletionStatus {
+function toEnvelopeCompletion(state: PipelineState): CompletionStatus {
   const s = state.completionStatus as string;
   if (ENVELOPE_COMPLETION.has(s as CompletionStatus)) {
     return s as CompletionStatus;
@@ -48,7 +48,7 @@ function toEnvelopeCompletion(state: AgentState): CompletionStatus {
   return "fail_safe";
 }
 
-function delegationSummaryFromState(state: AgentState): DelegationSummary {
+function delegationSummaryFromState(state: PipelineState): DelegationSummary {
   const decisions = state.delegationDecisions;
   const grantedCount = decisions.filter(
     (d) => d.status === "approved" || d.status === "narrowed",
@@ -62,7 +62,7 @@ function delegationSummaryFromState(state: AgentState): DelegationSummary {
   };
 }
 
-function permissionSummaryFromState(state: AgentState): PermissionSummary {
+function permissionSummaryFromState(state: PipelineState): PermissionSummary {
   const grants = state.activePermissions;
   return {
     total_granted: grants.length,
@@ -82,7 +82,7 @@ interface AuditEventOrdering {
 export interface AuditEvent {
   event_id: string;
   run_id: string;
-  agent_id: string;
+  requester_id: string;
   observed_at: string;
   event_type: string;
   details: Record<string, unknown>;
@@ -100,7 +100,7 @@ export class AuditEngine {
 
   emit(args: {
     run_id: string;
-    agent_id: string;
+    requester_id: string;
     event_type: string;
     details: Record<string, unknown>;
   }): AuditEvent {
@@ -116,7 +116,7 @@ export class AuditEngine {
     const hashInput = stableStringify({
       event_id,
       run_id: args.run_id,
-      agent_id: args.agent_id,
+      requester_id: args.requester_id,
       observed_at,
       event_type: args.event_type,
       details: args.details,
@@ -128,7 +128,7 @@ export class AuditEngine {
     const event: AuditEvent = {
       event_id,
       run_id: args.run_id,
-      agent_id: args.agent_id,
+      requester_id: args.requester_id,
       observed_at,
       event_type: args.event_type,
       details: args.details,
@@ -140,7 +140,7 @@ export class AuditEngine {
     return event;
   }
 
-  seal(state: AgentState): AuditEnvelope {
+  seal(state: PipelineState): AuditEnvelope {
     const completed_at = new Date().toISOString();
     const trace_hash = sha256Hex(stableStringify(state.trace));
     const task_hash = sha256Hex(
@@ -161,7 +161,7 @@ export class AuditEngine {
       schema_version: "0.3",
       envelope_id,
       run_id: state.runId,
-      agent_id: state.telemetry.agent_id,
+      requester_id: state.telemetry.requester_id,
       task_hash,
       started_at,
       completed_at,

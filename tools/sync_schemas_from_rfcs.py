@@ -57,12 +57,12 @@ def build_branching_schema(rfc_id: str) -> dict[str, Any]:
     }
 
 
-def build_agent_loop_schema() -> dict[str, Any]:
+def build_cognitive_pipeline_schema() -> dict[str, Any]:
     return {
         "$schema": "http://json-schema.org/draft-07/schema#",
-        "title": "Open CoT RFC 0007 — Agent loop protocol trace",
+        "title": "Open CoT RFC 0007 — Cognitive Pipeline Protocol Trace",
         "description": (
-            "Reasoning trace emitted by an agent loop (RFC 0007). "
+            "Reasoning trace emitted by a cognitive pipeline (RFC 0007). "
             "Extends RFC 0001 with optional tool_invocation on action steps (RFC 0003)."
         ),
         "allOf": [
@@ -185,7 +185,7 @@ def main() -> int:
         elif rfc_id == "0004":
             data = build_branching_schema(rfc_id)
         elif rfc_id == "0007":
-            data = build_agent_loop_schema()
+            data = build_cognitive_pipeline_schema()
         elif rfc_id == "0008":
             data = build_dataset_packaging_schema()
         else:

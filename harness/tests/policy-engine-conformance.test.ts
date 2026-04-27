@@ -42,7 +42,7 @@ function makeRequest(overrides?: Partial<DelegationRequest>): DelegationRequest 
   const base: DelegationRequest = {
     schema_version: "0.2",
     request_id: "req-conformance",
-    requester: "agent-conformance",
+    requester: "cognitive-pipeline-conformance",
     run_id: "run-conformance",
     intent: "Conformance policy check",
     justification: "Verify OPA decision mapping contract",
@@ -87,7 +87,7 @@ describe("OPA decision conformance fixtures", () => {
         policyPath: "open_cot/delegation",
       });
       const request = makeRequest(fixtureCase.request);
-      const decision = await engine.evaluate(request, "agent-1");
+      const decision = await engine.evaluate(request, "cognitive-pipeline-1");
 
       expect(decision.request_id).toBe(request.request_id);
       expect(decision.decision_id).toMatch(/^[0-9a-f]{64}$/);

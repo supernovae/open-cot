@@ -1,7 +1,7 @@
 /**
- * Telemetry types — RFC 0031 (Agent Observability & Telemetry).
+ * Telemetry types — RFC 0031 (Cognitive pipeline Observability & Telemetry).
  *
- * Mirrors schemas/rfc-0031-agent-observability-telemetry.json.
+ * Mirrors schemas/rfc-0031-cognitive-pipeline-observability-telemetry.json.
  */
 
 export interface TelemetryMetrics {
@@ -20,16 +20,16 @@ export interface TelemetryOrdering {
 
 export interface TelemetryRecord {
   version: string;
-  agent_id: string;
+  requester_id: string;
   observed_at: string;
   ordering: TelemetryOrdering;
   metrics: TelemetryMetrics;
 }
 
-export function createInitialTelemetry(agentId: string): TelemetryRecord {
+export function createInitialTelemetry(requesterId: string): TelemetryRecord {
   return {
     version: "0.2",
-    agent_id: agentId,
+    requester_id: requesterId,
     observed_at: new Date().toISOString(),
     ordering: {
       event_seq: 0,

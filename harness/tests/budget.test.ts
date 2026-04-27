@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { createAgentState } from "../src/core/state.js";
+import { createPipelineState } from "../src/core/state.js";
 import { createBudgetTracker } from "../src/core/budget-tracker.js";
 
 describe("BudgetTracker", () => {
   it("records token usage", () => {
-    const state = createAgentState({ objective: "budget test" });
+    const state = createPipelineState({ objective: "budget test" });
     const tracker = createBudgetTracker();
     tracker.recordTokens(state, 100, "LLM call");
     expect(state.budget.tokensUsed).toBe(100);
@@ -12,7 +12,7 @@ describe("BudgetTracker", () => {
   });
 
   it("records cost", () => {
-    const state = createAgentState({ objective: "cost test" });
+    const state = createPipelineState({ objective: "cost test" });
     const tracker = createBudgetTracker();
     tracker.recordCost(state, 0.5, "API call");
     expect(state.budget.costUsed).toBeCloseTo(0.5);
@@ -20,7 +20,7 @@ describe("BudgetTracker", () => {
   });
 
   it("records steps", () => {
-    const state = createAgentState({ objective: "step test" });
+    const state = createPipelineState({ objective: "step test" });
     const tracker = createBudgetTracker();
     tracker.recordStep(state, "plan");
     tracker.recordStep(state, "act");
@@ -29,7 +29,7 @@ describe("BudgetTracker", () => {
   });
 
   it("records tool calls and updates telemetry", () => {
-    const state = createAgentState({ objective: "tool test" });
+    const state = createPipelineState({ objective: "tool test" });
     const tracker = createBudgetTracker();
     tracker.recordToolCall(state, "search");
     expect(state.budget.toolCallsUsed).toBe(1);
@@ -37,7 +37,7 @@ describe("BudgetTracker", () => {
   });
 
   it("records retries", () => {
-    const state = createAgentState({ objective: "retry test" });
+    const state = createPipelineState({ objective: "retry test" });
     const tracker = createBudgetTracker();
     tracker.recordRetry(state, "failed verification");
     expect(state.budget.retriesUsed).toBe(1);
@@ -45,7 +45,7 @@ describe("BudgetTracker", () => {
   });
 
   it("force-stops when step budget is exhausted with hard enforcement", () => {
-    const state = createAgentState({
+    const state = createPipelineState({
       objective: "exhaust test",
       budgetPolicy: {
         maxTokens: 100_000,
@@ -65,7 +65,7 @@ describe("BudgetTracker", () => {
   });
 
   it("does NOT force-stop with soft enforcement", () => {
-    const state = createAgentState({
+    const state = createPipelineState({
       objective: "soft test",
       budgetPolicy: {
         maxTokens: 100_000,
@@ -84,7 +84,7 @@ describe("BudgetTracker", () => {
   });
 
   it("keeps events log", () => {
-    const state = createAgentState({ objective: "events test" });
+    const state = createPipelineState({ objective: "events test" });
     const tracker = createBudgetTracker();
     tracker.recordTokens(state, 50, "call 1");
     tracker.recordTokens(state, 75, "call 2");
@@ -95,7 +95,7 @@ describe("BudgetTracker", () => {
   });
 
   it("isExhausted returns reason when budget is empty", () => {
-    const state = createAgentState({
+    const state = createPipelineState({
       objective: "check test",
       budgetPolicy: {
         maxTokens: 100,

@@ -27,7 +27,7 @@ TIER_A_SHORTNAMES: tuple[str, ...] = (
     "branching",
     "reward",
     "ensemble",
-    "agent_loop",
+    "cognitive_pipeline",
     "dataset_packaging",
 )
 
@@ -192,10 +192,10 @@ def _check_conformance_profiles() -> list[str]:
 def _cross_consistency(loaded: dict[str, dict[str, Any]]) -> list[str]:
     """Lightweight checks across known pairs."""
     warnings: list[str] = []
-    if "rfc-0007-agent-loop.json" in loaded:
-        s = json.dumps(loaded["rfc-0007-agent-loop.json"])
+    if "rfc-0007-cognitive-pipeline.json" in loaded:
+        s = json.dumps(loaded["rfc-0007-cognitive-pipeline.json"])
         if "rfc-0001-reasoning.json" not in s:
-            warnings.append("rfc-0007-agent-loop.json should reference rfc-0001-reasoning.json")
+            warnings.append("rfc-0007-cognitive-pipeline.json should reference rfc-0001-reasoning.json")
     return warnings
 
 

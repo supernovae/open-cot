@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "RFC 0028 — Capability Environment (stub)",
+  "description": "Placeholder JSON Schema for RFC 0028. The RFC does not yet contain an extractable JSON Schema block; evolve this file as the RFC stabilizes.",
+  "type": "object",
+  "additionalProperties": true,
+  "x-opencot": {
+    "rfc": "0028",
+    "shortname": "capability_environment",
+    "status": "stub",
+    "source_rfc": "rfcs/0028-capability-environment-schema.md"
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0028-capability-environment.json"
+}

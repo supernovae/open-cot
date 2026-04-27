@@ -1,5 +1,5 @@
 /**
- * Sandbox / safety types — RFC 0017 (Agent Safety & Sandboxing).
+ * Sandbox / safety types — RFC 0017 (Cognitive pipeline Safety & Sandboxing).
  *
  * Defines the sandbox configuration that policy engines consume at run start.
  */

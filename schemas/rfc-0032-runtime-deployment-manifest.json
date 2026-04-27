@@ -1,0 +1,235 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://opencot.dev/schema/rfc0032/deployment-manifest.json",
+  "title": "Open CoT RFC 0032 — Cognitive pipeline Deployment Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "container_image": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entrypoint": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "environment": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "container_image"
+      ]
+    },
+    "resources": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "cpu": {
+          "type": "string"
+        },
+        "memory": {
+          "type": "string"
+        },
+        "gpu": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "health_check": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "http",
+            "tcp",
+            "exec",
+            "grpc"
+          ]
+        },
+        "path": {
+          "type": "string"
+        },
+        "port": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535
+        },
+        "interval_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "success_threshold": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "failure_threshold": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "kind"
+      ]
+    },
+    "scaling": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "min_replicas": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "max_replicas": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "min_replicas",
+        "max_replicas"
+      ]
+    },
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "pipeline",
+            "dataset",
+            "tool_pack",
+            "model",
+            "other"
+          ]
+        },
+        "version_constraint": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "kind"
+      ]
+    },
+    "deployment_manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "enum": [
+            "0.1"
+          ]
+        },
+        "manifest_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requester_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "runtime": {
+          "$ref": "#/$defs/runtime"
+        },
+        "resources": {
+          "$ref": "#/$defs/resources"
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "governance_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sandbox_config": {
+          "type": "object"
+        },
+        "budget_defaults": {
+          "type": "object"
+        },
+        "tool_allowlist": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dependency"
+          }
+        },
+        "health_check": {
+          "$ref": "#/$defs/health_check"
+        },
+        "scaling": {
+          "$ref": "#/$defs/scaling"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "manifest_id",
+        "requester_id",
+        "version",
+        "runtime",
+        "policies",
+        "governance_ref",
+        "sandbox_config",
+        "budget_defaults",
+        "tool_allowlist",
+        "scaling"
+      ]
+    }
+  },
+  "properties": {
+    "deployment_manifest": {
+      "$ref": "#/$defs/deployment_manifest"
+    }
+  },
+  "required": [
+    "deployment_manifest"
+  ],
+  "x-opencot": {
+    "rfc": "0032",
+    "shortname": "runtime_deployment_manifest",
+    "source_rfc": "rfcs/0032-runtime-deployment-manifest.md"
+  }
+}

@@ -10,7 +10,7 @@
 
 ## 1. Summary
 
-Open CoT is a **cognitive control plane**. This RFC specifies **organizational governance**: how policies, permissions, and constraints cascade from platform defaults through organizations and teams to agents—the enterprise-readiness layer. Configs are hierarchical and **monotonic toward restriction** (children narrow, never broaden). Resolution walks the parent chain and merges so the strictest interpretation wins. This extends **RFC 0041** (policies) and **RFC 0042** (permissions); it binds them to scope and compliance metadata without redefining policy rules or ACL tuples.
+Open CoT is a **cognitive control plane**. This RFC specifies **organizational governance**: how policies, permissions, and constraints cascade from platform defaults through organizations and teams to pipelines—the enterprise-readiness layer. Configs are hierarchical and **monotonic toward restriction** (children narrow, never broaden). Resolution walks the parent chain and merges so the strictest interpretation wins. This extends **RFC 0041** (policies) and **RFC 0042** (permissions); it binds them to scope and compliance metadata without redefining policy rules or ACL tuples.
 
 ---
 
@@ -22,15 +22,15 @@ Open CoT is a **cognitive control plane**. This RFC specifies **organizational g
 
 ## 3. Relationship to prior RFCs
 
-RFC **0041** — `required_policies` hold **policy_id** values evaluated per 0041. RFC **0042** — `max_trust_level` caps trust; tools interact with grants. RFC **0026** — `scope_id` and parent links identify org, team, agent. RFC **0007** — governance SHOULD load during **receive** / pre-act. RFC **0045** — `compliance_requirements[].pii_policy` references a **constraint_id**.
+RFC **0041** — `required_policies` hold **policy_id** values evaluated per 0041. RFC **0042** — `max_trust_level` caps trust; tools interact with grants. RFC **0026** — `scope_id` and parent links identify org, team, cognitive pipeline. RFC **0007** — governance SHOULD load during **receive** / pre-act. RFC **0045** — `compliance_requirements[].pii_policy` references a **constraint_id**.
 
 ---
 
 ## 4. Governance layers and inheritance
 
-**Levels (wide → narrow):** `global` (platform defaults, e.g. block `shell` unless an approved exception path exists), `organization` (tenant posture, e.g. SOC2 + no DB writes), `team` (refinements, e.g. Engineering code tools under approval), `agent` (per-agent overrides; still bound by ancestors).
+**Levels (wide → narrow):** `global` (platform defaults, e.g. block `shell` unless an approved exception path exists), `organization` (tenant posture, e.g. SOC2 + no DB writes), `team` (refinements, e.g. Engineering code tools under approval), `cognitive pipeline` (per-cognitive pipeline overrides; still bound by ancestors).
 
-**Parent chain:** `agent` → `team` → `organization` → `global`. Only `global` has `parent_governance_id: null`. Each non-global record MUST point to one parent at the immediate ancestor level.
+**Parent chain:** `cognitive pipeline` → `team` → `organization` → `global`. Only `global` has `parent_governance_id: null`. Each non-global record MUST point to one parent at the immediate ancestor level.
 
 **Narrowing (normative):** `restricted_tools` — effective blocklist is **union** along the chain. `allowed_tools_override` — **intersection** of non-empty allowlists; empty array at a layer adds no intersection; children MUST NOT allow tools blocked above. `required_policies` — **union**. `max_trust_level` — order `untrusted < low < medium < high` as permitted ceiling; effective ceiling is the **minimum** (strictest); child ceiling MUST NOT exceed parent. `approval_workflows` — child entries only **tighten** control; default merge is **conjunctive** (all applicable workflows satisfied). Violations MUST fail validation with deterministic errors.
 
@@ -38,7 +38,7 @@ RFC **0041** — `required_policies` hold **policy_id** values evaluated per 004
 
 ## 5. Policy resolution
 
-For each governed request: (1) load the agent-scoped governance record; (2) walk `parent_governance_id` through team, org, global; (3) merge per §4; (4) materialize the effective policy set for RFC 0041/0042; (5) emit in deterministic order (e.g. global→…→agent) for audit. Implementations SHOULD cache by `(agent_id, governance revision tuple)` and invalidate on change.
+For each governed request: (1) load the cognitive-pipeline-scoped governance record; (2) walk `parent_governance_id` through team, org, global; (3) merge per §4; (4) materialize the effective policy set for RFC 0041/0042; (5) emit in deterministic order (e.g. global→…→cognitive pipeline) for audit. Implementations SHOULD cache by `(requester_id, governance revision tuple)` and invalidate on change.
 
 ---
 
@@ -57,7 +57,7 @@ Field semantics: `governance_id` UUID for this document; `scope_level` / `scope_
   "properties": {
     "version": { "type": "string", "enum": ["0.2"] },
     "governance_id": { "type": "string", "format": "uuid" },
-    "scope_level": { "type": "string", "enum": ["global", "organization", "team", "agent"] },
+    "scope_level": { "type": "string", "enum": ["global", "organization", "team", "pipeline"] },
     "scope_id": { "type": ["string", "null"] },
     "parent_governance_id": { "type": ["string", "null"] },
     "required_policies": {
@@ -213,7 +213,7 @@ Inherits org parent `a1b2c3d4-…`; adds code/repo tools via allowlist (still ca
 
 ## 8. Cross-references
 
-**RFC 0007** — Governed FSM; governance during receive state. **RFC 0041** — Policy enforcement; `required_policies`. **RFC 0042** — Permissions; trust capped by `max_trust_level`. **RFC 0026** — Agent identity; `scope_id`. **RFC 0045** — Ethics; `pii_policy` → **constraint_id**.
+**RFC 0007** — Governed FSM; governance during receive state. **RFC 0041** — Policy enforcement; `required_policies`. **RFC 0042** — Permissions; trust capped by `max_trust_level`. **RFC 0026** — Cognitive pipeline identity; `scope_id`. **RFC 0045** — Ethics; `pii_policy` → **constraint_id**.
 
 ---
 
