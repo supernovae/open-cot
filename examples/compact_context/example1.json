@@ -1,0 +1,6 @@
+{
+  "format": "compact-json",
+  "schema_ref": "cognitive_artifact",
+  "content": "{artifact_id:artifact-1}",
+  "content_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}

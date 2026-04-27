@@ -1,0 +1,7 @@
+{
+  "approval_id": "approval-1",
+  "intent_id": "intent-1",
+  "requested_at": "2026-04-27T15:00:00Z",
+  "status": "requested",
+  "prompt": "Approve read-only repository status inspection?"
+}

@@ -1,24 +1,20 @@
-# Experiment Cards (Ideas to Chew On)
+# Experiment Cards
 
-These cards are designed for quick, reproducible community experiments around reasoning transparency, control, and safety.
+Experiment cards are paused during the compact core reset.
 
-Each card includes:
+Future cards should target the current Open CoT runtime-boundary contract:
 
-- hypothesis
-- relevant RFC/schema artifacts
-- runnable commands
-- metrics to report
-- expected failure modes
+- cognitive artifacts
+- capability snapshots
+- execution intents
+- policy gates
+- observations
+- reconciliation results
 
-## Cards
+Each card should include the hypothesis, referenced RFCs, runnable commands,
+metrics to report, and expected failure modes.
 
-- `encrypted_reasoning_observability.md`
-- `runaway_loop_detection.md`
-- `token_budget_enforcement.md`
-- `adversarial_tool_misbehavior.md`
-- `policy_constrained_execution.md`
-
-When reporting results, open an issue using the `experiment-feedback.yml` template and attach:
+When reporting results, attach:
 
 - config used
 - output artifact hashes

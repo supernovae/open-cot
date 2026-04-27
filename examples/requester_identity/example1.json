@@ -1,0 +1,8 @@
+{
+  "requester_id": "model:local-eval",
+  "kind": "model",
+  "trust_level": "low",
+  "governance_context": {
+    "workspace": "demo"
+  }
+}

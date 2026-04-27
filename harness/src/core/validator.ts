@@ -17,7 +17,7 @@ export interface ValidationResult {
   errors: string[];
 }
 
-// Lazy-loaded compiled validator for rfc-0001
+// Lazy-loaded compiled validator for the cognitive pipeline schema.
 let _traceValidate: ((data: unknown) => boolean) | null = null;
 let _traceErrors: (() => Array<{ instancePath?: string; message?: string }>) | null = null;
 
@@ -30,7 +30,7 @@ async function ensureTraceValidator(): Promise<void> {
   const addFormats = (formatsMod as any).default ?? formatsMod;
   const ajv = new Ajv({ allErrors: true, strict: false });
   addFormats(ajv);
-  const schema = loadSchema("rfc-0001-reasoning.json");
+  const schema = loadSchema("rfc-0007-cognitive-pipeline.json");
   const validate = ajv.compile(schema);
   _traceValidate = (data: unknown) => validate(data) as boolean;
   _traceErrors = () =>
@@ -43,7 +43,7 @@ function loadSchema(filename: string): Record<string, unknown> {
 }
 
 /**
- * Validate a trace against rfc-0001-reasoning.json (the base trace schema).
+ * Validate a trace against the cognitive pipeline schema.
  */
 export async function validateTrace(trace: Trace): Promise<ValidationResult> {
   await ensureTraceValidator();

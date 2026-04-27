@@ -1,0 +1,39 @@
+{
+  "artifact_id": "artifact-1",
+  "schema_version": "open-cot.core.v1",
+  "capability_snapshot_id": "snapshot-1",
+  "intent_verification": {
+    "objective": "Summarize repository status.",
+    "request_boundaries": [
+      "read-only"
+    ],
+    "allowed_scope": [
+      "inspect files"
+    ],
+    "prohibited_scope": [
+      "write files"
+    ]
+  },
+  "reasoning_trace": {
+    "evidence_mode": "audit_summary",
+    "summary": "The request is read-only and can use the repository status endpoint.",
+    "steps": [
+      {
+        "step_id": "r1",
+        "kind": "interpretation",
+        "content": "Classified as read-only inspection.",
+        "visibility": "audit_summary",
+        "confidence": 0.9
+      }
+    ]
+  },
+  "assumptions": [
+    "Repository access is available."
+  ],
+  "execution_intents": [],
+  "observations": [],
+  "uncertainty": {
+    "level": "low",
+    "explanation": "The requested operation is narrow."
+  }
+}

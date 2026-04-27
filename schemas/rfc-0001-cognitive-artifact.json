@@ -1,0 +1,195 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Open CoT RFC 0001 - Cognitive Artifact and Reasoning Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schema_version": {
+      "type": "string",
+      "enum": [
+        "open-cot.core.v1"
+      ]
+    },
+    "capability_snapshot_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "intent_verification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "objective",
+        "request_boundaries",
+        "allowed_scope",
+        "prohibited_scope"
+      ],
+      "properties": {
+        "objective": {
+          "type": "string"
+        },
+        "request_boundaries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "allowed_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "prohibited_scope": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "reasoning_trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_mode",
+        "summary",
+        "steps"
+      ],
+      "properties": {
+        "evidence_mode": {
+          "type": "string",
+          "enum": [
+            "audit_summary",
+            "detailed_evidence",
+            "redacted_evidence"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reasoning_step"
+          }
+        },
+        "contains_sensitive_content": {
+          "type": "boolean"
+        },
+        "redaction_reason": {
+          "type": "string"
+        }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "execution_intents": {
+      "type": "array",
+      "items": {
+        "$ref": "rfc-0003-execution-intent.json"
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "$ref": "rfc-0005-observation-receipt.json#/$defs/observation"
+      }
+    },
+    "uncertainty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "explanation"
+      ],
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "explanation": {
+          "type": "string"
+        }
+      }
+    },
+    "yield_reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "artifact_id",
+    "schema_version",
+    "capability_snapshot_id",
+    "intent_verification",
+    "reasoning_trace",
+    "assumptions",
+    "execution_intents",
+    "observations",
+    "uncertainty"
+  ],
+  "$defs": {
+    "reasoning_step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step_id",
+        "kind",
+        "content",
+        "visibility"
+      ],
+      "properties": {
+        "step_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "interpretation",
+            "constraint",
+            "hypothesis",
+            "verification",
+            "yield"
+          ]
+        },
+        "content": {
+          "type": "string"
+        },
+        "visibility": {
+          "type": "string",
+          "enum": [
+            "audit_summary",
+            "detailed_evidence",
+            "redacted"
+          ]
+        },
+        "redaction_reason": {
+          "type": "string"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0001-cognitive-artifact.json",
+  "x-opencot": {
+    "rfc": "0001",
+    "shortname": "cognitive_artifact",
+    "source_rfc": "rfcs/0001-cognitive-artifact.md"
+  }
+}

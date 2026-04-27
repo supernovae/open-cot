@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Open CoT RFC 0008 - Budget, Cost, and Temporal Bounds",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "budget_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "max_execution_intents": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "max_endpoint_calls": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "max_tokens": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "max_cost_usd": {
+      "type": "number",
+      "minimum": 0
+    },
+    "valid_after": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "valid_until": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "budget_id"
+  ],
+  "$id": "https://opencot.dev/schemas/rfc-0008-execution-budget.json",
+  "x-opencot": {
+    "rfc": "0008",
+    "shortname": "execution_budget",
+    "source_rfc": "rfcs/0008-execution-budget.md"
+  }
+}

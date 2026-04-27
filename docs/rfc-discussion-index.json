@@ -1,325 +1,79 @@
 {
   "repository": "supernovae/open-cot",
   "category_slug": "ideas",
-  "count": 53,
+  "count": 12,
   "rfcs": {
     "0001": {
-      "rfc_title": "Initial Structured Reasoning Schema",
-      "rfc_path": "rfcs/0001-initial-schema.md",
-      "discussion_title": "RFC 0001 \u2014 Initial Structured Reasoning Schema",
+      "rfc_title": "Cognitive Artifact & Reasoning Evidence",
+      "rfc_path": "rfcs/0001-cognitive-artifact.md",
+      "discussion_title": "RFC 0001 - Cognitive Artifact & Reasoning Evidence",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/1"
     },
     "0002": {
-      "rfc_title": "Verifier Output Schema",
-      "rfc_path": "rfcs/0002-verifier-output-schema.md",
-      "discussion_title": "RFC 0002 \u2014 Verifier Output Schema",
+      "rfc_title": "Capability Snapshot & Endpoint Descriptor",
+      "rfc_path": "rfcs/0002-capability-snapshot.md",
+      "discussion_title": "RFC 0002 - Capability Snapshot & Endpoint Descriptor",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/2"
     },
     "0003": {
-      "rfc_title": "Tool Invocation Schema",
-      "rfc_path": "rfcs/0003-tool-invocation-schema.md",
-      "discussion_title": "RFC 0003 \u2014 Tool Invocation Schema",
+      "rfc_title": "Execution Intent & Endpoint Invocation",
+      "rfc_path": "rfcs/0003-execution-intent.md",
+      "discussion_title": "RFC 0003 - Execution Intent & Endpoint Invocation",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/3"
     },
     "0004": {
-      "rfc_title": "Branching Reasoning Extensions",
-      "rfc_path": "rfcs/0004-branching-reasoning-schema.md",
-      "discussion_title": "RFC 0004 \u2014 Branching Reasoning Extensions",
+      "rfc_title": "Policy Gate & Permission Evaluation",
+      "rfc_path": "rfcs/0004-policy-gate.md",
+      "discussion_title": "RFC 0004 - Policy Gate & Permission Evaluation",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/4"
     },
     "0005": {
-      "rfc_title": "RL Reward Trace Schema",
-      "rfc_path": "rfcs/0005-rl-reward-trace-schema.md",
-      "discussion_title": "RFC 0005 \u2014 RL Reward Trace Schema",
+      "rfc_title": "Observation, Receipt & Audit Evidence",
+      "rfc_path": "rfcs/0005-observation-receipt.md",
+      "discussion_title": "RFC 0005 - Observation, Receipt & Audit Evidence",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/5"
     },
     "0006": {
-      "rfc_title": "Multi\u2011Verifier Ensemble Schema",
-      "rfc_path": "rfcs/0006-multi-verifier-ensemble-schema.md",
-      "discussion_title": "RFC 0006 \u2014 Multi\u2011Verifier Ensemble Schema",
+      "rfc_title": "Reconciliation Result & Error Taxonomy",
+      "rfc_path": "rfcs/0006-reconciliation-result.md",
+      "discussion_title": "RFC 0006 - Reconciliation Result & Error Taxonomy",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/6"
     },
     "0007": {
-      "rfc_title": "Cognitive Pipeline Protocol",
-      "rfc_path": "rfcs/0007-cognitive-pipeline-protocol.md",
-      "discussion_title": "RFC 0007 \u2014 Cognitive Pipeline Protocol",
+      "rfc_title": "Runtime Boundary & Cognitive Pipeline",
+      "rfc_path": "rfcs/0007-cognitive-pipeline.md",
+      "discussion_title": "RFC 0007 - Runtime Boundary & Cognitive Pipeline",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/7"
     },
     "0008": {
-      "rfc_title": "Dataset Packaging Standard",
-      "rfc_path": "rfcs/0008-dataset-packaging-standard.md",
-      "discussion_title": "RFC 0008 \u2014 Dataset Packaging Standard",
+      "rfc_title": "Budget, Cost & Temporal Bounds",
+      "rfc_path": "rfcs/0008-execution-budget.md",
+      "discussion_title": "RFC 0008 - Budget, Cost & Temporal Bounds",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/8"
     },
     "0009": {
-      "rfc_title": "Reward Fusion Specification",
-      "rfc_path": "rfcs/0009-reward-fusion-specification.md",
-      "discussion_title": "RFC 0009 \u2014 Reward Fusion Specification",
+      "rfc_title": "Requester Identity & Governance Context",
+      "rfc_path": "rfcs/0009-requester-identity.md",
+      "discussion_title": "RFC 0009 - Requester Identity & Governance Context",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/9"
     },
     "0010": {
-      "rfc_title": "Cognitive Context Schema",
-      "rfc_path": "rfcs/0010-cognitive-context-schema.md",
-      "discussion_title": "RFC 0010 \u2014 Cognitive Context Schema",
+      "rfc_title": "Human Approval, Yield & Resume",
+      "rfc_path": "rfcs/0010-human-approval.md",
+      "discussion_title": "RFC 0010 - Human Approval, Yield & Resume",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/10"
     },
     "0011": {
-      "rfc_title": "Multi\u2011Agent Protocol",
-      "rfc_path": "rfcs/0011-multi-party-cognition-protocol.md",
-      "discussion_title": "RFC 0011 \u2014 Multi\u2011Agent Protocol",
+      "rfc_title": "Conformance, Registry & Compatibility Rules",
+      "rfc_path": "rfcs/0011-conformance-registry.md",
+      "discussion_title": "RFC 0011 - Conformance, Registry & Compatibility Rules",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/11"
     },
     "0012": {
-      "rfc_title": "Dataset Streaming Format",
-      "rfc_path": "rfcs/0012-dataset-streaming-format.md",
-      "discussion_title": "RFC 0012 \u2014 Dataset Streaming Format",
+      "rfc_title": "Compact Context Serialization",
+      "rfc_path": "rfcs/0012-compact-context.md",
+      "discussion_title": "RFC 0012 - Compact Context Serialization",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/12"
-    },
-    "0013": {
-      "rfc_title": "Memory Compression & Embedding",
-      "rfc_path": "rfcs/0013-memory-compression-embedding.md",
-      "discussion_title": "RFC 0013 \u2014 Memory Compression & Embedding",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/13"
-    },
-    "0014": {
-      "rfc_title": "Memory Conflict Resolution",
-      "rfc_path": "rfcs/0014-memory-conflict-resolution.md",
-      "discussion_title": "RFC 0014 \u2014 Memory Conflict Resolution",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/14"
-    },
-    "0015": {
-      "rfc_title": "Multi\u2011Agent Reward Sharing",
-      "rfc_path": "rfcs/0015-multi-party-reward-sharing.md",
-      "discussion_title": "RFC 0015 \u2014 Multi\u2011Agent Reward Sharing",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/15"
-    },
-    "0016": {
-      "rfc_title": "Tool Capability Negotiation",
-      "rfc_path": "rfcs/0016-tool-capability-negotiation.md",
-      "discussion_title": "RFC 0016 \u2014 Tool Capability Negotiation",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/16"
-    },
-    "0017": {
-      "rfc_title": "Runtime Safety & Sandboxing",
-      "rfc_path": "rfcs/0017-runtime-safety-sandboxing.md",
-      "discussion_title": "RFC 0017 \u2014 Runtime Safety & Sandboxing",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/17"
-    },
-    "0018": {
-      "rfc_title": "Tool Error Taxonomy",
-      "rfc_path": "rfcs/0018-tool-error-taxonomy.md",
-      "discussion_title": "RFC 0018 \u2014 Tool Error Taxonomy",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/18"
-    },
-    "0019": {
-      "rfc_title": "Multi\u2011Agent Planning Graphs",
-      "rfc_path": "rfcs/0019-collaborative-planning-graphs.md",
-      "discussion_title": "RFC 0019 \u2014 Multi\u2011Agent Planning Graphs",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/19"
-    },
-    "0020": {
-      "rfc_title": "Verifiable Scratchpad Compression",
-      "rfc_path": "rfcs/0020-verifiable-scratchpad-compression.md",
-      "discussion_title": "RFC 0020 \u2014 Verifiable Scratchpad Compression",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/20"
-    },
-    "0021": {
-      "rfc_title": "Capability Declaration",
-      "rfc_path": "rfcs/0021-capability-declaration.md",
-      "discussion_title": "RFC 0021 \u2014 Capability Declaration",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/21"
-    },
-    "0022": {
-      "rfc_title": "Cognitive Evaluation Protocol",
-      "rfc_path": "rfcs/0022-cognitive-evaluation-protocol.md",
-      "discussion_title": "RFC 0022 \u2014 Cognitive Evaluation Protocol",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/22"
-    },
-    "0023": {
-      "rfc_title": "Human\u2011in\u2011the\u2011Loop Feedback Schema",
-      "rfc_path": "rfcs/0023-humain-in-the-loop-schema.md",
-      "discussion_title": "RFC 0023 \u2014 Human\u2011in\u2011the\u2011Loop Feedback Schema",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/23"
-    },
-    "0024": {
-      "rfc_title": "Multi\u2011Modal Reasoning Schema",
-      "rfc_path": "rfcs/0024-multi-modal-reasoning-schema.md",
-      "discussion_title": "RFC 0024 \u2014 Multi\u2011Modal Reasoning Schema",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/24"
-    },
-    "0025": {
-      "rfc_title": "Tool Marketplace Registry Format",
-      "rfc_path": "rfcs/0025-tool-marketplace-registry-format.md",
-      "discussion_title": "RFC 0025 \u2014 Tool Marketplace Registry Format",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/25"
-    },
-    "0026": {
-      "rfc_title": "Requester Identity & Authentication",
-      "rfc_path": "rfcs/0026-requester-identity-auth.md",
-      "discussion_title": "RFC 0026 \u2014 Requester Identity & Authentication",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/26"
-    },
-    "0027": {
-      "rfc_title": "Distributed Execution Protocol",
-      "rfc_path": "rfcs/0027-distributed-execution-protocol.md",
-      "discussion_title": "RFC 0027 \u2014 Distributed Execution Protocol",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/27"
-    },
-    "0028": {
-      "rfc_title": "Cognitive pipeline\u2011to\u2011Environment Interaction Schema",
-      "rfc_path": "rfcs/0028-capability-environment-schema.md",
-      "discussion_title": "RFC 0028 \u2014 Cognitive pipeline\u2011to\u2011Environment Interaction Schema",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/28"
-    },
-    "0029": {
-      "rfc_title": "Cognitive Benchmark Dataset Format",
-      "rfc_path": "rfcs/0029-cognitive-benchmark-dataset.md",
-      "discussion_title": "RFC 0029 \u2014 Cognitive Benchmark Dataset Format",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/29"
-    },
-    "0030": {
-      "rfc_title": "Runtime Lifecycle & Versioning",
-      "rfc_path": "rfcs/0030-runtime-lifecycle-versioning.md",
-      "discussion_title": "RFC 0030 \u2014 Runtime Lifecycle & Versioning",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/30"
-    },
-    "0031": {
-      "rfc_title": "Cognitive Observability & Telemetry",
-      "rfc_path": "rfcs/0031-cognitive-observability-telemetry.md",
-      "discussion_title": "RFC 0031 \u2014 Cognitive Observability & Telemetry",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/31"
-    },
-    "0032": {
-      "rfc_title": "Runtime Deployment Manifest",
-      "rfc_path": "rfcs/0032-runtime-deployment-manifest.md",
-      "discussion_title": "RFC 0032 \u2014 Runtime Deployment Manifest",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/32"
-    },
-    "0033": {
-      "rfc_title": "Runtime Security Posture & Threat Model",
-      "rfc_path": "rfcs/0033-runtime-security-threat-model.md",
-      "discussion_title": "RFC 0033 \u2014 Runtime Security Posture & Threat Model",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/33"
-    },
-    "0034": {
-      "rfc_title": "Cognitive Federation Protocol",
-      "rfc_path": "rfcs/0034-cognitive-federation-protocol.md",
-      "discussion_title": "RFC 0034 \u2014 Cognitive Federation Protocol",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/34"
-    },
-    "0035": {
-      "rfc_title": "Data Provenance Tracking",
-      "rfc_path": "rfcs/0035-data-provenance-tracking.md",
-      "discussion_title": "RFC 0035 \u2014 Data Provenance Tracking",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/35"
-    },
-    "0036": {
-      "rfc_title": "Cognitive pipeline\u2011Native Compression & Delta Sync",
-      "rfc_path": "rfcs/0036-cognitive-native-compression-delta.md",
-      "discussion_title": "RFC 0036 \u2014 Cognitive pipeline\u2011Native Compression & Delta Sync",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/36"
-    },
-    "0037": {
-      "rfc_title": "Token Economy & Cost Modeling",
-      "rfc_path": "rfcs/0037-token-economy-cost-modeling.md",
-      "discussion_title": "RFC 0037 \u2014 Token Economy & Cost Modeling",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/37"
-    },
-    "0038": {
-      "rfc_title": "Cost\u2011Aware Reasoning & Budget Enforcement",
-      "rfc_path": "rfcs/0038-cost-aware-reasoning-budget.md",
-      "discussion_title": "RFC 0038 \u2014 Cost\u2011Aware Reasoning & Budget Enforcement",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/38"
-    },
-    "0039": {
-      "rfc_title": "Tool Cost Modeling & Billing Semantics",
-      "rfc_path": "rfcs/0039-tool-cost-modeling-biling.md",
-      "discussion_title": "RFC 0039 \u2014 Tool Cost Modeling & Billing Semantics",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/39"
-    },
-    "0040": {
-      "rfc_title": "Multi\u2011Agent Economic Incentives",
-      "rfc_path": "rfcs/0040-multi-party-economic-incentives.md",
-      "discussion_title": "RFC 0040 \u2014 Multi\u2011Agent Economic Incentives",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/40"
-    },
-    "0041": {
-      "rfc_title": "Policy Enforcement Schema",
-      "rfc_path": "rfcs/0041-policy-enforcement-schema.md",
-      "discussion_title": "RFC 0041 \u2014 Policy Enforcement Schema",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/41"
-    },
-    "0042": {
-      "rfc_title": "Permissions & Access Control",
-      "rfc_path": "rfcs/0042-permission-acl.md",
-      "discussion_title": "RFC 0042 \u2014 Permissions & Access Control",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/42"
-    },
-    "0043": {
-      "rfc_title": "Auditing & Compliance Logs",
-      "rfc_path": "rfcs/0043-auditing-compliance-logs.md",
-      "discussion_title": "RFC 0043 \u2014 Auditing & Compliance Logs",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/43"
-    },
-    "0044": {
-      "rfc_title": "Governance & Organizational Controls",
-      "rfc_path": "rfcs/0044-governance-organizational-controls.md",
-      "discussion_title": "RFC 0044 \u2014 Governance & Organizational Controls",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/44"
-    },
-    "0045": {
-      "rfc_title": "Ethics & Risk Constraints for Cognitive Runtimes",
-      "rfc_path": "rfcs/0045-ethics-risk-constraints-cognitive-runtimes.md",
-      "discussion_title": "RFC 0045 \u2014 Ethics & Risk Constraints for Cognitive Runtimes",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/45"
-    },
-    "0046": {
-      "rfc_title": "Conformance & Interoperability Protocol",
-      "rfc_path": "rfcs/0046-conformance-interoperability-protocol.md",
-      "discussion_title": "RFC 0046 \u2014 Conformance & Interoperability Protocol",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/46"
-    },
-    "0047": {
-      "rfc_title": "Delegation Extension",
-      "rfc_path": "rfcs/0047-delegation-extension.md",
-      "discussion_title": "RFC 0047 \u2014 Delegation Extension",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/47"
-    },
-    "0048": {
-      "rfc_title": "Execution Receipts & Audit Envelopes",
-      "rfc_path": "rfcs/0048-execution-receipts-audit-envelopes.md",
-      "discussion_title": "RFC 0048 \u2014 Execution Receipts & Audit Envelopes",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/48"
-    },
-    "0049": {
-      "rfc_title": "Capability Manifest",
-      "rfc_path": "rfcs/0049-capability-manifest.md",
-      "discussion_title": "RFC 0049 \u2014 Capability Manifest",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/49"
-    },
-    "0050": {
-      "rfc_title": "TOON Adapter: Token-Oriented Object Notation",
-      "rfc_path": "rfcs/0050-toon-adapter.md",
-      "discussion_title": "RFC 0050 \u2014 TOON Adapter: Token-Oriented Object Notation",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/50"
-    },
-    "0051": {
-      "rfc_title": "Temporal Semantics & Validity Extension",
-      "rfc_path": "rfcs/0051-temporal-semantics-validity-extension.md",
-      "discussion_title": "RFC 0051 \u2014 Temporal Semantics & Validity Extension",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/51"
-    },
-    "0052": {
-      "rfc_title": "Cognitive Artifact & Capability Snapshot",
-      "rfc_path": "rfcs/0052-cognitive-artifact-and-capability-snapshot.md",
-      "discussion_title": "RFC 0052 \u2014 Cognitive Artifact & Capability Snapshot",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/52"
-    },
-    "0053": {
-      "rfc_title": "Reconciliation Result & Error Taxonomy",
-      "rfc_path": "rfcs/0053-reconciliation-result.md",
-      "discussion_title": "RFC 0053 \u2014 Reconciliation Result & Error Taxonomy",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/53"
     }
   }
 }

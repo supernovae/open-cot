@@ -1,0 +1,7 @@
+{
+  "evaluation_id": "eval-1",
+  "intent_id": "intent-1",
+  "evaluated_at": "2026-04-27T15:00:00Z",
+  "result": "allow",
+  "reason": "Read-only endpoint within scope."
+}

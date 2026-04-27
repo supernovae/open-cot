@@ -1,31 +1,17 @@
 # RFC Lifecycle Governance
 
-Open CoT uses this lifecycle for RFCs:
+Open CoT now keeps only active core RFCs in `rfcs/`.
 
-1. `draft`
-2. `implementation_required`
-3. `stable`
-4. `superseded` or `archived`
+## States
 
-## Label semantics
+- `draft`: active proposal in the compact core.
+- `stable`: accepted core contract with generated schema and examples.
+- `archived`: removed from the active tree and retained only in Git history.
 
-- **draft**: idea/proposal stage; may not have complete schema coverage.
-- **implementation_required**: accepted direction, must ship schema artifacts + examples + consumer path.
-- **stable**: production-ready contract for the targeted tier.
-- **superseded**: replaced by newer RFC; include replacement links.
-- **archived**: inactive and not promoted.
+## Reset Rule
 
-## Promotion expectations
+The core reset is intentionally breaking. Removed RFCs are not compatibility targets, and missing RFC numbers should not remain in the active set. Renumbering is allowed when the active core is reset.
 
-- Tier A promotion to `stable` requires:
-  - deterministic sync output,
-  - conformance profile coverage,
-  - migration notes for major schema changes.
+## Schema Rule
 
-## Deprecation notes
-
-When superseding an RFC, document:
-
-- replacement RFC id(s),
-- compatibility impact,
-- migration path and timeline.
+Normative schemas MUST be embedded in RFC markdown between `opencot:schema` markers. Generated files in `schemas/` are derived artifacts.

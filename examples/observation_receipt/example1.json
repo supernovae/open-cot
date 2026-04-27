@@ -1,0 +1,21 @@
+{
+  "observation": {
+    "observation_id": "obs-1",
+    "intent_id": "intent-1",
+    "status": "recorded",
+    "summary": "Repository status was read.",
+    "output": {
+      "clean": true
+    },
+    "observed_at": "2026-04-27T15:00:00Z"
+  },
+  "receipt": {
+    "receipt_id": "receipt-1",
+    "intent_id": "intent-1",
+    "endpoint_id": "repo-status",
+    "status": "executed",
+    "input_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "output_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "issued_at": "2026-04-27T15:00:00Z"
+  }
+}

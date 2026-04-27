@@ -1,7 +1,0 @@
-{
-  "branch_group": "g1",
-  "branch_score": 0.72,
-  "pruned": false,
-  "exploration_strategy": "beam",
-  "path_id": "path_a"
-}
