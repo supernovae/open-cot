@@ -308,6 +308,18 @@
       "rfc_path": "rfcs/0051-temporal-semantics-validity-extension.md",
       "discussion_title": "RFC 0051 \u2014 Temporal Semantics & Validity Extension",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/51"
+    },
+    "0052": {
+      "rfc_title": "Cognitive Artifact & Capability Snapshot",
+      "rfc_path": "rfcs/0052-cognitive-artifact-and-capability-snapshot.md",
+      "discussion_title": "RFC 0052 \u2014 Cognitive Artifact & Capability Snapshot",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/52"
+    },
+    "0053": {
+      "rfc_title": "Reconciliation Result & Error Taxonomy",
+      "rfc_path": "rfcs/0053-reconciliation-result.md",
+      "discussion_title": "RFC 0053 \u2014 Reconciliation Result & Error Taxonomy",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/53"
     }
   }
 }

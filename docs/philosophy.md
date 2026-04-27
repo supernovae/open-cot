@@ -1,47 +1,39 @@
 # Philosophy
 
-Open-CoT exists to make **governed agent execution** interoperable: a shared, machine-verifiable contract between model output, runtime enforcement, policy, delegation, tools, provenance, and audit.
+Open CoT exists to make the boundary between cognition and capability portable.
 
-We are deliberately opinionated about **where trust lives**. Capability flows through grants, policy, and brokers—not through persuasive text in the model channel. That can feel heavier than ad-hoc agent scripts; the bet is that regulated and multi-vendor environments will prefer **one inspectable contract** over many implicit ones.
+The model-like component is useful because it can interpret, compress, explain, and propose. It is not useful as an authority boundary. Open CoT treats its output as a cognitive artifact: structured, inspectable, and untrusted until a runtime reconciles it against capability, policy, budget, and evidence.
 
 ## Principles
 
-### Typed schemas over ambiguous prose
+### Typed artifacts over ambiguous prose
 
-Every serious boundary—reasoning steps, tool intent, FSM phase, delegation, permission, receipt, audit envelope—is expressed as **JSON Schema** and validated by the harness. Natural language may explain *why* a human approved something; it does not define *whether* a transition is legal.
+Every serious boundary should be expressed as JSON Schema: cognitive artifact, capability snapshot, execution intent, policy material, observation, receipt, and reconciliation result. Natural language can explain context; it cannot grant permission.
 
-### The model is an untrusted proposer
+### Capability snapshots over ambient access
 
-Models suggest plans and capability needs. They **never** authorize themselves. The harness treats model output like any other untrusted input: parse, validate, consult policy, then either advance the FSM or refuse. Obedience to the model is a bug.
+Cognition receives an explicit snapshot of available endpoints. The snapshot binds endpoint names, input shape, risk, approval requirement, and digest. Requests outside that snapshot are invalid.
 
-### Portable harness semantics
+### Execution intent is not execution
 
-The governed FSM and artifact shapes are **model-agnostic**. Any model that can emit structured output (or sit behind an adapter that shapes output) can participate. Portability comes from shared control-plane semantics, not from standardizing hidden chain-of-thought prose.
+An execution intent is a proposal. A runtime must validate shape, snapshot identity, capability digest, arguments, policy, risk, approval, budget, and preconditions before side effects occur.
 
-### Explicit provenance and evidence
+### Policy is separate from validation
 
-Side effects and decisions leave **receipts** and audit-linked records. A completed run should answer: what was requested, what was allowed, what ran, and how integrity was sealed. Silence is not accountability.
+Zod, JSON Schema, or any other validator can prove shape. They cannot prove permission. Policy gates are separate artifacts and should leave their own evidence.
 
-### Permission-aware execution
+### Observations over transcript trust
 
-Tool calls require **explicit authority**—grants with scope and lifetime, or a documented standing authorization cited on the execution receipt. Permission is a runtime object managed by the trust stack, not a vibe inferred from the prompt.
+Endpoint output becomes an observation. Observations are structured runtime records, not loose transcript text. They can carry result data, skipped work, validation failures, policy refusals, and reconciliation errors.
 
-### Delegation as a bounded request
+### Reconciliation over orchestration by text
 
-When more capability is needed, the agent issues a formal **delegation request**. Policy approves, narrows, denies, or escalates. The auth broker issues a narrowed receipt. Delegation is not a model-signed blank check.
+The runtime owns progression. The cognitive step emits an artifact, then yields to the runtime boundary. This keeps retries, crash recovery, endpoint execution, and audit in deterministic code.
 
-### Fail-closed safety
+### Implementation pressure should improve the standard
 
-If validation fails, **deny**. If observation violates policy, **quarantine** and route toward **`fail_safe`** rather than leaking unsafe material back to the model. If budgets exhaust, **stop**. Uncertainty defaults to refusal, not optimism.
+Open Lagrange is a proving ground, not a competing dialect. If it needs a portable structure, Open CoT should gain or refine an RFC/schema. Runtime-specific choices stay local; reusable interfaces belong here.
 
-Designs that “try the tool call and roll back” still owe the same receipts: optimism belongs in the training loss, not in the authorization boundary.
+### Backward compatibility without freezing vocabulary
 
-### Token-aware by design
-
-Structure costs tokens, and tokens cost money and context. The control plane should not burn the model's budget on bureaucracy. Capability manifests (RFC 0049) tell the model what it can do upfront so it does not waste tokens guessing. Compact text serialization keeps the overhead under 200 tokens. Context compilation — summarizing observations, windowing traces, stripping harness metadata — keeps the model focused on the task, not the plumbing. See [`docs/token-efficiency.md`](./token-efficiency.md) for active research on wire formats and small-model strategies.
-
-### Small credible proofs before ambitious claims
-
-The reference harness exists to show that the **contract works**: one end-to-end path that respects the FSM, receipts, and validation. We aim for a narrow, correct slice of the ecosystem—not a declaration that every framework must adopt this stack tomorrow.
-
-If a behavior cannot be expressed in schema and FSM transitions yet, we treat that as a **spec gap** to fix, not as encouragement to bypass the harness with bespoke glue code.
+Earlier RFCs use historical terms from the project’s transitional period. Those documents remain part of the record. New work should prefer cognition, capability, execution intent, observation, policy gate, runtime boundary, and reconciliation terminology.

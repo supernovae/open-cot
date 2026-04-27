@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://opencot.dev/schema/v0.10/reconciliation-result.json",
+  "title": "Open CoT RFC 0053 — Reconciliation Result and Error Taxonomy",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "reconciliation_id",
+    "status",
+    "capability_snapshot",
+    "executed_intents",
+    "skipped_intents",
+    "observations",
+    "errors",
+    "final_message"
+  ],
+  "properties": {
+    "reconciliation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "completed_with_errors",
+        "yielded",
+        "requires_approval",
+        "failed"
+      ]
+    },
+    "capability_snapshot": {
+      "$ref": "rfc-0052-cognitive-artifact.json#/$defs/capability_snapshot"
+    },
+    "artifact": {
+      "$ref": "rfc-0052-cognitive-artifact.json#/$defs/cognitive_artifact"
+    },
+    "executed_intents": {
+      "type": "array",
+      "items": {
+        "$ref": "rfc-0052-cognitive-artifact.json#/$defs/execution_intent"
+      }
+    },
+    "skipped_intents": {
+      "type": "array",
+      "items": {
+        "$ref": "rfc-0052-cognitive-artifact.json#/$defs/execution_intent"
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "$ref": "rfc-0052-cognitive-artifact.json#/$defs/observation"
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/reconciliation_error"
+      }
+    },
+    "final_message": {
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "error_code": {
+      "type": "string",
+      "enum": [
+        "INVALID_ARTIFACT",
+        "SNAPSHOT_MISMATCH",
+        "UNKNOWN_MCP_SERVER",
+        "UNKNOWN_CAPABILITY",
+        "CAPABILITY_DIGEST_MISMATCH",
+        "SCHEMA_VALIDATION_FAILED",
+        "POLICY_DENIED",
+        "APPROVAL_REQUIRED",
+        "PRECONDITION_FAILED",
+        "BUDGET_EXCEEDED",
+        "MCP_EXECUTION_FAILED",
+        "RESULT_VALIDATION_FAILED",
+        "YIELDED"
+      ]
+    },
+    "reconciliation_error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "message",
+        "observed_at"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/error_code"
+        },
+        "message": {
+          "type": "string"
+        },
+        "intent_id": {
+          "type": "string"
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  },
+  "x-opencot": {
+    "rfc": "0053",
+    "shortname": "reconciliation_result",
+    "source_rfc": "rfcs/0053-reconciliation-result.md"
+  }
+}
