@@ -43,7 +43,7 @@ This makes Open CoT useful beyond any one framework. An implementation can use R
 |------|------|
 | [`rfcs/`](./rfcs/) | **53 RFCs** covering reasoning traces, tool invocation, governed execution, policy, delegation, receipts, capability manifests, cognitive artifacts, and reconciliation results |
 | [`schemas/`](./schemas/) | Versioned JSON Schemas per RFC, including `registry.json` |
-| [`harness/`](./harness/) | Reference TypeScript harness that exercises earlier governed execution RFCs |
+| [`harness/`](./harness/) | Reference TypeScript core package that exercises earlier governed execution RFCs |
 | [`examples/`](./examples/) | Validated instance fixtures keyed by registry shortname |
 | [`reference/python/`](./reference/python/) | Reference Python tooling |
 | [`tools/`](./tools/) | Schema and fixture validation, registry sync, and RFC helpers |
@@ -89,7 +89,7 @@ pip install -r requirements-tools.txt
 python tools/validate.py
 ```
 
-Run the reference harness:
+Run the reference package:
 
 ```bash
 cd harness && npm install && npm test
@@ -105,7 +105,7 @@ That implementation pressure-tests Open CoT. If Open Lagrange needs a portable s
 
 - **53 RFCs** and a versioned JSON Schema registry.
 - New draft schemas for cognitive artifacts and reconciliation results.
-- Reference harness coverage for governed execution, policy, delegation, receipts, budgets, and capability manifests.
+- Reference package coverage for governed execution, policy, delegation, receipts, budgets, and capability manifests.
 - Cross-language validation tooling for schemas and examples.
 - Experiment cards and local runbooks under [`docs/experiments/`](./docs/experiments/).
 

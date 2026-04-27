@@ -5,7 +5,7 @@ import type { PolicySet, PolicyRule } from "../src/governance/policy-evaluator.j
 import { AuthBroker } from "../src/governance/auth-broker.js";
 import { AuditEngine } from "../src/governance/audit-engine.js";
 import type { DelegationRequest, DelegationDecision } from "../src/schemas/delegation.js";
-import { createAgentState } from "../src/core/state.js";
+import { createPipelineState } from "../src/core/state.js";
 
 const sampleScope = {
   resource: "tool:search",
@@ -16,7 +16,7 @@ function makeRequest(overrides?: Partial<DelegationRequest>): DelegationRequest 
   return {
     schema_version: "0.2",
     request_id: "req-test-1",
-    requester: "agent-test",
+    requester: "cognitive-pipeline-test",
     run_id: "run-test",
     intent: "Search the web",
     justification: "Need external facts",
@@ -30,7 +30,7 @@ describe("PermissionManager", () => {
   it("grant() creates an active permission", () => {
     const pm = new PermissionManager();
     const grant = pm.grant({
-      granted_to: "agent-1",
+      granted_to: "cognitive-pipeline-1",
       scope: sampleScope,
       audience: "tool:search",
       ttl_seconds: 3600,
@@ -49,7 +49,7 @@ describe("PermissionManager", () => {
   it("consume() marks one-shot permission as consumed", () => {
     const pm = new PermissionManager();
     const grant = pm.grant({
-      granted_to: "agent-1",
+      granted_to: "cognitive-pipeline-1",
       scope: sampleScope,
       audience: "tool:search",
       ttl_seconds: 3600,
@@ -64,7 +64,7 @@ describe("PermissionManager", () => {
   it("consume() rejects non-one-shot permissions", () => {
     const pm = new PermissionManager();
     const grant = pm.grant({
-      granted_to: "agent-1",
+      granted_to: "cognitive-pipeline-1",
       scope: sampleScope,
       audience: "tool:search",
       ttl_seconds: 3600,
@@ -79,7 +79,7 @@ describe("PermissionManager", () => {
   it("isValid() returns false for expired permissions", () => {
     const pm = new PermissionManager();
     const grant = pm.grant({
-      granted_to: "agent-1",
+      granted_to: "cognitive-pipeline-1",
       scope: sampleScope,
       audience: "tool:search",
       ttl_seconds: 0,
@@ -94,7 +94,7 @@ describe("PermissionManager", () => {
   it("revoke() marks permission as revoked", () => {
     const pm = new PermissionManager();
     const grant = pm.grant({
-      granted_to: "agent-1",
+      granted_to: "cognitive-pipeline-1",
       scope: sampleScope,
       audience: "tool:search",
       ttl_seconds: 3600,
@@ -111,7 +111,7 @@ describe("PermissionManager", () => {
   it("revokeAll() revokes all active permissions", () => {
     const pm = new PermissionManager();
     const a = pm.grant({
-      granted_to: "agent-1",
+      granted_to: "cognitive-pipeline-1",
       scope: sampleScope,
       audience: "tool:search",
       ttl_seconds: 3600,
@@ -120,7 +120,7 @@ describe("PermissionManager", () => {
       granted_by: "policy:p1",
     });
     const b = pm.grant({
-      granted_to: "agent-2",
+      granted_to: "cognitive-pipeline-2",
       scope: { resource: "tool:calc", action: "execute" },
       audience: "tool:calc",
       ttl_seconds: 3600,
@@ -136,7 +136,7 @@ describe("PermissionManager", () => {
   it("getEvents() tracks lifecycle events", () => {
     const pm = new PermissionManager();
     const grant = pm.grant({
-      granted_to: "agent-1",
+      granted_to: "cognitive-pipeline-1",
       scope: sampleScope,
       audience: "tool:search",
       ttl_seconds: 3600,
@@ -173,7 +173,7 @@ describe("PolicyEvaluator", () => {
       ],
     };
     ev.addPolicy(policy);
-    const decision = ev.evaluate(baseRequest(), "agent-1");
+    const decision = ev.evaluate(baseRequest(), "cognitive-pipeline-1");
     expect(decision.status).toBe("approved");
   });
 
@@ -192,7 +192,7 @@ describe("PolicyEvaluator", () => {
         },
       ],
     });
-    const decision = ev.evaluate(baseRequest(), "agent-1");
+    const decision = ev.evaluate(baseRequest(), "cognitive-pipeline-1");
     expect(decision.status).toBe("denied");
     expect(decision.denial_reason).toBe("Search disabled");
   });
@@ -212,7 +212,7 @@ describe("PolicyEvaluator", () => {
         },
       ],
     });
-    const decision = ev.evaluate(baseRequest(), "agent-1");
+    const decision = ev.evaluate(baseRequest(), "cognitive-pipeline-1");
     expect(decision.status).toBe("narrowed");
     expect(decision.narrowed_scope?.constraints?.excluded_fields).toEqual([
       "pii",
@@ -222,7 +222,7 @@ describe("PolicyEvaluator", () => {
 
   it("default deny when no rules match", () => {
     const ev = new PolicyEvaluator();
-    const decision = ev.evaluate(baseRequest(), "agent-1");
+    const decision = ev.evaluate(baseRequest(), "cognitive-pipeline-1");
     expect(decision.status).toBe("denied");
     expect(decision.denial_reason).toContain("fail-closed");
   });
@@ -241,7 +241,7 @@ describe("PolicyEvaluator", () => {
       priority: 10,
       rules: [{ rule_id: "d1", action: "deny", resource: "tool:search", reason: "blocked" }],
     });
-    const decision = ev.evaluate(baseRequest(), "agent-1");
+    const decision = ev.evaluate(baseRequest(), "cognitive-pipeline-1");
     expect(decision.status).toBe("denied");
     expect(decision.denial_reason).toBe("blocked");
   });
@@ -254,7 +254,7 @@ describe("PolicyEvaluator", () => {
       priority: 1,
       rules: [{ rule_id: "w1", action: "allow", resource: "tool:*" }],
     });
-    const decision = ev.evaluate(baseRequest(), "agent-1");
+    const decision = ev.evaluate(baseRequest(), "cognitive-pipeline-1");
     expect(decision.status).toBe("approved");
   });
 });
@@ -334,19 +334,19 @@ describe("AuditEngine", () => {
     const engine = new AuditEngine();
     const e1 = engine.emit({
       run_id: "run-1",
-      agent_id: "agent-1",
+      requester_id: "cognitive-pipeline-1",
       event_type: "test.a",
       details: { n: 1 },
     });
     const e2 = engine.emit({
       run_id: "run-1",
-      agent_id: "agent-1",
+      requester_id: "cognitive-pipeline-1",
       event_type: "test.b",
       details: { n: 2 },
     });
     const e3 = engine.emit({
       run_id: "run-1",
-      agent_id: "agent-1",
+      requester_id: "cognitive-pipeline-1",
       event_type: "test.c",
       details: { n: 3 },
     });
@@ -361,7 +361,7 @@ describe("AuditEngine", () => {
 
   it("seal() produces audit envelope", () => {
     const engine = new AuditEngine();
-    const state = createAgentState({ objective: "demo task" });
+    const state = createPipelineState({ objective: "demo task" });
     state.trace.steps.push({
       id: "s-1",
       type: "thought",

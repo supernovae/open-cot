@@ -22,9 +22,9 @@ This matrix maps current RFC coverage to the concrete functions needed for an en
 | Tool/verifier sidecars | RFC `0002`, `0003`, `0006` | Partial | Schema coverage + examples | Integrate into default evaluation pipeline |
 | Branching/search trace structures | RFC `0004` | Partial | Schema/examples only | Add scoring and harness paths for branch metrics |
 | Reward and reward fusion | RFC `0005`, `0009` | Partial | Schema/examples only | Add reward-aware evaluation and preference/RL training glue |
-| Agent loop protocol | RFC `0007` | Partial | `reference/python/agent_loop_runner.py` mock loop | Wire into real eval/training traces and audit outputs |
+| Cognitive pipeline loop protocol | RFC `0007` | Partial | `reference/python/cognitive_pipeline_runner.py` mock loop | Wire into real eval/training traces and audit outputs |
 | Dataset packaging/streaming | RFC `0008`, `0012` | Implemented | Packaging layouts, manifests, synthetic datasets | Add strict governance gates (dedup/contamination/provenance assertions) |
-| Agent memory/safety/policy | RFC `0010`, `0017`, `0041`, `0045` | Partial | Schema-level docs, limited runtime checks | Enforce policy budgets/redaction/tool denial in eval scripts |
+| Cognitive pipeline memory/safety/policy | RFC `0010`, `0017`, `0041`, `0045` | Partial | Schema-level docs, limited runtime checks | Enforce policy budgets/redaction/tool denial in eval scripts |
 | Evaluation reporting | RFC `0022`, `0029` | Partial | `benchmarks/scoring/scorer.py`, task specs | Add self-consistency, semantic step checks, harness adapter |
 | Identity/compliance/audit | RFC `0026`, `0043`, `0044` | Partial | Policies specified | Emit machine-readable audit events per run |
 | Observability + budgets + cost | RFC `0031`, `0037`, `0038`, `0039` | Gap | Mostly RFC text and examples | Add runtime counters and budget guardrails in execution |

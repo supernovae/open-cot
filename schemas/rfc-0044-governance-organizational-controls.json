@@ -21,7 +21,7 @@
         "global",
         "organization",
         "team",
-        "agent"
+        "pipeline"
       ]
     },
     "scope_id": {

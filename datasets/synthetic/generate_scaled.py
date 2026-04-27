@@ -35,7 +35,7 @@ def build_scaled_traces() -> list[dict[str, object]]:
         "benchmark",
         "validator",
         "trace",
-        "agent",
+        "pipeline",
         "memory",
         "policy",
         "budget",

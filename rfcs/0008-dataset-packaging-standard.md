@@ -1,8 +1,8 @@
 # RFC 0008 — Dataset Packaging Standard (v0.1)
-**Status:** Draft  
-**Author:** Byron / Open CoT Community  
-**Created:** 2026‑04‑14  
-**Target Version:** Schema v0.3  
+**Status:** Draft
+**Author:** Byron / Open CoT Community
+**Created:** 2026‑04‑14
+**Target Version:** Schema v0.3
 **Discussion:** https://github.com/supernovae/open-cot/discussions/8
 ---
 
@@ -12,14 +12,14 @@ This RFC defines the **Dataset Packaging Standard** for distributing, sharing, a
 
 It provides a unified, model‑agnostic format for packaging:
 
-- reasoning traces (RFC 0001)  
-- verifier outputs (RFC 0002)  
-- tool invocation logs (RFC 0003)  
-- branching structures (RFC 0004)  
-- RL reward traces (RFC 0005)  
-- multi‑verifier ensembles (RFC 0006)  
+- reasoning traces (RFC 0001)
+- verifier outputs (RFC 0002)
+- tool invocation logs (RFC 0003)
+- branching structures (RFC 0004)
+- RL reward traces (RFC 0005)
+- multi‑verifier ensembles (RFC 0006)
 
-The goal is to make reasoning datasets **portable, reproducible, inspectable, and interoperable** across training pipelines, evaluation harnesses, and agent frameworks.
+The goal is to make reasoning datasets **portable, reproducible, inspectable, and interoperable** across training pipelines, evaluation harnesses, and cognitive pipeline frameworks.
 
 ---
 
@@ -27,46 +27,46 @@ The goal is to make reasoning datasets **portable, reproducible, inspectable, an
 
 Reasoning datasets today are fragmented:
 
-- Some contain raw CoT text with no structure.  
-- Some contain tool calls but no observations.  
-- Some contain verifier labels but no reward signals.  
-- Some contain branching traces but no metadata.  
-- Some are stored as loose JSON files with no manifest.  
+- Some contain raw CoT text with no structure.
+- Some contain tool calls but no observations.
+- Some contain verifier labels but no reward signals.
+- Some contain branching traces but no metadata.
+- Some are stored as loose JSON files with no manifest.
 
 This fragmentation makes it difficult to:
 
-- train RL‑based reasoning models  
-- evaluate step‑level correctness  
-- reproduce agent trajectories  
-- share datasets across frameworks  
-- benchmark models consistently  
+- train RL‑based reasoning models
+- evaluate step‑level correctness
+- reproduce cognitive pipeline trajectories
+- share datasets across frameworks
+- benchmark models consistently
 
 This RFC defines a **standard packaging format** so that reasoning datasets can be:
 
-- versioned  
-- validated  
-- merged  
-- sharded  
-- streamed  
-- consumed by any training or evaluation pipeline  
+- versioned
+- validated
+- merged
+- sharded
+- streamed
+- consumed by any training or evaluation pipeline
 
 ---
 
 ## 3. Design Goals
 
 ### 3.1 Must‑Have Goals
-- Support all schemas from RFC 0001–0007.  
-- Provide a clear directory structure.  
-- Provide a dataset manifest.  
-- Support sharding and streaming.  
-- Support dataset‑level metadata.  
-- Support dataset validation.  
-- Support partial datasets (e.g., traces only, rewards only).  
+- Support all schemas from RFC 0001–0007.
+- Provide a clear directory structure.
+- Provide a dataset manifest.
+- Support sharding and streaming.
+- Support dataset‑level metadata.
+- Support dataset validation.
+- Support partial datasets (e.g., traces only, rewards only).
 
 ### 3.2 Non‑Goals
-- Defining a specific training format (e.g., HF datasets).  
-- Defining a specific compression format.  
-- Defining a universal licensing model.  
+- Defining a specific training format (e.g., HF datasets).
+- Defining a specific compression format.
+- Defining a universal licensing model.
 - Encoding model weights or training logs.
 
 ---

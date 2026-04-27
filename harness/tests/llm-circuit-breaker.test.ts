@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { MockLLMBackend } from "../src/backends/mock.js";
 import type { BudgetPolicy } from "../src/schemas/budget.js";
-import { createAgentState } from "../src/core/state.js";
+import { createPipelineState } from "../src/core/state.js";
 import { createBudgetTracker } from "../src/core/budget-tracker.js";
 import { callLLMWithCircuitBreaker } from "../src/core/llm-circuit-breaker.js";
 
@@ -18,7 +18,7 @@ function makePolicy(maxTokens: number): BudgetPolicy {
 
 describe("callLLMWithCircuitBreaker", () => {
   it("stops before decode when prompt estimate exceeds remaining budget", async () => {
-    const state = createAgentState({
+    const state = createPipelineState({
       objective: "tiny budget",
       budgetPolicy: makePolicy(8),
     });
@@ -42,7 +42,7 @@ describe("callLLMWithCircuitBreaker", () => {
   });
 
   it("interrupts streamed decoding when completion allowance is exhausted", async () => {
-    const state = createAgentState({
+    const state = createPipelineState({
       objective: "mid-stream budget stop",
       budgetPolicy: makePolicy(90),
     });
@@ -73,7 +73,7 @@ describe("callLLMWithCircuitBreaker", () => {
   });
 
   it("enters fail_safe when streamed output exceeds safety ceiling", async () => {
-    const state = createAgentState({
+    const state = createPipelineState({
       objective: "safety ceiling stop",
       budgetPolicy: makePolicy(500),
     });
@@ -102,7 +102,7 @@ describe("callLLMWithCircuitBreaker", () => {
   });
 
   it("enters fail_safe when blocked stream pattern appears", async () => {
-    const state = createAgentState({
+    const state = createPipelineState({
       objective: "pattern stop",
       budgetPolicy: makePolicy(500),
     });

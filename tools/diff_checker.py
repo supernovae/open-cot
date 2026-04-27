@@ -15,7 +15,7 @@ Each finding is tagged with a schema-diff severity:
   - minor (new optional capability)
   - patch (non-semantic or informational)
 
-These severities inform, but do not automatically decide, registry semver bumps.
+These severities inform, but do not automatically reconcile, registry semver bumps.
 """
 
 from __future__ import annotations
@@ -27,6 +27,11 @@ from pathlib import Path
 from typing import Any
 
 SEVERITY_ORDER = {"patch": 0, "minor": 1, "major": 2}
+PROPERTY_RENAMES = {
+    "agent_id": "requester_id",
+    "agents": "pipelines",
+    "parent_agent_id": "parent_requester_id",
+}
 
 
 def _norm_type(t: Any) -> str | None:
@@ -57,6 +62,12 @@ def _required_list(schema: Any) -> list[str]:
 
 def _record(findings: list[tuple[str, str]], severity: str, msg: str) -> None:
     findings.append((severity, msg))
+
+
+def _renamed_properties(before_keys: set[str], after_keys: set[str]) -> dict[str, str]:
+    return {
+        before: after for before, after in PROPERTY_RENAMES.items() if before in before_keys and after in after_keys
+    }
 
 
 def _tightened_min(before: dict[str, Any], after: dict[str, Any], key: str) -> bool:
@@ -130,16 +141,22 @@ def _compare(before: Any, after: Any, path: str, *, findings: list[tuple[str, st
 
     b_req = set(_required_list(before))
     a_req = set(_required_list(after))
-    for name in sorted(b_req - a_req):
+    required_renames = _renamed_properties(b_req, a_req)
+    renamed_before_required = set(required_renames)
+    renamed_after_required = set(required_renames.values())
+    for name in sorted((b_req - a_req) - renamed_before_required):
         _record(findings, "major", f"{path}: removed from required: {name!r}")
-    for name in sorted(a_req - b_req):
+    for name in sorted((a_req - b_req) - renamed_after_required):
         _record(findings, "minor", f"{path}: added to required: {name!r}")
 
     b_props = _props(before)
     a_props = _props(after)
-    for key in sorted(set(b_props) - set(a_props)):
+    property_renames = _renamed_properties(set(b_props), set(a_props))
+    renamed_before_props = set(property_renames)
+    renamed_after_props = set(property_renames.values())
+    for key in sorted((set(b_props) - set(a_props)) - renamed_before_props):
         _record(findings, "major", f"{path}: removed property {key!r}")
-    for key in sorted(set(a_props) - set(b_props)):
+    for key in sorted((set(a_props) - set(b_props)) - renamed_after_props):
         _record(findings, "minor", f"{path}: added property {key!r}")
 
     _constraint_diffs(before, after, path, findings)
@@ -148,6 +165,15 @@ def _compare(before: Any, after: Any, path: str, *, findings: list[tuple[str, st
         bp = b_props[key]
         ap = a_props[key]
         sub = f"{path}.properties.{key}"
+        if isinstance(bp, dict) and isinstance(ap, dict):
+            _compare(bp, ap, sub, findings=findings)
+        elif isinstance(bp, dict) != isinstance(ap, dict):
+            _record(findings, "major", f"{sub}: property shape changed (object vs non-object)")
+
+    for before_key, after_key in sorted(property_renames.items()):
+        bp = b_props[before_key]
+        ap = a_props[after_key]
+        sub = f"{path}.properties.{before_key}->{after_key}"
         if isinstance(bp, dict) and isinstance(ap, dict):
             _compare(bp, ap, sub, findings=findings)
         elif isinstance(bp, dict) != isinstance(ap, dict):
@@ -167,6 +193,25 @@ def _compare(before: Any, after: Any, path: str, *, findings: list[tuple[str, st
 
 def load_schema(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def schema_identity(path: Path) -> str:
+    data = load_schema(path)
+    meta = data.get("x-opencot") if isinstance(data, dict) else None
+    rfc = meta.get("rfc") if isinstance(meta, dict) else None
+    return f"rfc:{rfc}" if isinstance(rfc, str) and rfc else f"name:{path.name}"
+
+
+def index_schema_dir(path: Path) -> dict[str, Path]:
+    indexed: dict[str, Path] = {}
+    for schema_path in path.glob("*.json"):
+        if schema_path.name == "registry.json":
+            continue
+        identity = schema_identity(schema_path)
+        if identity in indexed:
+            raise RuntimeError(f"Duplicate schema identity {identity!r}: {indexed[identity].name}, {schema_path.name}")
+        indexed[identity] = schema_path
+    return indexed
 
 
 def compare_files(before: Path, after: Path) -> list[tuple[str, str]]:
@@ -197,14 +242,14 @@ def main() -> int:
     if args.before.is_file() and args.after.is_file():
         findings.extend(compare_files(args.before, args.after))
     elif args.before.is_dir() and args.after.is_dir():
-        b_names = {p.name for p in args.before.glob("*.json")}
-        a_names = {p.name for p in args.after.glob("*.json")}
-        for removed in sorted((b_names - a_names) - {"registry.json"}):
-            findings.append(("major", f"{removed}: schema file removed"))
-        for added in sorted((a_names - b_names) - {"registry.json"}):
-            findings.append(("minor", f"{added}: schema file added"))
-        for name in sorted((b_names & a_names) - {"registry.json"}):
-            findings.extend(compare_files(args.before / name, args.after / name))
+        before_index = index_schema_dir(args.before)
+        after_index = index_schema_dir(args.after)
+        for removed in sorted(set(before_index) - set(after_index)):
+            findings.append(("major", f"{before_index[removed].name}: schema file removed"))
+        for added in sorted(set(after_index) - set(before_index)):
+            findings.append(("minor", f"{after_index[added].name}: schema file added"))
+        for identity in sorted(set(before_index) & set(after_index)):
+            findings.extend(compare_files(before_index[identity], after_index[identity]))
     else:
         print("before and after must both be files or both be directories", file=sys.stderr)
         return 2

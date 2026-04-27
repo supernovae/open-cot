@@ -2,7 +2,7 @@
   "delegation_request": {
     "schema_version": "0.2",
     "request_id": "req-a1b2c3d4",
-    "requester": "agent-planner-01",
+    "requester": "cognitive-pipeline-planner-01",
     "run_id": "run-e5f6g7h8",
     "intent": "Read email headers to find meeting invitations",
     "justification": "The user asked me to check for upcoming meetings.",

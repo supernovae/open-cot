@@ -30,7 +30,7 @@ The adapter generalizes what `manifestToCompactText` does today into a reusable,
 - A bidirectional adapter: `toToon(object, schema?)` and `fromToon(toonString, schema?)`.
 - Schema-to-header generation: `schemaToToonHeader(jsonSchema)`.
 - A TOON serializer for capability manifests (`manifestToToon`) alongside the existing compact text.
-- A `wire_format` configuration option on agent configs (`"json" | "compact-text" | "toon"`).
+- A `wire_format` configuration option on cognitive pipeline configs (`"json" | "compact-text" | "toon"`).
 - Documentation, experiment card, and example fixtures.
 
 **Non-goals:**
@@ -38,7 +38,7 @@ The adapter generalizes what `manifestToCompactText` does today into a reusable,
 - TOON is **never normative**. It is never stored in audit envelopes, trace archives, or harness-to-harness interchange.
 - TOON does not replace JSON Schema validation. All TOON output is validated by converting back to JSON and running Ajv.
 - TOON does not define a new schema language. The inline header is a serialization hint, not a type system.
-- This RFC does not mandate TOON adoption. It is opt-in per agent or backend configuration.
+- This RFC does not mandate TOON adoption. It is opt-in per cognitive pipeline or backend configuration.
 
 ## 4. Normative requirements
 
@@ -140,7 +140,7 @@ constraints: no network after step 5; read-only filesystem
 [/toon:capability_manifest]
 ```
 
-This replaces `manifestToCompactText` when `wire_format` is `"toon"`. The structured JSON manifest on `AgentState` is unchanged.
+This replaces `manifestToCompactText` when `wire_format` is `"toon"`. The structured JSON manifest on `PipelineState` is unchanged.
 
 ## 9. Configuration
 
@@ -150,7 +150,7 @@ interface WireFormatConfig {
 }
 ```
 
-Added as an optional field on `GovernedAgentConfig` and as a parameter on `runChatAgent`. Default: `"compact-text"`.
+Added as an optional field on `GovernedPipelineConfig` and as a parameter on `runChatPipeline`. Default: `"compact-text"`.
 
 The manifest heartbeat and any future schema injections select the serializer based on this setting:
 
@@ -188,6 +188,6 @@ The following published work supports the token-efficiency claims motivating thi
 
 - `toToon` and `fromToon` round-trip for all schemas in the registry without validation errors.
 - `manifestToToon` output is under 200 tokens for a five-tool profile (matching RFC 0049 target).
-- Governed agent demo completes successfully with `wire_format: "toon"`.
+- Governed cognitive pipeline demo completes successfully with `wire_format: "toon"`.
 - Token count comparison (JSON vs compact-text vs TOON) is documented for capability manifest and reasoning trace fixtures.
 - No change in behavior for existing users who do not set `wire_format`.

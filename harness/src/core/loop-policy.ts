@@ -1,12 +1,12 @@
 /**
- * Loop policy engine — configurable guardrails for agent loop behavior.
+ * Loop policy engine — configurable guardrails for cognitive pipeline behavior.
  *
  * Policies are checked before each transition. Violations produce critique
  * steps in the trace rather than throwing, unless the violation is fatal.
  */
 
-import type { AgentState } from "./state.js";
-import type { Phase } from "../schemas/agent-loop.js";
+import type { PipelineState } from "./state.js";
+import type { Phase } from "../schemas/cognitive-pipeline.js";
 
 export interface LoopPolicy {
   maxRetries: number;
@@ -41,7 +41,7 @@ export interface PolicyViolation {
  * Returns an empty array if all checks pass.
  */
 export function checkPolicy(
-  state: AgentState,
+  state: PipelineState,
   proposed: Phase,
   policy: LoopPolicy,
 ): PolicyViolation[] {
@@ -102,7 +102,7 @@ export function checkPolicy(
   return violations;
 }
 
-function hasVerifyStep(state: AgentState): boolean {
+function hasVerifyStep(state: PipelineState): boolean {
   return state.trace.steps.some(
     (s) => s.type === "verify" || s.type === "critique",
   );

@@ -6,7 +6,7 @@ import type {
   DelegationStatus,
   RequestedScope,
 } from "../schemas/delegation.js";
-import type { Phase } from "../schemas/agent-loop.js";
+import type { Phase } from "../schemas/cognitive-pipeline.js";
 import type { SandboxConfig } from "../schemas/sandbox.js";
 import type { ToolContract } from "../schemas/tool-invocation.js";
 import { PolicyEvaluator } from "./policy-evaluator.js";
@@ -26,7 +26,7 @@ export interface ToolAccessPreview {
 
 export interface ToolAccessPreviewInput {
   runId: string;
-  agentId: string;
+  requesterId: string;
   objective: string;
   phase: Phase;
   tools: ToolContract[];
@@ -36,7 +36,7 @@ export interface ToolAccessPreviewInput {
 
 export interface PolicyPhaseConsultationInput {
   runId: string;
-  agentId: string;
+  requesterId: string;
   objective: string;
   phase: Phase;
   context?: Record<string, unknown>;
@@ -52,7 +52,7 @@ export interface DelegationPolicyEngine {
   readonly name: string;
   evaluate(
     request: DelegationRequest,
-    agentId: string,
+    requesterId: string,
   ): Promise<DelegationDecision>;
   consultPhase?(
     input: PolicyPhaseConsultationInput,
@@ -91,14 +91,14 @@ function stableStringify(value: unknown): string {
 
 export function createDelegationDecision(
   request: DelegationRequest,
-  agentId: string,
+  requesterId: string,
   draft: DelegationDecisionDraft,
 ): DelegationDecision {
   const decidedAt = draft.decidedAt ?? new Date().toISOString();
   const policyRefs = draft.policyRefs ?? [];
   const basis = stableStringify({
     request_id: request.request_id,
-    agent_id: agentId,
+    requester_id: requesterId,
     scope: request.requested_scope,
     status: draft.status,
     decided_by: draft.decidedBy,
@@ -149,9 +149,9 @@ export class InProcessPolicyEngine implements DelegationPolicyEngine {
 
   async evaluate(
     request: DelegationRequest,
-    agentId: string,
+    requesterId: string,
   ): Promise<DelegationDecision> {
-    return this.evaluator.evaluate(request, agentId);
+    return this.evaluator.evaluate(request, requesterId);
   }
 
   async consultPhase(
@@ -163,7 +163,7 @@ export class InProcessPolicyEngine implements DelegationPolicyEngine {
     const decision = this.evaluator.evaluate(
       createSyntheticRequest({
         runId: input.runId,
-        requester: input.agentId,
+        requester: input.requesterId,
         intent: `Consult phase ${input.phase}`,
         justification: `Policy consultation at phase ${input.phase}`,
         scope: {
@@ -172,7 +172,7 @@ export class InProcessPolicyEngine implements DelegationPolicyEngine {
           constraints: input.context,
         },
       }),
-      input.agentId,
+      input.requesterId,
     );
     return toPhaseConsultationDecision(decision);
   }
@@ -193,7 +193,7 @@ export class InProcessPolicyEngine implements DelegationPolicyEngine {
       const decision = this.evaluator.evaluate(
         createSyntheticRequest({
           runId: input.runId,
-          requester: input.agentId,
+          requester: input.requesterId,
           intent: `Preview tool access for ${tool.name}`,
           justification: `Manifest compilation for phase ${input.phase}`,
           scope: {
@@ -202,7 +202,7 @@ export class InProcessPolicyEngine implements DelegationPolicyEngine {
             constraints: input.context,
           },
         }),
-        input.agentId,
+        input.requesterId,
       );
       preview[tool.name] = toToolAccessPreview(decision);
     }

@@ -10,7 +10,7 @@
 
 ## 1. Summary
 
-This RFC defines the **Policy Enforcement Schema (v0.3)** for Open-CoT, a cognitive control plane for governed agent execution. The policy engine decides when a model may invoke tools, access data or memory, or perform other governed operations. Given a **delegation request** (RFC 0047) and active policies, it returns **`allow`**, **`deny`**, **`narrow`**, or **`require_approval`**, with optional `narrowing` constraints, denial reasons, or escalation targets.
+This RFC defines the **Policy Enforcement Schema (v0.3)** for Open-CoT, a cognitive control plane for governed cognitive pipeline execution. The policy engine evaluates when a model may invoke tools, access data or memory, or perform other governed operations. Given a **delegation request** (RFC 0047) and active policies, it returns **`allow`**, **`deny`**, **`narrow`**, or **`require_approval`**, with optional `narrowing` constraints, denial reasons, or escalation targets.
 
 v0.3 preserves **`narrow`** and introduces canonical temporal naming from RFC 0051: policy validity bounds use `effective_at` / `expires_at`, condition windows use `validity_window`, and evaluation records use `decided_at`. It formalizes deterministic temporal validity semantics while retaining composable narrowing and policy priority behavior.
 
@@ -26,9 +26,9 @@ Operators need typed policies, graduated responses (`narrow`, `require_approval`
 
 | RFC | Title | Relationship |
 |-----|--------|----------------|
-| RFC 0007 | Agent Loop Protocol | Governed FSM: policy consulted in frame, plan, validate_authority, observe_result, critique_verify, finalize. |
-| RFC 0017 | Agent Safety & Sandboxing | This RFC supersedes simple allow/block lists with structured rules, narrowing, and evaluation records. |
-| RFC 0026 | Agent Identity & Authentication | **Subject** identities and roles for `subject` matching. |
+| RFC 0007 | Cognitive Pipeline Protocol | Governed FSM: policy consulted in frame, plan, validate_authority, observe_result, critique_verify, finalize. |
+| RFC 0017 | Cognitive pipeline Safety & Sandboxing | This RFC supersedes simple allow/block lists with structured rules, narrowing, and evaluation records. |
+| RFC 0026 | Cognitive pipeline Identity & Authentication | **Subject** identities and roles for `subject` matching. |
 | RFC 0042 | Permissions & Access Control | **Consumes** policy decisions for grants. |
 | RFC 0047 | Delegation | Engine evaluates `delegation_request`; `request_id` links artifacts. |
 
@@ -56,7 +56,7 @@ Rule `action` and result `decision` share: **`allow`** (grant as narrowed so far
 
 ## 6. Resources and subjects
 
-Resources SHOULD use prefixes: `tool:<name>` (RFC 0003), `data:<path>`, `memory:<key-pattern>` (RFC 0010). Matching SHOULD prefer exact over pattern, then **longest-prefix / most-specific** tie-break (documented per implementation). **`subject`**: agent id, role, or wildcard per RFC 0026; wildcard grammar MUST be documented by the engine.
+Resources SHOULD use prefixes: `tool:<name>` (RFC 0003), `data:<path>`, `memory:<key-pattern>` (RFC 0010). Matching SHOULD prefer exact over pattern, then **longest-prefix / most-specific** tie-break (documented per implementation). **`subject`**: cognitive pipeline id, role, or wildcard per RFC 0026; wildcard grammar MUST be documented by the engine.
 
 ---
 
@@ -172,7 +172,7 @@ Engines MUST emit one object per evaluated `(request_id, policy_id)` or define a
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "agent_id": { "type": "string" },
+        "requester_id": { "type": "string" },
         "run_id": { "type": "string" },
         "budget_snapshot": { "type": "object", "additionalProperties": true },
         "risk_assessment": { "type": "string" }
@@ -209,7 +209,7 @@ Engines MUST emit one object per evaluated `(request_id, policy_id)` or define a
   "version": "0.3",
   "policy_id": "safety_no_shell",
   "policy_type": "safety",
-  "description": "Block shell for autonomous runs.",
+  "description": "Block shell for unsupervised runs.",
   "priority": 10,
   "effective_at": "2026-04-14T00:00:00Z",
   "rules": [
@@ -286,7 +286,7 @@ Engines MUST emit one object per evaluated `(request_id, policy_id)` or define a
   },
   "decided_at": "2026-04-18T12:34:56Z",
   "context": {
-    "agent_id": "agent/analyst-7",
+    "requester_id": "cognitive-pipeline/analyst-7",
     "run_id": "run_19c0",
     "budget_snapshot": { "currency": "USD", "remaining": 12.45 },
     "risk_assessment": "medium"

@@ -5,10 +5,10 @@
  * structured trace step so the full history is replayable.
  */
 
-import type { Phase } from "../schemas/agent-loop.js";
-import { VALID_TRANSITIONS, TERMINAL_PHASES } from "../schemas/agent-loop.js";
+import type { Phase } from "../schemas/cognitive-pipeline.js";
+import { VALID_TRANSITIONS, TERMINAL_PHASES } from "../schemas/cognitive-pipeline.js";
 import type { CompletionStatus } from "../schemas/audit-envelope.js";
-import type { AgentState } from "./state.js";
+import type { PipelineState } from "./state.js";
 
 export class InvalidTransitionError extends Error {
   constructor(
@@ -26,7 +26,7 @@ export class InvalidTransitionError extends Error {
 export class TerminalStateError extends Error {
   constructor(public readonly phase: Phase) {
     super(
-      `Agent is in terminal phase "${phase}" — no further transitions allowed`,
+      `Cognitive pipeline is in terminal phase "${phase}" — no further transitions allowed`,
     );
     this.name = "TerminalStateError";
   }
@@ -46,11 +46,11 @@ export function assertTransition(from: Phase, to: Phase): void {
 }
 
 /**
- * Transition the agent to a new phase. Mutates state in place and appends a
+ * Transition the cognitive pipeline to a new phase. Mutates state in place and appends a
  * trace step documenting the transition.
  */
 export function transition(
-  state: AgentState,
+  state: PipelineState,
   to: Phase,
   reason: string,
 ): void {
@@ -76,11 +76,11 @@ export function transition(
 }
 
 /**
- * Force-stop the agent with a given status. Used for budget exhaustion,
+ * Force-stop the cognitive pipeline with a given status. Used for budget exhaustion,
  * safety violations, and external stop signals.
  */
 export function forceStop(
-  state: AgentState,
+  state: PipelineState,
   status: CompletionStatus,
   reason: string,
 ): void {

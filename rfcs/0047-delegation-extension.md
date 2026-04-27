@@ -1,24 +1,24 @@
 # RFC 0047 — Delegation Extension (v0.2)
-**Status:** Draft  
-**Author:** Byron / Open CoT Community  
-**Created:** 2026-04-18  
-**Target Version:** Schema v0.8  
-**Discussion:** https://github.com/supernovae/open-cot/discussions/47  
+**Status:** Draft
+**Author:** Byron / Open CoT Community
+**Created:** 2026-04-18
+**Target Version:** Schema v0.8
+**Discussion:** https://github.com/supernovae/open-cot/discussions/47
 ---
 
 ## 1. Summary
 
-Open CoT is a **cognitive control plane**: the model proposes; the harness, policy engine, and authorized brokers **decide**. **Delegation** is the formal process by which a model requests authority to act, and the harness evaluates that request—granting, denying, narrowing, or escalating—before any side-effecting tool runs.
+Open CoT is a **cognitive control plane**: the model proposes; the harness, policy engine, and authorized brokers **reconcile**. **Delegation** is the formal process by which a model requests authority to act, and the harness evaluates that request—granting, denying, narrowing, or escalating—before any side-effecting tool runs.
 
 The governing insight of this extension is strict and non-negotiable: **the model does not authorize itself.** Typed schema objects represent every step of the authority flow so traces are replayable, policies consultable, and tool dispatch provably bound to a grant chain.
 
 This RFC defines three JSON objects:
 
-1. **`delegation_request`** — intent and scope proposed (in part) by the model; harness binds identity, run context, and provenance.  
-2. **`delegation_decision`** — harness/policy-only outcome linked to the request.  
+1. **`delegation_request`** — intent and scope proposed (in part) by the model; harness binds identity, run context, and provenance.
+2. **`delegation_decision`** — harness/policy-only outcome linked to the request.
 3. **`authority_receipt`** — tamper-evident grant artifact produced by an auth broker after approval, consumed at tool execution.
 
-**Cross-references:** [RFC 0007 — Agent Loop / FSM](0007-agent-loop-protocol.md) (states `request_authority`, `validate_authority`, `delegate_narrow`, `execute_tool`); [RFC 0026 — Agent Identity](0026-agent-identity-auth.md) (`requester` MUST be a verified `agent_id`); [RFC 0041 — Policy](0041-policy-enforcement-schema.md) (rules consulted → `policy_refs`); [RFC 0042 — Permissions](0042-permission-acl.md) (`permission_id` references stored grants); [RFC 0048 — Execution receipts](0048-execution-receipts-audit-envelopes.md) (tool receipts SHOULD reference `authority_receipt` or standing grant).
+**Cross-references:** [RFC 0007 — Cognitive Pipeline / FSM](0007-cognitive-pipeline-protocol.md) (states `request_authority`, `validate_authority`, `delegate_narrow`, `execute_tool`); [RFC 0026 — Cognitive pipeline Identity](0026-requester-identity-auth.md) (`requester` MUST be a verified `requester_id`); [RFC 0041 — Policy](0041-policy-enforcement-schema.md) (rules consulted → `policy_refs`); [RFC 0042 — Permissions](0042-permission-acl.md) (`permission_id` references stored grants); [RFC 0048 — Execution receipts](0048-execution-receipts-audit-envelopes.md) (tool receipts SHOULD reference `authority_receipt` or standing grant).
 
 ---
 
@@ -27,7 +27,7 @@ This RFC defines three JSON objects:
 | Zone | Who writes | Guarantees |
 |------|------------|--------------|
 | Model-adjacent | Model output supplies **intent**, **justification**, **requested_scope** preferences, TTL/audience **preferences**, and **task_context_ref** only. | Untrusted text and structure proposals. |
-| Harness | Fills `request_id`, `requester`, `run_id`, `observed_at`, `provenance`; merges model fields after validation. | `requester` MUST match verified identity ([RFC 0026](0026-agent-identity-auth.md)). |
+| Harness | Fills `request_id`, `requester`, `run_id`, `observed_at`, `provenance`; merges model fields after validation. | `requester` MUST match verified identity ([RFC 0026](0026-requester-identity-auth.md)). |
 | Policy | Emits **`delegation_decision`** exclusively. | Model MUST NOT emit or alter decisions. |
 | Auth broker | Emits **`authority_receipt`**; computes **integrity** over all other receipt fields. | Receipt is **tamper-evident**; executors verify hash (and signature when configured) before dispatch. |
 
@@ -39,14 +39,14 @@ This RFC defines three JSON objects:
 
 **Model-provided (merged by harness):** `intent`, `justification`, `requested_scope`, `preferred_ttl_seconds`, `preferred_audience`, `task_context_ref`.
 
-**Harness-provided:** `request_id`, `requester` (verified `agent_id`), `run_id`, `observed_at`, `provenance` (`trace_step_id`, `plan_version`).
+**Harness-provided:** `request_id`, `requester` (verified `requester_id`), `run_id`, `observed_at`, `provenance` (`trace_step_id`, `plan_version`).
 
 **Required fields:** `request_id`, `requester`, `run_id`, `requested_scope`, `observed_at`.
 
 `requested_scope` is an object with:
 
-- `resource` — logical resource identifier (e.g. `mailbox:user@example.com`).  
-- `action` — verb or capability token (e.g. `email.read`).  
+- `resource` — logical resource identifier (e.g. `mailbox:user@example.com`).
+- `action` — verb or capability token (e.g. `email.read`).
 - `constraints` — optional object (column allowlists, row limits, folder IDs, etc.).
 
 ### 3.2 `delegation_decision`
@@ -73,12 +73,12 @@ Produced by the **auth broker** after a favorable decision path. Binds `permissi
 
 ## 4. Lifecycle (FSM mapping)
 
-The following aligns with the governed execution FSM in [RFC 0007](0007-agent-loop-protocol.md):
+The following aligns with the governed execution FSM in [RFC 0007](0007-cognitive-pipeline-protocol.md):
 
-1. **`plan`** — Model proposes actions and capability annotations; no tools.  
-2. **`request_authority`** — Harness materializes a **`delegation_request`** (model content validated and normalized; harness fields authoritative).  
-3. **`validate_authority`** — Policy engine evaluates the request and emits **`delegation_decision`**.  
-4. **`delegate_narrow`** — Auth broker issues **`authority_receipt`** with `granted_scope ≤` effective allowed scope (set-theoretic or lattice comparison per deployment).  
+1. **`plan`** — Model proposes actions and capability annotations; no tools.
+2. **`request_authority`** — Harness materializes a **`delegation_request`** (model content validated and normalized; harness fields authoritative).
+3. **`validate_authority`** — Policy engine evaluates the request and emits **`delegation_decision`**.
+4. **`delegate_narrow`** — Auth broker issues **`authority_receipt`** with `granted_scope ≤` effective allowed scope (set-theoretic or lattice comparison per deployment).
 5. **`execute_tool`** — Tool executor accepts dispatch only with valid receipt (or documented standing grant shortcut per RFC 0007 §10.1). [RFC 0048](0048-execution-receipts-audit-envelopes.md) SHOULD cite the `receipt_id`.
 
 Standing authorization (`plan` → `execute_tool` shortcut) bypasses this chain only where policy explicitly allows; the execution receipt still MUST cite how obligation was satisfied.
@@ -231,7 +231,7 @@ The model asks to read full messages; policy narrows to **headers only**; broker
 {
   "schema_version": "0.2",
   "request_id": "dr_email_9f3a",
-  "requester": "agent:org/acme/exec-worker-07",
+  "requester": "cognitive-pipeline:org/acme/exec-worker-07",
   "run_id": "run_20260418_0412",
   "observed_at": "2026-04-18T04:12:01Z",
   "intent": "Summarize unread customer threads for Q2 report",
@@ -307,10 +307,10 @@ The model asks to read full messages; policy narrows to **headers only**; broker
 
 ## 9. Acceptance criteria
 
-1. For every tool side effect outside standing grants, the trace contains **`delegation_request`** → **`delegation_decision`** → **`authority_receipt`** in causal order with matching ids.  
-2. **`delegation_decision`** objects in audited stores MUST NOT be creatable or editable via model-facing APIs.  
-3. **`authority_receipt.integrity.content_hash`** MUST be verified before `execute_tool` dispatch; mismatch aborts execution and logs a security event.  
-4. `requester` MUST equal a registered [RFC 0026](0026-agent-identity-auth.md) `agent_id` vetted for the run.  
+1. For every tool side effect outside standing grants, the trace contains **`delegation_request`** → **`delegation_decision`** → **`authority_receipt`** in causal order with matching ids.
+2. **`delegation_decision`** objects in audited stores MUST NOT be creatable or editable via model-facing APIs.
+3. **`authority_receipt.integrity.content_hash`** MUST be verified before `execute_tool` dispatch; mismatch aborts execution and logs a security event.
+4. `requester` MUST equal a registered [RFC 0026](0026-requester-identity-auth.md) `requester_id` vetted for the run.
 5. [RFC 0048](0048-execution-receipts-audit-envelopes.md) tool execution records SHOULD include `receipt_id` (or standing-grant citation per RFC 0007); OAuth2 mappings in §5 are **optional**—native Open CoT objects are normative.
 
 ---

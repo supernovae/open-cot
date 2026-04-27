@@ -6,8 +6,8 @@ Loop-level guardrails can prevent infinite/redundant reasoning traces without co
 
 ## Required RFC/schema artifacts
 
-- `schemas/rfc-0007-agent-loop.json`
-- `schemas/rfc-0017-agent-safety-sandboxing.json`
+- `schemas/rfc-0007-cognitive-pipeline.json`
+- `schemas/rfc-0017-cognitive-pipeline-safety-sandboxing.json`
 - `schemas/rfc-0038-cost-aware-reasoning-budget.json`
 
 ## Run command

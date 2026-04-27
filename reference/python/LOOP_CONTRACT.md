@@ -1,6 +1,6 @@
 # Minimal Loop Transcript Contract (RFC 0007 aligned)
 
-This contract defines the minimum shape for a deterministic agent-loop transcript used in 0.1 tests.
+This contract defines the minimum shape for a deterministic cognitive-pipeline transcript used in 0.1 tests.
 
 ## Required top-level fields
 

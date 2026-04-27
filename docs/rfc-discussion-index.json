@@ -1,7 +1,7 @@
 {
   "repository": "supernovae/open-cot",
   "category_slug": "ideas",
-  "count": 51,
+  "count": 53,
   "rfcs": {
     "0001": {
       "rfc_title": "Initial Structured Reasoning Schema",
@@ -40,9 +40,9 @@
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/6"
     },
     "0007": {
-      "rfc_title": "Agent Loop Protocol",
-      "rfc_path": "rfcs/0007-agent-loop-protocol.md",
-      "discussion_title": "RFC 0007 \u2014 Agent Loop Protocol",
+      "rfc_title": "Cognitive Pipeline Protocol",
+      "rfc_path": "rfcs/0007-cognitive-pipeline-protocol.md",
+      "discussion_title": "RFC 0007 \u2014 Cognitive Pipeline Protocol",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/7"
     },
     "0008": {
@@ -58,14 +58,14 @@
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/9"
     },
     "0010": {
-      "rfc_title": "Agent Memory Schema",
-      "rfc_path": "rfcs/0010-agent-memory-schema.md",
-      "discussion_title": "RFC 0010 \u2014 Agent Memory Schema",
+      "rfc_title": "Cognitive Context Schema",
+      "rfc_path": "rfcs/0010-cognitive-context-schema.md",
+      "discussion_title": "RFC 0010 \u2014 Cognitive Context Schema",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/10"
     },
     "0011": {
       "rfc_title": "Multi\u2011Agent Protocol",
-      "rfc_path": "rfcs/0011-multi-agent-protocol.md",
+      "rfc_path": "rfcs/0011-multi-party-cognition-protocol.md",
       "discussion_title": "RFC 0011 \u2014 Multi\u2011Agent Protocol",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/11"
     },
@@ -89,7 +89,7 @@
     },
     "0015": {
       "rfc_title": "Multi\u2011Agent Reward Sharing",
-      "rfc_path": "rfcs/0015-multi-agent-reward-sharing.md",
+      "rfc_path": "rfcs/0015-multi-party-reward-sharing.md",
       "discussion_title": "RFC 0015 \u2014 Multi\u2011Agent Reward Sharing",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/15"
     },
@@ -100,9 +100,9 @@
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/16"
     },
     "0017": {
-      "rfc_title": "Agent Safety & Sandboxing",
-      "rfc_path": "rfcs/0017-agent-safety-sandboxing.md",
-      "discussion_title": "RFC 0017 \u2014 Agent Safety & Sandboxing",
+      "rfc_title": "Runtime Safety & Sandboxing",
+      "rfc_path": "rfcs/0017-runtime-safety-sandboxing.md",
+      "discussion_title": "RFC 0017 \u2014 Runtime Safety & Sandboxing",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/17"
     },
     "0018": {
@@ -113,7 +113,7 @@
     },
     "0019": {
       "rfc_title": "Multi\u2011Agent Planning Graphs",
-      "rfc_path": "rfcs/0019-multi-agent-planning-graphs.md",
+      "rfc_path": "rfcs/0019-collaborative-planning-graphs.md",
       "discussion_title": "RFC 0019 \u2014 Multi\u2011Agent Planning Graphs",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/19"
     },
@@ -124,15 +124,15 @@
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/20"
     },
     "0021": {
-      "rfc_title": "Agent Capability Declaration",
-      "rfc_path": "rfcs/0021-agent-capability-declaration.md",
-      "discussion_title": "RFC 0021 \u2014 Agent Capability Declaration",
+      "rfc_title": "Capability Declaration",
+      "rfc_path": "rfcs/0021-capability-declaration.md",
+      "discussion_title": "RFC 0021 \u2014 Capability Declaration",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/21"
     },
     "0022": {
-      "rfc_title": "Agent Evaluation Protocol",
-      "rfc_path": "rfcs/0022-agent-evaluation-protocol.md",
-      "discussion_title": "RFC 0022 \u2014 Agent Evaluation Protocol",
+      "rfc_title": "Cognitive Evaluation Protocol",
+      "rfc_path": "rfcs/0022-cognitive-evaluation-protocol.md",
+      "discussion_title": "RFC 0022 \u2014 Cognitive Evaluation Protocol",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/22"
     },
     "0023": {
@@ -154,57 +154,57 @@
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/25"
     },
     "0026": {
-      "rfc_title": "Agent Identity & Authentication",
-      "rfc_path": "rfcs/0026-agent-identity-auth.md",
-      "discussion_title": "RFC 0026 \u2014 Agent Identity & Authentication",
+      "rfc_title": "Requester Identity & Authentication",
+      "rfc_path": "rfcs/0026-requester-identity-auth.md",
+      "discussion_title": "RFC 0026 \u2014 Requester Identity & Authentication",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/26"
     },
     "0027": {
-      "rfc_title": "Distributed Agent Execution Protocol",
-      "rfc_path": "rfcs/0027-distributed-agent-execution-protocol.md",
-      "discussion_title": "RFC 0027 \u2014 Distributed Agent Execution Protocol",
+      "rfc_title": "Distributed Execution Protocol",
+      "rfc_path": "rfcs/0027-distributed-execution-protocol.md",
+      "discussion_title": "RFC 0027 \u2014 Distributed Execution Protocol",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/27"
     },
     "0028": {
-      "rfc_title": "Agent\u2011to\u2011Environment Interaction Schema",
-      "rfc_path": "rfcs/0028-agent-to-environment-schema.md",
-      "discussion_title": "RFC 0028 \u2014 Agent\u2011to\u2011Environment Interaction Schema",
+      "rfc_title": "Cognitive pipeline\u2011to\u2011Environment Interaction Schema",
+      "rfc_path": "rfcs/0028-capability-environment-schema.md",
+      "discussion_title": "RFC 0028 \u2014 Cognitive pipeline\u2011to\u2011Environment Interaction Schema",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/28"
     },
     "0029": {
-      "rfc_title": "Agent Benchmark Dataset Format",
-      "rfc_path": "rfcs/0029-agent-benchmark-dataset.md",
-      "discussion_title": "RFC 0029 \u2014 Agent Benchmark Dataset Format",
+      "rfc_title": "Cognitive Benchmark Dataset Format",
+      "rfc_path": "rfcs/0029-cognitive-benchmark-dataset.md",
+      "discussion_title": "RFC 0029 \u2014 Cognitive Benchmark Dataset Format",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/29"
     },
     "0030": {
-      "rfc_title": "Agent Lifecycle & Versioning",
-      "rfc_path": "rfcs/0030-agent-lifecycle-versioning.md",
-      "discussion_title": "RFC 0030 \u2014 Agent Lifecycle & Versioning",
+      "rfc_title": "Runtime Lifecycle & Versioning",
+      "rfc_path": "rfcs/0030-runtime-lifecycle-versioning.md",
+      "discussion_title": "RFC 0030 \u2014 Runtime Lifecycle & Versioning",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/30"
     },
     "0031": {
-      "rfc_title": "Agent Observability & Telemetry",
-      "rfc_path": "rfcs/0031-agent-observability-telemtry.md",
-      "discussion_title": "RFC 0031 \u2014 Agent Observability & Telemetry",
+      "rfc_title": "Cognitive Observability & Telemetry",
+      "rfc_path": "rfcs/0031-cognitive-observability-telemetry.md",
+      "discussion_title": "RFC 0031 \u2014 Cognitive Observability & Telemetry",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/31"
     },
     "0032": {
-      "rfc_title": "Agent Deployment Manifest",
-      "rfc_path": "rfcs/0032-agent-deployment-manifest.md",
-      "discussion_title": "RFC 0032 \u2014 Agent Deployment Manifest",
+      "rfc_title": "Runtime Deployment Manifest",
+      "rfc_path": "rfcs/0032-runtime-deployment-manifest.md",
+      "discussion_title": "RFC 0032 \u2014 Runtime Deployment Manifest",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/32"
     },
     "0033": {
-      "rfc_title": "Agent Security Posture & Threat Model",
-      "rfc_path": "rfcs/0033-agent-security-threat-model.md",
-      "discussion_title": "RFC 0033 \u2014 Agent Security Posture & Threat Model",
+      "rfc_title": "Runtime Security Posture & Threat Model",
+      "rfc_path": "rfcs/0033-runtime-security-threat-model.md",
+      "discussion_title": "RFC 0033 \u2014 Runtime Security Posture & Threat Model",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/33"
     },
     "0034": {
-      "rfc_title": "Agent Federation Protocol",
-      "rfc_path": "rfcs/0034-agent-federation-protocol.md",
-      "discussion_title": "RFC 0034 \u2014 Agent Federation Protocol",
+      "rfc_title": "Cognitive Federation Protocol",
+      "rfc_path": "rfcs/0034-cognitive-federation-protocol.md",
+      "discussion_title": "RFC 0034 \u2014 Cognitive Federation Protocol",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/34"
     },
     "0035": {
@@ -214,9 +214,9 @@
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/35"
     },
     "0036": {
-      "rfc_title": "Agent\u2011Native Compression & Delta Sync",
-      "rfc_path": "rfcs/0036-agent-native-compression-delta.md",
-      "discussion_title": "RFC 0036 \u2014 Agent\u2011Native Compression & Delta Sync",
+      "rfc_title": "Cognitive pipeline\u2011Native Compression & Delta Sync",
+      "rfc_path": "rfcs/0036-cognitive-native-compression-delta.md",
+      "discussion_title": "RFC 0036 \u2014 Cognitive pipeline\u2011Native Compression & Delta Sync",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/36"
     },
     "0037": {
@@ -239,7 +239,7 @@
     },
     "0040": {
       "rfc_title": "Multi\u2011Agent Economic Incentives",
-      "rfc_path": "rfcs/0040-multi-agent-economic-incentives.md",
+      "rfc_path": "rfcs/0040-multi-party-economic-incentives.md",
       "discussion_title": "RFC 0040 \u2014 Multi\u2011Agent Economic Incentives",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/40"
     },
@@ -268,9 +268,9 @@
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/44"
     },
     "0045": {
-      "rfc_title": "Ethical & Risk Constraints for Reasoning Agents",
-      "rfc_path": "rfcs/0045-ethical-risk-contraints-reasoning-agents.md",
-      "discussion_title": "RFC 0045 \u2014 Ethical & Risk Constraints for Reasoning Agents",
+      "rfc_title": "Ethics & Risk Constraints for Cognitive Runtimes",
+      "rfc_path": "rfcs/0045-ethics-risk-constraints-cognitive-runtimes.md",
+      "discussion_title": "RFC 0045 \u2014 Ethics & Risk Constraints for Cognitive Runtimes",
       "discussion_url": "https://github.com/supernovae/open-cot/discussions/45"
     },
     "0046": {

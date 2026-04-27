@@ -23,6 +23,6 @@ The project follows semantic versioning for schema and registry compatibility:
 ### Changed
 
 - Breaking temporal normalization across governance RFCs: canonical fields (`observed_at`, `decided_at`, `effective_at`, `expires_at`, `started_at`, `completed_at`, `superseded_at`) replace legacy aliases.
-- Governance spine schemas updated (policy, permissions, delegation, audit, receipts, lifecycle, telemetry, memory, multi-agent protocol) and registry regenerated.
+- Governance spine schemas updated (policy, permissions, delegation, audit, receipts, lifecycle, telemetry, memory, multi-party protocol) and registry regenerated.
 - Reference harness runtime/types aligned to canonical temporal fields, logical ordering metadata, and updated governance artifacts.
 - Example fixtures now use registry shortname folders for delegation, permissions, and execution/audit receipts.

@@ -1,0 +1,125 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OpenCoT Cognitive pipeline Memory Schema v0.1",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "enum": [
+        "0.2"
+      ],
+      "description": "Schema version."
+    },
+    "requester_id": {
+      "type": "string",
+      "description": "Unique identifier for the cognitive pipeline."
+    },
+    "short_term_memory": {
+      "type": "array",
+      "description": "Ephemeral memory entries for the current episode.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {},
+          "type": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "key",
+          "value"
+        ]
+      }
+    },
+    "long_term_memory": {
+      "type": "array",
+      "description": "Persistent memory entries across episodes.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "value": {},
+          "type": {
+            "type": "string"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "superseded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "confidence": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "key",
+          "value"
+        ]
+      }
+    },
+    "episodic_memory": {
+      "type": "array",
+      "description": "Chronological logs of past episodes.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "episode_id": {
+            "type": "string"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "episode_id",
+          "observed_at"
+        ]
+      }
+    },
+    "tool_memory": {
+      "type": "object",
+      "description": "Tool-specific memory keyed by tool name.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "object"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "version",
+    "requester_id"
+  ],
+  "$id": "https://opencot.dev/schemas/rfc-0010-cognitive-context.json",
+  "x-opencot": {
+    "rfc": "0010",
+    "shortname": "cognitive_context",
+    "source_rfc": "rfcs/0010-cognitive-context-schema.md"
+  }
+}

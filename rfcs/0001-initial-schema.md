@@ -16,7 +16,7 @@ It provides a minimal core for:
 - tool-augmented reasoning
 - verifier sidecars
 - benchmark and training datasets
-- deterministic replay in agent loops
+- deterministic replay in cognitive pipelines
 
 ---
 
@@ -32,7 +32,7 @@ It provides a minimal core for:
 ### 2.2 Non-goals
 
 - Defining a specific training recipe.
-- Requiring one universal agent runtime.
+- Requiring one universal cognitive pipeline runtime.
 - Standardizing hidden model internals.
 
 ---
@@ -122,7 +122,7 @@ Each step may include:
 
 ### 6.1 Scope expansion fields
 
-- **Decision:** Keep token timing, model metadata, RL rewards, and multi-agent fields optional and out of the required core object.
+- **Decision:** Keep token timing, model metadata, RL rewards, and multi-party fields optional and out of the required core object.
 - **Rationale:** Preserves broad interoperability and avoids forcing runtime-specific internals.
 - **Normative requirement:** Core traces **MUST** validate with only fields in this RFC. Additional fields **MAY** be attached as extensions or linked sidecars.
 - **Migration note:** Future versions can promote extensions to first-class fields only with a major compatibility review.
@@ -150,7 +150,7 @@ This RFC is accepted when:
 - At least 3 maintainers approve it.
 - A reference validator passes against the schema.
 - At least one example dataset uses this format.
-- At least one agent loop implementation emits schema-valid traces.
+- At least one cognitive pipeline implementation emits schema-valid traces.
 
 ---
 

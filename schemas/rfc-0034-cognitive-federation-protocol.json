@@ -1,0 +1,181 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://opencot.dev/schema/rfc0034/federation.json",
+  "title": "Open CoT RFC 0034 — Cognitive pipeline Federation Protocol",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "trust_level": {
+      "type": "string",
+      "enum": [
+        "untrusted",
+        "verified",
+        "trusted"
+      ]
+    },
+    "federation_peer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "peer_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "endpoint": {
+          "type": "string",
+          "format": "uri"
+        },
+        "trust_level": {
+          "$ref": "#/$defs/trust_level"
+        },
+        "public_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accepted_scopes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "max_delegation_ttl_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "last_verified_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "peer_id",
+        "endpoint",
+        "trust_level",
+        "public_key",
+        "accepted_scopes",
+        "max_delegation_ttl_seconds"
+      ]
+    },
+    "integrity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "hash_algorithm": {
+          "type": "string",
+          "minLength": 1
+        },
+        "content_hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "signature": {
+          "type": "string"
+        },
+        "signing_key_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "hash_algorithm",
+        "content_hash"
+      ]
+    },
+    "federation_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "enum": [
+            "0.1"
+          ]
+        },
+        "request_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_peer_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target_peer_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "delegation_request": {
+          "$ref": "https://opencot.dev/schema/rfc0047/delegation-extension-v0.2.json#/$defs/delegation_request"
+        },
+        "trust_chain": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "schema_version",
+        "request_id",
+        "source_peer_id",
+        "target_peer_id",
+        "delegation_request",
+        "trust_chain"
+      ]
+    },
+    "federation_response": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "enum": [
+            "0.1"
+          ]
+        },
+        "request_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "accepted",
+            "rejected",
+            "narrowed"
+          ]
+        },
+        "delegation_decision": {
+          "$ref": "https://opencot.dev/schema/rfc0047/delegation-extension-v0.2.json#/$defs/delegation_decision"
+        },
+        "response_integrity": {
+          "$ref": "#/$defs/integrity"
+        }
+      },
+      "required": [
+        "schema_version",
+        "request_id",
+        "status",
+        "delegation_decision",
+        "response_integrity"
+      ]
+    }
+  },
+  "properties": {
+    "federation_peer": {
+      "$ref": "#/$defs/federation_peer"
+    },
+    "federation_request": {
+      "$ref": "#/$defs/federation_request"
+    },
+    "federation_response": {
+      "$ref": "#/$defs/federation_response"
+    }
+  },
+  "x-opencot": {
+    "rfc": "0034",
+    "shortname": "cognitive_federation_protocol",
+    "source_rfc": "rfcs/0034-cognitive-federation-protocol.md"
+  }
+}

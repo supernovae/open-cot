@@ -136,7 +136,8 @@
       "required": [
         "step_id",
         "kind",
-        "content"
+        "content",
+        "visibility"
       ],
       "properties": {
         "step_id": {
@@ -156,10 +157,56 @@
         "content": {
           "type": "string"
         },
+        "visibility": {
+          "type": "string",
+          "enum": [
+            "audit_summary",
+            "detailed_evidence",
+            "redacted"
+          ]
+        },
+        "redaction_reason": {
+          "type": "string"
+        },
         "confidence": {
           "type": "number",
           "minimum": 0,
           "maximum": 1
+        }
+      }
+    },
+    "reasoning_trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_mode",
+        "summary",
+        "steps"
+      ],
+      "properties": {
+        "evidence_mode": {
+          "type": "string",
+          "enum": [
+            "audit_summary",
+            "detailed_evidence",
+            "redacted_evidence"
+          ]
+        },
+        "summary": {
+          "type": "string",
+          "description": "Audit-safe explanation of the cognitive path. This is evidence, not authority."
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reasoning_trace_step"
+          }
+        },
+        "contains_sensitive_content": {
+          "type": "boolean"
+        },
+        "redaction_reason": {
+          "type": "string"
         }
       }
     },
@@ -308,10 +355,7 @@
           }
         },
         "reasoning_trace": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/reasoning_trace_step"
-          }
+          "$ref": "#/$defs/reasoning_trace"
         },
         "execution_intent": {
           "type": "array",

@@ -8,7 +8,7 @@
 
 ## 1. Summary
 
-This RFC defines **cost‑aware reasoning**, enabling agents to:
+This RFC defines **cost‑aware reasoning**, enabling pipelines to:
 
 - reason under token budgets  
 - prune branches based on cost  
@@ -38,7 +38,7 @@ It extends:
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Open CoT RFC 0038 — Cost-Aware Reasoning Budget",
-  "description": "Budget policy and snapshot types for enforcing token, cost, step, tool-call, and retry limits on agent loops.",
+  "description": "Budget policy and snapshot types for enforcing token, cost, step, tool-call, and retry limits on cognitive pipelines.",
   "type": "object",
   "properties": {
     "budget": {
@@ -53,7 +53,7 @@ It extends:
         "max_cost": {
           "type": "number",
           "minimum": 0,
-          "description": "Maximum dollar cost for the entire agent run."
+          "description": "Maximum dollar cost for the entire cognitive pipeline run."
         },
         "max_steps": {
           "type": "integer",
@@ -76,7 +76,7 @@ It extends:
     "enforcement": {
       "type": "string",
       "enum": ["hard", "soft", "warn"],
-      "description": "How the budget is enforced. 'hard' force-stops the agent, 'soft' logs warnings, 'warn' emits telemetry only."
+      "description": "How the budget is enforced. 'hard' force-stops the cognitive pipeline, 'soft' logs warnings, 'warn' emits telemetry only."
     },
     "snapshot": {
       "type": "object",
@@ -127,4 +127,4 @@ It extends:
 
 ## 5. Conclusion
 
-This RFC defines how agents reason within explicit economic constraints.
+This RFC defines how pipelines reason within explicit economic constraints.

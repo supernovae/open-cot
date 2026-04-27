@@ -302,7 +302,7 @@ describe("manifestToToon", () => {
   it("produces TOON output with markers", () => {
     const manifest = buildManifest({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       phase: "frame",
       toolContracts: [searchContract, calcContract, writeContract],
       sandbox: DEFAULT_SANDBOX_CONFIG,
@@ -330,7 +330,7 @@ describe("manifestToToon", () => {
 
     const manifest = buildManifest({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       phase: "frame",
       toolContracts: allTools,
       sandbox,
@@ -345,7 +345,7 @@ describe("manifestToToon", () => {
   it("is more compact than JSON", () => {
     const manifest = buildManifest({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       phase: "frame",
       toolContracts: allTools,
       sandbox: { ...DEFAULT_SANDBOX_CONFIG, blockedTools: ["shell"] },
@@ -361,7 +361,7 @@ describe("manifestToToon", () => {
   it("TOON word count stays under 100 for typical manifest", () => {
     const manifest = buildManifest({
       runId: "run-1",
-      agentId: "agent-1",
+      requesterId: "cognitive-pipeline-1",
       phase: "frame",
       toolContracts: allTools,
       sandbox: { ...DEFAULT_SANDBOX_CONFIG, blockedTools: ["shell"] },
@@ -380,7 +380,7 @@ describe("manifestToToon", () => {
 describe("serializeManifest", () => {
   const manifest = buildManifest({
     runId: "run-1",
-    agentId: "agent-1",
+    requesterId: "cognitive-pipeline-1",
     phase: "frame",
     toolContracts: [searchContract, calcContract],
     sandbox: DEFAULT_SANDBOX_CONFIG,

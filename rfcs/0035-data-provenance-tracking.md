@@ -12,9 +12,9 @@ This RFC defines provenance and integrity metadata for Open CoT artifacts, inclu
 
 It extends:
 
-- RFC 0010 — Agent Memory Schema
+- RFC 0010 — Cognitive pipeline Memory Schema
 - RFC 0020 — Verifiable Scratchpad Compression
-- RFC 0022 — Agent Evaluation Protocol
+- RFC 0022 — Cognitive pipeline Evaluation Protocol
 
 ---
 
@@ -24,7 +24,7 @@ Required provenance dimensions:
 
 - source identity
 - transformation chain
-- actor (agent/tool) identity
+- actor (cognitive-pipeline/tool) identity
 - timestamp and pipeline stage
 
 Integrity additions:
@@ -47,7 +47,7 @@ Integrity additions:
     "artifact_id": { "type": "string" },
     "artifact_type": { "type": "string" },
     "source": { "type": "string" },
-    "agent_id": { "type": "string" },
+    "requester_id": { "type": "string" },
     "tool_id": { "type": "string" },
     "timestamp": { "type": "string", "format": "date-time" },
     "transformation": { "type": "string" },
@@ -78,7 +78,7 @@ Integrity additions:
   "artifact_id": "trace_001",
   "artifact_type": "reasoning_trace",
   "source": "synthetic_seed_v0",
-  "agent_id": "planner",
+  "requester_id": "planner",
   "timestamp": "2026-04-14T12:00:00Z",
   "transformation": "converted_from_gsm8k_minimal",
   "parent_artifact_ids": ["raw_qa_001"],

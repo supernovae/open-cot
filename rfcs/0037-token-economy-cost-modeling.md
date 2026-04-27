@@ -1,35 +1,35 @@
 # RFC 0037 — Token Economy & Cost Modeling (v0.1)
-**Status:** Draft  
-**Author:** Byron / Open CoT Community  
-**Created:** 2026‑04‑14  
-**Target Version:** Schema v0.7  
+**Status:** Draft
+**Author:** Byron / Open CoT Community
+**Created:** 2026‑04‑14
+**Target Version:** Schema v0.7
 **Discussion:** https://github.com/supernovae/open-cot/discussions/37
 ---
 
 ## 1. Summary
 
-This RFC defines a **token economy and cost modeling standard** for reasoning agents, enabling:
+This RFC defines a **token economy and cost modeling standard** for reasoning pipelines, enabling:
 
-- token budgeting  
-- cost‑aware planning  
-- cost‑aware tool selection  
-- economic constraints on CoT expansion  
-- predictable inference costs  
+- token budgeting
+- cost‑aware planning
+- cost‑aware tool selection
+- economic constraints on CoT expansion
+- predictable inference costs
 
 It integrates with:
 
-- RFC 0007 — Agent Loop Protocol  
-- RFC 0020 — Scratchpad Compression  
+- RFC 0007 — Cognitive Pipeline Protocol
+- RFC 0020 — Scratchpad Compression
 
 ---
 
 ## 2. Cost Components
 
-- **model_cost** — tokens in/out  
-- **tool_cost** — per‑call cost  
-- **memory_cost** — read/write cost  
-- **branch_cost** — cost per branch  
-- **verification_cost** — verifier calls  
+- **model_cost** — tokens in/out
+- **tool_cost** — per‑call cost
+- **memory_cost** — read/write cost
+- **branch_cost** — cost per branch
+- **verification_cost** — verifier calls
 
 ---
 

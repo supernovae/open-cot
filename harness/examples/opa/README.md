@@ -18,7 +18,7 @@ cd harness
 POLICY_ENGINE=opa \
 OPA_BASE_URL=http://127.0.0.1:8181 \
 OPA_POLICY_PATH=open_cot/delegation \
-npx tsx examples/governed-demo.ts
+npx tsx examples/governed-pipeline-demo.ts
 ```
 
 ## Try policy modes
@@ -34,11 +34,11 @@ Examples:
 ```bash
 # deny search requests
 POLICY_ENGINE=opa OPA_BASE_URL=http://127.0.0.1:8181 \
-  npx tsx examples/governed-demo.ts --deny "search for open source"
+  npx tsx examples/governed-pipeline-demo.ts --deny "search for open source"
 
 # narrow search requests
 POLICY_ENGINE=opa OPA_BASE_URL=http://127.0.0.1:8181 \
-  npx tsx examples/governed-demo.ts --narrow "search for open source"
+  npx tsx examples/governed-pipeline-demo.ts --narrow "search for open source"
 ```
 
 ## Response contract expected by harness

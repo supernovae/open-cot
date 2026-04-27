@@ -6,7 +6,7 @@ function makeRequest(overrides?: Partial<DelegationRequest>): DelegationRequest 
   return {
     schema_version: "0.2",
     request_id: "req-live-opa",
-    requester: "agent-live",
+    requester: "cognitive-pipeline-live",
     run_id: "run-live",
     intent: "Live OPA integration check",
     justification: "Validate runtime OPA decision mapping",
@@ -48,7 +48,7 @@ describeLive("OpaPolicyEngine live integration", () => {
       },
     });
     const request = makeRequest();
-    const decision = await engine.evaluate(request, "agent-live-01");
+    const decision = await engine.evaluate(request, "cognitive-pipeline-live-01");
 
     expect(decision.request_id).toBe(request.request_id);
     expect(decision.decision_id).toMatch(/^[0-9a-f]{64}$/);

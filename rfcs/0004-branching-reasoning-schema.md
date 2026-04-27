@@ -1,23 +1,23 @@
 # RFC 0004 — Branching Reasoning Extensions (ToT / GoT)
-**Status:** Draft  
-**Author:** Byron / Open CoT Community  
-**Created:** 2026‑04‑14  
-**Target Version:** Schema v0.2  
+**Status:** Draft
+**Author:** Byron / Open CoT Community
+**Created:** 2026‑04‑14
+**Target Version:** Schema v0.2
 **Discussion:** https://github.com/supernovae/open-cot/discussions/4
 ---
 
 ## 1. Summary
 
-This RFC proposes **branching and graph‑structured reasoning extensions** to the Open CoT Reasoning Schema.  
+This RFC proposes **branching and graph‑structured reasoning extensions** to the Open CoT Reasoning Schema.
 It enables representation of:
 
-- **Tree‑of‑Thoughts (ToT)**  
-- **Graph‑of‑Thoughts (GoT)**  
-- **multi‑path exploration**  
-- **search‑based reasoning**  
-- **beam search / BFS / DFS reasoning**  
-- **pruned branches**  
-- **branch scoring and selection**  
+- **Tree‑of‑Thoughts (ToT)**
+- **Graph‑of‑Thoughts (GoT)**
+- **multi‑path exploration**
+- **search‑based reasoning**
+- **beam search / BFS / DFS reasoning**
+- **pruned branches**
+- **branch scoring and selection**
 
 These extensions build on RFC 0001 (Initial Reasoning Schema) and introduce new fields and conventions for representing non‑linear reasoning.
 
@@ -27,21 +27,21 @@ These extensions build on RFC 0001 (Initial Reasoning Schema) and introduce new 
 
 Linear Chain‑of‑Thought is insufficient for many reasoning tasks:
 
-- Complex planning  
-- Mathematical proofs  
-- Multi‑step coding tasks  
-- Search problems  
-- Multi‑hypothesis reasoning  
-- RL‑trained long‑horizon reasoning  
+- Complex planning
+- Mathematical proofs
+- Multi‑step coding tasks
+- Search problems
+- Multi‑hypothesis reasoning
+- RL‑trained long‑horizon reasoning
 
 Research such as **Tree‑of‑Thoughts** and **Graph‑of‑Thoughts** demonstrates that **branching exploration** significantly improves performance.
 
 However:
 
-- No open standard exists for representing branching reasoning.  
-- Existing implementations use ad‑hoc formats.  
-- Agent frameworks cannot interoperate.  
-- RL pipelines cannot train on structured search traces.  
+- No open standard exists for representing branching reasoning.
+- Existing implementations use ad‑hoc formats.
+- Cognitive pipeline frameworks cannot interoperate.
+- RL pipelines cannot train on structured search traces.
 - Datasets cannot represent multi‑path reasoning.
 
 This RFC defines a **unified, interoperable, graph‑friendly extension** to the reasoning schema.
@@ -51,18 +51,18 @@ This RFC defines a **unified, interoperable, graph‑friendly extension** to the
 ## 3. Design Goals
 
 ### 3.1 Must‑Have Goals
-- Support **trees** (ToT) and **graphs** (GoT).  
-- Support **branch scoring** and **pruning**.  
-- Support **multiple candidate paths**.  
-- Maintain compatibility with RFC 0001.  
-- Allow **partial or full exploration traces**.  
-- Support **search algorithms** (BFS, DFS, beam search).  
+- Support **trees** (ToT) and **graphs** (GoT).
+- Support **branch scoring** and **pruning**.
+- Support **multiple candidate paths**.
+- Maintain compatibility with RFC 0001.
+- Allow **partial or full exploration traces**.
+- Support **search algorithms** (BFS, DFS, beam search).
 - Support **RL reward propagation** across branches.
 
 ### 3.2 Non‑Goals
-- Defining a specific search algorithm.  
-- Enforcing a particular branching strategy.  
-- Representing full agent state machines.  
+- Defining a specific search algorithm.
+- Enforcing a particular branching strategy.
+- Representing full cognitive pipeline state machines.
 - Encoding model weights or proprietary metadata.
 
 ---
@@ -71,19 +71,19 @@ This RFC defines a **unified, interoperable, graph‑friendly extension** to the
 
 A reasoning trace may contain:
 
-- **nodes** (steps)  
-- **edges** (parent → child relationships)  
-- **branch groups** (sets of alternative paths)  
-- **branch scores** (model‑assigned or verifier‑assigned)  
-- **pruned branches** (optional)  
+- **nodes** (steps)
+- **edges** (parent → child relationships)
+- **branch groups** (sets of alternative paths)
+- **branch scores** (model‑assigned or verifier‑assigned)
+- **pruned branches** (optional)
 
 This RFC introduces:
 
-- `branch_group`  
-- `branch_score`  
-- `pruned`  
-- `exploration_strategy`  
-- `path_id`  
+- `branch_group`
+- `branch_score`
+- `pruned`
+- `exploration_strategy`
+- `path_id`
 
 These fields extend the existing step structure.
 
@@ -225,7 +225,7 @@ This RFC will be accepted when:
 At least 3 maintainers approve it.
 A reference implementation can parse branching traces.
 At least one ToT or GoT example dataset is converted.
-At least one agent loop emits branching traces.
+At least one cognitive pipeline emits branching traces.
 
 ## 10. Conclusion
 

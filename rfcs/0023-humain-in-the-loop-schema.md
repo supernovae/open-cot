@@ -4,9 +4,9 @@
 
 ## 1. Summary
 
-This RFC defines the **Human-in-the-Loop (HITL) Interaction Schema** for Open-CoT, the cognitive control plane for governed agent execution. It standardizes how agents **request** human judgment (`approval`, `clarification`, `review`, `override`), how supervisors **respond**, and how responses **resume** execution. Payloads are transport-agnostic (UIs, tickets, chatops, async queues).
+This RFC defines the **Human-in-the-Loop (HITL) Interaction Schema** for Open-CoT, the cognitive control plane for governed cognitive pipeline execution. It standardizes how pipelines **request** human judgment (`approval`, `clarification`, `review`, `override`), how supervisors **respond**, and how responses **resume** execution. Payloads are transport-agnostic (UIs, tickets, chatops, async queues).
 
-In [RFC 0007](0007-agent-loop-protocol.md), HITL maps to **`escalate`**: the run pauses on a `human_interaction_request` correlated to `run_id`, `agent_id`, and `step_ref`, until a `human_interaction_response`, **timeout**, or cancellation.
+In [RFC 0007](0007-cognitive-pipeline-protocol.md), HITL maps to **`escalate`**: the run pauses on a `human_interaction_request` correlated to `run_id`, `requester_id`, and `step_ref`, until a `human_interaction_response`, **timeout**, or cancellation.
 
 ## 2. Motivation
 
@@ -16,9 +16,9 @@ In [RFC 0007](0007-agent-loop-protocol.md), HITL maps to **`escalate`**: the run
 
 **Types:** `approval` (sign-off before side effects), `clarification` (disambiguation), `review` (artifact review), `override` (supersede prior decisions within bounds). **`options[]`** holds `{ id, label, description?, risk_hint? }`; `approval`/`clarification` SHOULD include options for deterministic automation. **`human_interaction_response.decision`** is `approved`, `rejected`, `modified`, or `timeout`; `modified` SHOULD carry **`justification`** (extensions hold extra payload).
 
-**`urgency`** (`low`…`critical`) affects queueing only—not ACL bypass. **`timeout_seconds`** bounds wait before auto-`timeout` (policy defines deny vs retry). **`context`** MUST include `run_id`, `agent_id`, `step_ref`. **`requested_by.agent`** identifies the principal; **`presented_to.human`** names role, person, or queue.
+**`urgency`** (`low`…`critical`) affects queueing only—not ACL bypass. **`timeout_seconds`** bounds wait before auto-`timeout` (policy defines deny vs retry). **`context`** MUST include `run_id`, `requester_id`, `step_ref`. **`requested_by.cognitive pipeline`** identifies the principal; **`presented_to.human`** names role, person, or queue.
 
-**FSM:** On **`escalate`**, emit `human_interaction_request` before the governed action. On `approved` (+ `selected_option` when options exist), resume per [RFC 0007](0007-agent-loop-protocol.md) toward `validate_authority` / `observe_result`. On `rejected` or timeout-as-deny, do not perform the blocked effect without new delegation ([RFC 0047](0047-delegation-extension.md)).
+**FSM:** On **`escalate`**, emit `human_interaction_request` before the governed action. On `approved` (+ `selected_option` when options exist), resume per [RFC 0007](0007-cognitive-pipeline-protocol.md) toward `validate_authority` / `observe_result`. On `rejected` or timeout-as-deny, do not perform the blocked effect without new delegation ([RFC 0047](0047-delegation-extension.md)).
 
 ## 4. JSON Schema
 
@@ -55,19 +55,19 @@ In [RFC 0007](0007-agent-loop-protocol.md), HITL maps to **`escalate`**: the run
         "context": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["run_id", "agent_id", "step_ref"],
+          "required": ["run_id", "requester_id", "step_ref"],
           "properties": {
             "run_id": { "type": "string", "minLength": 1 },
-            "agent_id": { "type": "string", "minLength": 1 },
+            "requester_id": { "type": "string", "minLength": 1 },
             "step_ref": { "type": "string", "minLength": 1 }
           }
         },
         "requested_by": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["agent"],
+          "required": ["pipeline"],
           "properties": {
-            "agent": { "type": "string", "minLength": 1 },
+            "pipeline": { "type": "string", "minLength": 1 },
             "role": { "type": "string" }
           }
         },
@@ -121,8 +121,8 @@ In [RFC 0007](0007-agent-loop-protocol.md), HITL maps to **`escalate`**: the run
   ],
   "urgency": "high",
   "timeout_seconds": 900,
-  "context": { "run_id": "run_7b91", "agent_id": "support-agent-prod", "step_ref": "plan/12/tool/sql.execute" },
-  "requested_by": { "agent": "support-agent-prod", "role": "tier2" },
+  "context": { "run_id": "run_7b91", "requester_id": "support-cognitive-pipeline-prod", "step_ref": "plan/12/tool/sql.execute" },
+  "requested_by": { "pipeline": "support-cognitive-pipeline-prod", "role": "tier2" },
   "presented_to": { "human": "oncall-db", "queue": "risk-review", "channel": "pager" }
 }
 ```
@@ -140,8 +140,8 @@ In [RFC 0007](0007-agent-loop-protocol.md), HITL maps to **`escalate`**: the run
   ],
   "urgency": "medium",
   "timeout_seconds": 3600,
-  "context": { "run_id": "run_2aa4", "agent_id": "records-agent", "step_ref": "plan/4/delegate/archive_policy" },
-  "requested_by": { "agent": "records-agent" },
+  "context": { "run_id": "run_2aa4", "requester_id": "records-cognitive pipeline", "step_ref": "plan/4/delegate/archive_policy" },
+  "requested_by": { "pipeline": "records-cognitive pipeline" },
   "presented_to": { "human": "legal-ops", "queue": "clarifications" }
 }
 ```
@@ -150,7 +150,7 @@ In [RFC 0007](0007-agent-loop-protocol.md), HITL maps to **`escalate`**: the run
 
 | RFC | Title | Relationship |
 |-----|--------|----------------|
-| [RFC 0007](0007-agent-loop-protocol.md) | Agent Loop Protocol | `escalate` pause/resume. |
+| [RFC 0007](0007-cognitive-pipeline-protocol.md) | Cognitive Pipeline Protocol | `escalate` pause/resume. |
 | [RFC 0041](0041-policy-enforcement-schema.md) | Policy Enforcement | `require_approval` → typed requests. |
 | [RFC 0042](0042-permission-acl.md) | Permissions & ACL | Human-consent grants bind `request_id` / context. |
 | [RFC 0047](0047-delegation-extension.md) | Delegation | Overrides may require re-delegation. |
@@ -160,13 +160,13 @@ In [RFC 0007](0007-agent-loop-protocol.md), HITL maps to **`escalate`**: the run
 
 | Question | Resolution |
 |----------|------------|
-| Subsume RLHF / eval feedback ([RFC 0005](0005-rl-reward-trace-schema.md), [RFC 0022](0022-agent-evaluation-protocol.md))? | **No**—those are training/eval traces; this is **runtime governance**. |
+| Subsume RLHF / eval feedback ([RFC 0005](0005-rl-reward-trace-schema.md), [RFC 0022](0022-cognitive-evaluation-protocol.md))? | **No**—those are training/eval traces; this is **runtime governance**. |
 | Mandatory `options`? | **SHOULD** for `approval`/`clarification`; optional for `review`/`override` if freeform is allowed. |
-| Who may respond? | **`responder_id`** MUST be authenticated; tie to [RFC 0026](0026-agent-identity-auth.md) where possible. |
+| Who may respond? | **`responder_id`** MUST be authenticated; tie to [RFC 0026](0026-requester-identity-auth.md) where possible. |
 
 ## 8. Acceptance Criteria
 
-1. Each `human_interaction_request` validates and includes `context.run_id`, `context.agent_id`, `context.step_ref`.
+1. Each `human_interaction_request` validates and includes `context.run_id`, `context.requester_id`, `context.step_ref`.
 2. Each `human_interaction_response` references `request_id` and a normative `decision`.
-3. [RFC 0007](0007-agent-loop-protocol.md) implementations MUST emit these records on `escalate` for [RFC 0041](0041-policy-enforcement-schema.md) `require_approval` when using this profile.
+3. [RFC 0007](0007-cognitive-pipeline-protocol.md) implementations MUST emit these records on `escalate` for [RFC 0041](0041-policy-enforcement-schema.md) `require_approval` when using this profile.
 4. Auto-timeout responses use `decision: "timeout"`; policy documents timeout semantics and clocks.

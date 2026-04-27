@@ -13,7 +13,7 @@ This RFC defines a structured error taxonomy for tool invocation failures and de
 It extends:
 
 - RFC 0003 — Tool Invocation Schema
-- RFC 0007 — Agent Loop Protocol
+- RFC 0007 — Cognitive Pipeline Protocol
 
 ---
 

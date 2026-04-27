@@ -1,5 +1,5 @@
-export { createAgentState } from "./state.js";
-export type { AgentState, AgentStateInit } from "./state.js";
+export { createPipelineState } from "./state.js";
+export type { PipelineState, PipelineStateInit } from "./state.js";
 export {
   transition,
   forceStop,

@@ -8,7 +8,7 @@
 
 ## 1. Summary
 
-This RFC defines a **multi‑modal extension** to the reasoning schema, enabling agents to reason over:
+This RFC defines a **multi‑modal extension** to the reasoning schema, enabling pipelines to reason over:
 
 - text  
 - images  

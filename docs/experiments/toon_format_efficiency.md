@@ -50,9 +50,9 @@ Measure:
 - **Repair loops:** How many re-prompts needed for a valid parse?
 - **Token consumption:** prompt + completion tokens per successful generation.
 
-### 4. End-to-end agent run
+### 4. End-to-end cognitive pipeline run
 
-Run the governed agent demo with `wireFormat: "toon"` vs `wireFormat: "compact-text"` vs `wireFormat: "json"` on the same objective. Compare:
+Run the governed cognitive pipeline demo with `wireFormat: "toon"` vs `wireFormat: "compact-text"` vs `wireFormat: "json"` on the same objective. Compare:
 
 - Total prompt tokens across all LLM calls
 - Total completion tokens
@@ -80,7 +80,7 @@ Fixture files: [`examples/toon/`](../../examples/toon/)
 | Reduction vs JSON (minified) | percentage | same formula |
 | Parse success rate | percentage | `fromToon` success / total attempts |
 | Repair loop count | integer | re-prompts until valid parse |
-| Task completion rate | percentage | agent runs with correct final answer |
+| Task completion rate | percentage | cognitive pipeline runs with correct final answer |
 | Total tokens per successful run | integer | sum of all LLM calls |
 
 ## Expected failure modes
@@ -95,11 +95,11 @@ Fixture files: [`examples/toon/`](../../examples/toon/)
 # Static comparison (once fixture scripts are ready)
 npx tsx harness/examples/toon-benchmark.ts
 
-# Governed agent with TOON
-WIRE_FORMAT=toon npx tsx harness/examples/governed-demo.ts
+# Governed cognitive pipeline with TOON
+WIRE_FORMAT=toon npx tsx harness/examples/governed-pipeline-demo.ts
 
-# Governed agent with compact-text (baseline)
-WIRE_FORMAT=compact-text npx tsx harness/examples/governed-demo.ts
+# Governed cognitive pipeline with compact-text (baseline)
+WIRE_FORMAT=compact-text npx tsx harness/examples/governed-pipeline-demo.ts
 ```
 
 ## Success criteria
@@ -108,4 +108,4 @@ WIRE_FORMAT=compact-text npx tsx harness/examples/governed-demo.ts
 - TOON achieves at least 30% token reduction vs minified JSON for multi-step reasoning traces.
 - Round-trip validation passes for 100% of fixtures.
 - Parse success rate on model-generated TOON is at least 90% for GPT-4 class models without repair loops.
-- No regression in task completion quality when governed agent uses `wireFormat: "toon"`.
+- No regression in task completion quality when governed cognitive pipeline uses `wireFormat: "toon"`.

@@ -39,8 +39,8 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Run chat-demo (smoke test)
-        run: npx tsx examples/chat-demo.ts "What is 2+2?"
+      - name: Run chat pipeline demo (smoke test)
+        run: npx tsx examples/chat-pipeline-demo.ts "What is 2+2?"
 
-      - name: Run coder-demo (smoke test)
-        run: npx tsx examples/coder-demo.ts "Add error handling to the code"
+      - name: Run coder pipeline demo (smoke test)
+        run: npx tsx examples/coder-pipeline-demo.ts "Add error handling to the code"

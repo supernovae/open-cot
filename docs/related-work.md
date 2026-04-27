@@ -1,7 +1,7 @@
 # 📚 Related Work: Structured Reasoning, Chain‑of‑Thought, and Agentic LLMs
 
 This document summarizes the major research threads that inform the **Open CoT Standard**.  
-It complements the annotated bibliography by explaining *how* each line of work influences the design of structured reasoning schemas, evaluation metrics, and agent loop protocols.
+It complements the annotated bibliography by explaining *how* each line of work influences the design of structured reasoning schemas, evaluation metrics, and cognitive pipeline protocols.
 
 ---
 
@@ -26,7 +26,7 @@ Interleaves *Thought* and *Action* steps, enabling tool use and environment inte
 
 **Impact:**  
 - Schema includes `action`, `observation`, and `tool` fields.
-- Supports agent loops that alternate between reasoning and acting.
+- Supports cognitive pipelines that alternate between reasoning and acting.
 
 ### Reflexion
 Adds self‑critique and iterative refinement.

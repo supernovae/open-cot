@@ -91,6 +91,6 @@
   "x-opencot": {
     "rfc": "0045",
     "shortname": "ethics",
-    "source_rfc": "rfcs/0045-ethical-risk-contraints-reasoning-agents.md"
+    "source_rfc": "rfcs/0045-ethics-risk-constraints-cognitive-runtimes.md"
   }
 }

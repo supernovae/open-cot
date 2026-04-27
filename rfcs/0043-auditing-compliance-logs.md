@@ -10,7 +10,7 @@
 
 ## 1. Summary
 
-Open CoT is a **cognitive control plane**: governed agents run under explicit policies, permissions, budgets, and traces. This RFC defines the **audit subsystem**, which emits **immutable, hash-chained evidence** of everything that happened during governed execution—supporting **forensics**, **compliance reporting**, and **tamper detection**.
+Open CoT is a **cognitive control plane**: governed pipelines run under explicit policies, permissions, budgets, and traces. This RFC defines the **audit subsystem**, which emits **immutable, hash-chained evidence** of everything that happened during governed execution—supporting **forensics**, **compliance reporting**, and **tamper detection**.
 
 Audit extends **RFC 0041 (Policy Enforcement)** and **RFC 0031 (Observability & Telemetry)**. Telemetry optimizes operations and reliability; audit provides a **normative evidence trail** (authorization decisions, delegation, tool use, denials, budget outcomes) suitable for regulators, customers, and incident response.
 
@@ -39,9 +39,9 @@ Two schema objects apply: **`audit_event`** (append-only chain links) and **`aud
 
 ## 5. Field Semantics (Concise)
 
-**`audit_event`:** `event_id` (UUID), `run_id`, `agent_id`, `observed_at` (RFC 3339 UTC), `event_type`, `details`, `parent_event_id` (UUID or `null` for genesis), `ordering.event_seq` (monotonic sequence per run), and `integrity` (`hash_algorithm`, `content_hash`).
+**`audit_event`:** `event_id` (UUID), `run_id`, `requester_id`, `observed_at` (RFC 3339 UTC), `event_type`, `details`, `parent_event_id` (UUID or `null` for genesis), `ordering.event_seq` (monotonic sequence per run), and `integrity` (`hash_algorithm`, `content_hash`).
 
-**`audit_envelope`:** `envelope_id`, `run_id`, `agent_id` (primary), `started_at`, `completed_at`, `completion_status`, `trace_hash`, `event_chain_head`, `event_chain_tail`, `event_count`, `delegation_summary`, `permission_summary`, `budget_final` (RFC 0038 snapshot shape), `policy_violations[]`, `integrity` (hash required; `signature_algorithm` / `signature` optional).
+**`audit_envelope`:** `envelope_id`, `run_id`, `requester_id` (primary), `started_at`, `completed_at`, `completion_status`, `trace_hash`, `event_chain_head`, `event_chain_tail`, `event_count`, `delegation_summary`, `permission_summary`, `budget_final` (RFC 0038 snapshot shape), `policy_violations[]`, `integrity` (hash required; `signature_algorithm` / `signature` optional).
 
 **`completion_status`:** `succeeded` | `failed` | `denied` | `budget_exhausted` | `external_stop` | `escalation_timeout` | `fail_safe`.
 
@@ -76,7 +76,7 @@ Two schema objects apply: **`audit_event`** (append-only chain links) and **`aud
     "schema_version": { "type": "string", "enum": ["0.3"] },
     "event_id": { "type": "string", "format": "uuid" },
     "run_id": { "type": "string", "minLength": 1 },
-    "agent_id": { "type": "string", "minLength": 1 },
+    "requester_id": { "type": "string", "minLength": 1 },
     "observed_at": { "type": "string", "format": "date-time" },
     "event_type": { "type": "string", "enum": ["run_started","policy_evaluated","permission_granted","permission_consumed","permission_expired","permission_revoked","tool_executed","delegation_requested","delegation_decided","escalation_initiated","escalation_resolved","postcondition_violated","denial_recorded","budget_warning","budget_exhausted","run_completed","run_failed","trace_sealed"] },
     "details": { "type": "object", "additionalProperties": true },
@@ -100,7 +100,7 @@ Two schema objects apply: **`audit_event`** (append-only chain links) and **`aud
       "required": ["hash_algorithm", "content_hash"]
     }
   },
-  "required": ["schema_version","event_id","run_id","agent_id","observed_at","event_type","details","parent_event_id","ordering","integrity"]
+  "required": ["schema_version","event_id","run_id","requester_id","observed_at","event_type","details","parent_event_id","ordering","integrity"]
 }
 ```
 <!-- opencot:schema:end -->
@@ -118,7 +118,7 @@ Two schema objects apply: **`audit_event`** (append-only chain links) and **`aud
     "schema_version": { "type": "string", "enum": ["0.3"] },
     "envelope_id": { "type": "string", "format": "uuid" },
     "run_id": { "type": "string", "minLength": 1 },
-    "agent_id": { "type": "string", "minLength": 1 },
+    "requester_id": { "type": "string", "minLength": 1 },
     "started_at": { "type": "string", "format": "date-time" },
     "completed_at": { "type": "string", "format": "date-time" },
     "completion_status": { "type": "string", "enum": ["succeeded","failed","denied","budget_exhausted","external_stop","escalation_timeout","fail_safe"] },
@@ -193,7 +193,7 @@ Two schema objects apply: **`audit_event`** (append-only chain links) and **`aud
       "required": ["hash_algorithm", "content_hash"]
     }
   },
-  "required": ["schema_version","envelope_id","run_id","agent_id","started_at","completed_at","completion_status","trace_hash","event_chain_head","event_chain_tail","event_count","delegation_summary","permission_summary","budget_final","policy_violations","integrity"]
+  "required": ["schema_version","envelope_id","run_id","requester_id","started_at","completed_at","completion_status","trace_hash","event_chain_head","event_chain_tail","event_count","delegation_summary","permission_summary","budget_final","policy_violations","integrity"]
 }
 ```
 <!-- opencot:schema:end -->
@@ -205,21 +205,21 @@ Two schema objects apply: **`audit_event`** (append-only chain links) and **`aud
 Illustrative `content_hash`; verifiers recompute from canonical bytes with `integrity` removed.
 
 ```json
-{"schema_version":"0.3","event_id":"a1b2c3d4-e5f6-4789-a012-3456789abcde","run_id":"run_20260414T153012Z_planner_01","agent_id":"planner.primary","observed_at":"2026-04-14T15:30:18.421Z","event_type":"permission_granted","details":{"permission_id":"perm_search_readonly_01","scope":{"tools":["tool:web_search"],"resources":["urn:opencot:corp_kb:public"]},"ttl_seconds":900,"grantor":"policy_engine@v0.7","policy_binding":{"policy_id":"corp_safe_search","policy_version":"2026.04.1"}},"parent_event_id":"00000000-0000-4000-8000-000000000001","ordering":{"event_seq":3},"integrity":{"hash_algorithm":"sha256","content_hash":"7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069"}}
+{"schema_version":"0.3","event_id":"a1b2c3d4-e5f6-4789-a012-3456789abcde","run_id":"run_20260414T153012Z_planner_01","requester_id":"planner.primary","observed_at":"2026-04-14T15:30:18.421Z","event_type":"permission_granted","details":{"permission_id":"perm_search_readonly_01","scope":{"tools":["tool:web_search"],"resources":["urn:opencot:corp_kb:public"]},"ttl_seconds":900,"grantor":"policy_engine@v0.7","policy_binding":{"policy_id":"corp_safe_search","policy_version":"2026.04.1"}},"parent_event_id":"00000000-0000-4000-8000-000000000001","ordering":{"event_seq":3},"integrity":{"hash_algorithm":"sha256","content_hash":"7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069"}}
 ```
 
 ### 10.2 `audit_envelope` — delegation, tools, success
 
 ```json
-{"schema_version":"0.3","envelope_id":"f47ac10b-58cc-4372-a567-0e02b2c3d479","run_id":"run_20260414T153012Z_planner_01","agent_id":"planner.primary","started_at":"2026-04-14T15:30:12.000Z","completed_at":"2026-04-14T15:31:02.883Z","completion_status":"succeeded","trace_hash":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","event_chain_head":"00000000-0000-4000-8000-000000000001","event_chain_tail":"99999999-9999-4999-8999-999999999999","event_count":14,"delegation_summary":{"total_requested":1,"total_granted":1,"total_denied":0,"total_narrowed":1},"permission_summary":{"total_granted":2,"total_consumed":2,"total_expired":0,"total_revoked":0},"budget_final":{"tokens_used":4120,"tokens_remaining":880,"cost_used":0.042,"cost_remaining":0.058,"steps_used":6,"steps_remaining":4,"tool_calls_used":3,"tool_calls_remaining":7,"retries_used":0,"retries_remaining":2},"policy_violations":[],"integrity":{"hash_algorithm":"sha256","content_hash":"2c624232cdd221699294d012d04dfb23f036edaedd441b52e063bd86ba4a3b74","signature_algorithm":"ed25519","signature":"BASE64_DETACHED_SIGNATURE_PLACEHOLDER"}}
+{"schema_version":"0.3","envelope_id":"f47ac10b-58cc-4372-a567-0e02b2c3d479","run_id":"run_20260414T153012Z_planner_01","requester_id":"planner.primary","started_at":"2026-04-14T15:30:12.000Z","completed_at":"2026-04-14T15:31:02.883Z","completion_status":"succeeded","trace_hash":"e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855","event_chain_head":"00000000-0000-4000-8000-000000000001","event_chain_tail":"99999999-9999-4999-8999-999999999999","event_count":14,"delegation_summary":{"total_requested":1,"total_granted":1,"total_denied":0,"total_narrowed":1},"permission_summary":{"total_granted":2,"total_consumed":2,"total_expired":0,"total_revoked":0},"budget_final":{"tokens_used":4120,"tokens_remaining":880,"cost_used":0.042,"cost_remaining":0.058,"steps_used":6,"steps_remaining":4,"tool_calls_used":3,"tool_calls_remaining":7,"retries_used":0,"retries_remaining":2},"policy_violations":[],"integrity":{"hash_algorithm":"sha256","content_hash":"2c624232cdd221699294d012d04dfb23f036edaedd441b52e063bd86ba4a3b74","signature_algorithm":"ed25519","signature":"BASE64_DETACHED_SIGNATURE_PLACEHOLDER"}}
 ```
 
 ## 11. Cross-References
 
 | RFC | Document | Relevance |
 |-----|----------|-----------|
-| RFC 0007 | [0007-agent-loop-protocol.md](0007-agent-loop-protocol.md) | Governed FSM; `audit_seal`, `trace_sealed`, receipt linkage. |
-| RFC 0031 | [0031-agent-observability-telemtry.md](0031-agent-observability-telemtry.md) | Telemetry; audit extends with compliance-grade events. |
+| RFC 0007 | [0007-cognitive-pipeline-protocol.md](0007-cognitive-pipeline-protocol.md) | Governed FSM; `audit_seal`, `trace_sealed`, receipt linkage. |
+| RFC 0031 | [0031-cognitive-observability-telemetry.md](0031-cognitive-observability-telemetry.md) | Telemetry; audit extends with compliance-grade events. |
 | RFC 0035 | [0035-data-provenance-tracking.md](0035-data-provenance-tracking.md) | Provenance and integrity model alignment. |
 | RFC 0041 | [0041-policy-enforcement-schema.md](0041-policy-enforcement-schema.md) | Policy evaluations as audit events. |
 | RFC 0042 | [0042-permission-acl.md](0042-permission-acl.md) | Permission lifecycle in `permission_*` events. |
@@ -234,7 +234,7 @@ Illustrative `content_hash`; verifiers recompute from canonical bytes with `inte
 | Chain link | `parent_event_id` → predecessor **`event_id`**; tamper evidence from per-event `content_hash` + envelope binding. |
 | Per-event signatures | Out of scope for v0.3; optional **envelope** signature only. |
 | Strict `details` typing | Deferred; `additionalProperties: true` until stable cross-vendor shapes exist. |
-| Multi-agent | Each event carries its **`agent_id`**; envelope `agent_id` is the run’s primary agent. |
+| Multi-cognitive pipeline | Each event carries its **`requester_id`**; envelope `requester_id` is the run’s primary cognitive pipeline. |
 | Clock skew | `observed_at` is writer clock; NTP recommended; ordering uses `event_seq` first. |
 
 ## 13. Acceptance Criteria
