@@ -1,8 +1,16 @@
 {
-  "requester_id": "model:local-eval",
-  "kind": "model",
-  "trust_level": "low",
-  "governance_context": {
-    "workspace": "demo"
-  }
+  "principal_id": "human:local-user",
+  "principal_type": "human",
+  "delegate_id": "runtime:project-reconciler",
+  "delegate_type": "reconciler",
+  "project_id": "project-1",
+  "workspace_id": "workspace-demo",
+  "allowed_scopes": ["project:read", "project:summarize"],
+  "denied_scopes": ["project:write"],
+  "allowed_capabilities": ["status", "summarize"],
+  "max_risk_level": "read",
+  "approval_required_for": ["write", "destructive", "external_side_effect"],
+  "expires_at": "2026-04-27T16:00:00Z",
+  "trace_id": "trace-1",
+  "parent_workflow_id": "project-workflow-1"
 }
