@@ -1,4 +1,4 @@
-# RFC 0009 — Requester Identity & Governance Context (v1.0)
+# RFC 0009 — Requester Identity & Delegation Context (v1.0)
 
 **Status:** Draft
 **Author:** Open CoT Community
@@ -10,7 +10,7 @@
 
 ## Summary
 
-Defines requester identity as the authenticated principal attached to a cognitive operation.
+Defines the typed delegation context attached to a cognitive operation. Runtime execution must carry explicit principal, delegate, project, workspace, scope, capability, risk, and trace boundaries.
 
 Open CoT means **Cognitive Operations Theory** in this core reset. The standard defines portable artifacts at the boundary between cognition and execution. The model-facing artifact is untrusted input until validated and reconciled by runtime code.
 
@@ -20,6 +20,8 @@ Open CoT means **Cognitive Operations Theory** in this core reset. The standard 
 - Implementations MUST validate artifacts against the schema embedded in this RFC.
 - Implementations MUST keep execution authority outside reasoning text.
 - Implementations MUST record enough evidence for replay, audit, and conformance testing.
+- Implementations MUST NOT execute with ambient user authority when a delegation context is required.
+- Endpoint calls SHOULD carry enough delegation context for audit and policy evaluation.
 
 ## Schema
 
@@ -27,46 +29,113 @@ Open CoT means **Cognitive Operations Theory** in this core reset. The standard 
 ```json
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Open CoT RFC 0009 - Requester Identity and Governance Context",
+  "title": "Open CoT RFC 0009 - Requester Identity and Delegation Context",
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "requester_id": {
+    "principal_id": {
       "type": "string",
       "minLength": 1
     },
-    "kind": {
+    "principal_type": {
       "type": "string",
       "enum": [
-        "model",
-        "service",
         "human",
+        "service",
         "runtime"
       ]
     },
-    "display_name": {
-      "type": "string"
+    "delegate_id": {
+      "type": "string",
+      "minLength": 1
     },
-    "trust_level": {
+    "delegate_type": {
       "type": "string",
       "enum": [
-        "untrusted",
-        "low",
-        "medium",
-        "high",
-        "system"
+        "reconciler",
+        "service",
+        "runtime"
       ]
     },
-    "governance_context": {
-      "type": "object",
-      "additionalProperties": true
+    "project_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "workspace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "allowed_scopes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "denied_scopes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "allowed_capabilities": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "max_risk_level": {
+      "$ref": "#/$defs/risk_level"
+    },
+    "approval_required_for": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/risk_level"
+      }
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trace_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "parent_workflow_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_workflow_id": {
+      "type": "string",
+      "minLength": 1
     }
   },
   "required": [
-    "requester_id",
-    "kind",
-    "trust_level"
-  ]
+    "principal_id",
+    "principal_type",
+    "delegate_id",
+    "delegate_type",
+    "project_id",
+    "workspace_id",
+    "allowed_scopes",
+    "denied_scopes",
+    "allowed_capabilities",
+    "max_risk_level",
+    "approval_required_for",
+    "expires_at",
+    "trace_id",
+    "parent_workflow_id"
+  ],
+  "$defs": {
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "read",
+        "write",
+        "destructive",
+        "external_side_effect"
+      ]
+    }
+  }
 }
 ```
 <!-- opencot:schema:end -->
