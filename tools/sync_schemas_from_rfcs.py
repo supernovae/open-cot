@@ -158,6 +158,16 @@ def main() -> int:
         rendered = ", ".join(f"{rfc_id}({len(paths)})" for rfc_id, paths in sorted(dups.items()))
         raise RuntimeError(f"Duplicate RFC ids detected: {rendered}")
 
+    manually_authored_schema_ids = {"0052", "0053"}
+    manually_authored_schemas: dict[str, dict[str, Any]] = {}
+    for rfc_id in manually_authored_schema_ids:
+        shortname = RFC_SHORTNAME.get(rfc_id)
+        if not shortname:
+            continue
+        path = SCHEMAS_DIR / schema_filename(rfc_id, shortname)
+        if path.is_file():
+            manually_authored_schemas[rfc_id] = json.loads(path.read_text(encoding="utf-8"))
+
     SCHEMAS_DIR.mkdir(parents=True, exist_ok=True)
     for stale in SCHEMAS_DIR.glob("rfc-*.json"):
         stale.unlink()
@@ -170,7 +180,9 @@ def main() -> int:
 
         data: dict[str, Any] | None = None
 
-        if rfc_id == "0004":
+        if rfc_id in manually_authored_schemas:
+            data = manually_authored_schemas[rfc_id]
+        elif rfc_id == "0004":
             data = build_branching_schema(rfc_id)
         elif rfc_id == "0007":
             data = build_agent_loop_schema()

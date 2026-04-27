@@ -2,91 +2,86 @@
 
 <img src="./assets/open-cot-banner.png" alt="Open CoT banner" width="100%" />
 
-### Cognitive Control Plane for Governed Agent Execution
+### Schemas for Cognitive Artifacts, Capabilities, and Reconciliation
 
-**Open CoT** — an open standard and reference implementation for model-agnostic governed agent execution.
+**Open CoT** — an open standard for portable cognitive artifacts, capability snapshots, execution intent, observations, policy boundaries, receipts, and reconciliation results.
 
 <img src="https://img.shields.io/badge/Project-Open%20CoT-5c6bc0?style=for-the-badge" alt="Open CoT" />
 <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License: MIT" /></a>
 <a href="./docs/contributing.md"><img src="https://img.shields.io/badge/Contributions-Welcome-4caf50?style=for-the-badge" alt="Contributions welcome" /></a>
-<a href="./schemas/rfc-0001-reasoning.json"><img src="https://img.shields.io/badge/Schema-JSON%20Draft-ff9800?style=for-the-badge" alt="JSON Schema" /></a>
+<a href="./schemas/rfc-0052-cognitive-artifact.json"><img src="https://img.shields.io/badge/Schema-JSON%20Draft-ff9800?style=for-the-badge" alt="JSON Schema" /></a>
 
 </div>
 
 ---
 
-## Why this exists
+## Why This Exists
 
-Agents need to reach tools, data, and services, but every stack reinvents authorization, safety boundaries, and audit. Models are often treated as if their natural-language output were both intent and permission. There is no **portable contract** between what a model *proposes* and what a deployment *allows*.
+Modern AI systems need a stable contract between fuzzy cognition and concrete capability. The model-like component can interpret, summarize, propose, and produce typed artifacts, but it must not own runtime authority or side effects.
 
-> Open-CoT is a model-agnostic cognitive control plane that standardizes the trusted contract between model output, harness/runtime enforcement, policy, delegation, tool execution, provenance, and audit.
+Open CoT defines the portable interface layer for that boundary:
 
-Open-CoT separates those layers: typed schemas for proposals and artifacts, a **normative governed execution model**, and a reference harness that enforces the contract end to end. The same envelopes and state machine can sit behind different models and runtimes because the control plane is explicit, not inferred from free-form text.
+- what cognitive artifacts look like,
+- how available capabilities are represented,
+- how execution intent binds to an immutable capability snapshot,
+- how policy, delegation, budget, and receipts are recorded,
+- how observations and final reconciliation results are serialized.
 
-That matters wherever you need **comparable audit**, **shared tooling across vendors**, or **defensible denial** when a model asks for something unsafe. The goal is not prettier logs; it is a **trusted contract** between proposal and execution.
+Earlier runtime-governance language was useful while the project was searching for the right security shape. The standard is now moving toward a sharper inversion: **cognition emits structured artifacts; runtimes reconcile those artifacts against capability, policy, budget, and evidence**.
 
-## The core insight
+## The Core Insight
 
-If reasoning, tool intent, provenance, budgets, state transitions, and delegation are carried in **stable typed schemas**, then a harness or runtime can be **portable** across models: it does not have to reverse-engineer each vendor’s behavior.
+The LLM is not the runtime, orchestrator, or authority boundary. It is a non-deterministic cognitive function. A runtime can use its output only after validation and reconciliation.
 
-**Models propose.** Schemas **express**. The harness **validates**. Policy **decides**. The auth broker **narrows** scope and issues receipts. Tools **execute** only under granted authority. Receipts and audit artifacts **prove** what ran and who allowed it.
+**Cognition emits.** Schemas express. Capability snapshots bound what may be requested. Policy gates authorize or refuse. Runtimes execute through explicit endpoints. Observations, receipts, and reconciliation results prove what happened.
 
-## What this repo contains
+This makes Open CoT useful beyond any one framework. An implementation can use Restate, Temporal, a queue worker, a local process, MCP, HTTP, or a custom executor. The portable layer is the schema contract, not the implementation stack.
+
+## What This Repo Contains
 
 | Area | Role |
 |------|------|
-| [`rfcs/`](./rfcs/) | **51 RFCs** — normative definitions for reasoning traces, tool invocation, the governed FSM, sandboxing, budgets, permissions, policy, delegation, provenance, identity, org governance, receipts, audit, and capability manifests |
-| [`schemas/`](./schemas/) | Versioned JSON Schemas per RFC (`registry.json`, `rfc-*-*.json`) |
-| [`harness/`](./harness/) | **Reference harness** (TypeScript) — governed FSM, validation, tools, budgets, trace emission |
+| [`rfcs/`](./rfcs/) | **53 RFCs** covering reasoning traces, tool invocation, governed execution, policy, delegation, receipts, capability manifests, cognitive artifacts, and reconciliation results |
+| [`schemas/`](./schemas/) | Versioned JSON Schemas per RFC, including `registry.json` |
+| [`harness/`](./harness/) | Reference TypeScript harness that exercises earlier governed execution RFCs |
 | [`examples/`](./examples/) | Validated instance fixtures keyed by registry shortname |
 | [`reference/python/`](./reference/python/) | Reference Python tooling |
-| [`tools/`](./tools/) | Schema and fixture validation (`validate.py`, sync helpers) |
-| [`standards/`](./standards/) | Human-readable patterns, metrics, narrative docs |
+| [`tools/`](./tools/) | Schema and fixture validation, registry sync, and RFC helpers |
+| [`standards/`](./standards/) | Human-readable reasoning patterns and evaluation metrics |
 | [`datasets/`](./datasets/) | Conventions and converters for training-ready data |
 | [`benchmarks/`](./benchmarks/) | Tasks, scoring, leaderboards |
 | [`conformance/`](./conformance/) | Conformance and interoperability material |
-| [`tests/`](./tests/) | Shared Python tests for validation and tooling |
-| [`docs/`](./docs/) | Contributing, architecture, philosophy, ELI5 guide, experiment cards |
+| [`docs/`](./docs/) | Architecture, philosophy, contributing, experiments, and launch notes |
 
-For a concise layout of control plane vs data plane, see [`docs/architecture.md`](./docs/architecture.md).
+For the current architecture framing, see [`docs/architecture.md`](./docs/architecture.md).
 
-**If you are evaluating quickly:** (1) read [`docs/eli5_guide.md`](./docs/eli5_guide.md), (2) run the harness tests above, (3) run `python tools/validate.py`, (4) skim RFC 0007 plus RFCs 0041, 0042, 0047, 0048, and 0051 for the governance and temporal spine.
+## Forward Spine
 
-## The governed execution model
+The newer reconciliation-oriented spine is:
 
-RFC 0007 defines a **fourteen-state** finite state machine. A compliant run starts in **`receive`** and ends in **`audit_seal`**. Along the main path:
+- **RFC 0052** — cognitive artifacts, execution intent, observations, and immutable capability snapshots.
+- **RFC 0053** — reconciliation result envelope and structured error taxonomy.
+- **RFC 0049** — capability manifests, now a predecessor to more precise capability snapshots.
+- **RFC 0041** — policy documents and policy gate semantics.
+- **RFC 0047** — delegation requests, decisions, and authority receipts.
+- **RFC 0048** — execution receipts and audit envelopes.
+- **RFC 0051** — temporal semantics for validity, replay, and ordering.
 
-`receive` → `frame` → `plan` → `request_authority` → `validate_authority` → `delegate_narrow` → `execute_tool` → `observe_result` → `critique_verify` → `finalize` → `audit_seal`
+Older RFCs still matter. RFC 0001, 0003, and 0007 define foundational reasoning, tool invocation, and governed execution concepts. The new RFCs clarify how those ideas become a portable schema layer for reconciliation runtimes.
 
-Authority and failure routing adds **`deny`**, **`escalate`**, and **`fail_safe`**, each terminating into a sealed audit according to policy.
+## Design Principles
 
-**The model cannot self-authorize.** It may only request capabilities; the harness, policy engine, and broker decide, narrow, and record grants. **Tool side effects occur only in `execute_tool`**, with explicit permission or a documented standing authorization cited on the execution receipt (RFC 0048).
+- **Typed artifacts over prompt contracts** — model output is structured input, not authority.
+- **Capability snapshots over ambient tools** — cognition sees an explicit inventory and cannot invent endpoints.
+- **Execution intent over direct execution** — proposed work is reconciled before side effects.
+- **Policy gates over schema-only safety** — valid shape is not permission.
+- **Observations and receipts over logs alone** — every side effect should leave replayable evidence.
+- **Implementation neutrality** — Open CoT should not require Restate, MCP, Vercel AI SDK, Open Lagrange, or any specific runtime.
+- **Spec gaps become RFC work** — if an implementation needs a general interface, it belongs here.
 
-RFC 0007 also allows a **pre-authorized shortcut** from `plan` to `execute_tool` when a deployment holds a **standing grant** (for example, sandbox allowlists): the shortcut must still be cited on the receipt so auditors can see why delegation states were skipped.
+## Quick Start
 
-## Design principles
-
-- **Typed schemas over ambiguous prose** — contracts are JSON Schema, not instructions embedded in model copy.
-- **The model is an untrusted proposer** — output is validated input, not implicit command.
-- **Portable harness semantics** — the same FSM and envelopes apply across models and adapters.
-- **Explicit provenance and evidence** — receipts, delegation records, and audit envelopes close the loop.
-- **Permission-aware tool execution** — grants are scoped, consumable, and auditable.
-- **Delegation as a bounded request** — narrow, time-bounded authority; no self-issued power of attorney.
-- **Policy-enforced narrowing and auditability** — policy consults at defined boundaries; runs seal into tamper-evident audit material.
-
-Values behind these bullets are expanded in [`docs/philosophy.md`](./docs/philosophy.md). Token efficiency and context management strategies are covered in [`docs/token-efficiency.md`](./docs/token-efficiency.md).
-
-## Quick start
-
-**Reference harness** (mock backend, no API keys required):
-
-```bash
-cd harness && npm install && npm test
-```
-
-Optional demos: `npx tsx examples/chat-demo.ts` and `npx tsx examples/coder-demo.ts` (see [`harness/README.md`](./harness/README.md)).
-
-**Python validation** (schemas + examples):
+Validate schemas and examples:
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
@@ -94,61 +89,30 @@ pip install -r requirements-tools.txt
 python tools/validate.py
 ```
 
-**New to the project?** Start with [`docs/eli5_guide.md`](./docs/eli5_guide.md).
-
-**Optional:** CPU-friendly smoke path `bash scripts/quickstart_experiment.sh`; after installing `requirements-tools.txt`, run `pytest -q` for repo tests. For local OSS train/eval, see [`experiments/local_oss_runbook.md`](./experiments/local_oss_runbook.md).
-
-**Live LLM** (OpenAI-compatible endpoint such as Ollama):
+Run the reference harness:
 
 ```bash
-cd harness && OPENAI_BASE_URL=http://localhost:11434/v1 npx tsx examples/chat-demo.ts "Explain recursion"
+cd harness && npm install && npm test
 ```
 
-## What the harness covers
+## Open Lagrange Relationship
 
-| Capability | RFC | Harness touchpoints |
-|------------|-----|---------------------|
-| Governed execution FSM | RFC 0007 | `src/schemas/agent-loop.ts`, `src/core/transitions.ts` |
-| Permission system | RFC 0042 | `src/schemas/permission.ts` (grants; model cannot mint) |
-| Policy enforcement (consult hooks + loop guardrails) | RFC 0041 | `src/core/loop-policy.ts`, schema alignment with RFC 0041 / 0043 |
-| Delegation flow | RFC 0047 | `src/schemas/delegation.ts`, `AgentState` delegation fields |
-| Execution receipts | RFC 0048 | `src/schemas/receipt.ts` |
-| Audit envelopes | RFC 0043 | `src/schemas/audit-envelope.ts` |
-| Budget enforcement | RFC 0038 | `src/core/budget-tracker.ts` |
-| Tool contracts | RFC 0003 (+ 0018 errors) | `src/core/tool-registry.ts`, `src/tools/` |
-| Safety sandboxing | RFC 0017 | `src/schemas/sandbox.ts`, enforcement in tool registry |
-| Capability manifests | RFC 0049 | `src/governance/manifest-builder.ts`, injected at `frame` / `critique_verify` |
-| Observability telemetry | RFC 0031 | `src/schemas/telemetry.ts`, metrics on `AgentState` |
+Open Lagrange is the opinionated TypeScript proving ground for this standard. It uses Restate for durable reconciliation, Zod for runtime boundaries, Vercel AI SDK for structured cognitive artifact generation, and MCP-shaped endpoints for side effects.
 
-The harness and schemas **mutually stress-test** each other: invalid transitions or shapes fail fast in CI; gaps in the spec show up as harness friction.
+That implementation pressure-tests Open CoT. If Open Lagrange needs a portable structure, this repo should receive the RFC/schema update instead of letting a private dialect grow elsewhere.
 
-Reasoning **patterns** (plan–verify, debate, and similar) remain documented for datasets and evaluation in [`standards/reasoning-patterns.md`](./standards/reasoning-patterns.md); they sit alongside the control plane, not instead of it.
+## Current Status
 
-## Current status
-
-- **51 RFCs** and a versioned JSON Schema registry with CI validation.
-- Reference harness implements the governed FSM, delegation and receipt types, budgets, sandboxed tools, and trace validation (see table above).
-- Cross-language checks: TypeScript-emitted traces validate under Python tooling.
-- Tiered examples, synthetic seed data, and experiment runbooks under [`experiments/`](./experiments/).
-- Breaking temporal normalization landed in RFC 0051 (`observed_at` / `decided_at` / `effective_at` / `completed_at`); migration guide: [`docs/temporal-migration-rfc0051.md`](./docs/temporal-migration-rfc0051.md).
-
-## Experiment cards
-
-For focused scenarios (hidden reasoning, runaway loops, token budgets, policy hooks), see [`docs/experiments/`](./docs/experiments/README.md). Launch packaging notes live in [`docs/public-launch.md`](./docs/public-launch.md).
+- **53 RFCs** and a versioned JSON Schema registry.
+- New draft schemas for cognitive artifacts and reconciliation results.
+- Reference harness coverage for governed execution, policy, delegation, receipts, budgets, and capability manifests.
+- Cross-language validation tooling for schemas and examples.
+- Experiment cards and local runbooks under [`docs/experiments/`](./docs/experiments/).
 
 ## Contributing
 
-See [`docs/contributing.md`](./docs/contributing.md). Improvements to schema clarity, harness coverage, examples, and benchmarks are especially welcome.
-
-Normative changes belong in RFCs first; reference code should follow the spec, not the other way around. Small harness fixes that clarify an already-intended RFC are welcome when they include a pointer to the RFC section they implement.
-
-### RFC feedback process
-
-- Use each RFC’s linked GitHub **Discussion** for normative debate.
-- Use **Issues** for actionable implementation work.
-- RFC changes in PRs should link the RFC file and its Discussion thread.
-- Index of discussions: [`docs/rfc-discussions.md`](./docs/rfc-discussions.md).
+See [`docs/contributing.md`](./docs/contributing.md). Normative changes belong in RFCs first; implementations should follow the spec and feed gaps back into it.
 
 ## License
 
-This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE) for the full text.
+This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE).
