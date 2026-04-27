@@ -1,18 +1,18 @@
 {
-  "version": "0.2",
-  "task": "Summarize repository status.",
-  "steps": [
+  "plan_id": "plan-1",
+  "schema_version": "open-cot.execution-plan.v1",
+  "project_id": "project-1",
+  "plan_version": "v1",
+  "goal": "Summarize repository status.",
+  "tasks": [
     {
-      "id": "s1",
-      "type": "thought",
-      "content": "Received request."
-    },
-    {
-      "id": "s2",
-      "type": "plan",
-      "content": "Use read-only status endpoint."
+      "task_id": "task-1",
+      "title": "Read repository status",
+      "objective": "Use a read-only endpoint to inspect repository status.",
+      "allowed_scopes": ["project:read"],
+      "allowed_capabilities": ["status"],
+      "max_risk_level": "read"
     }
   ],
-  "final_answer": "Repository status summarized.",
-  "termination": "succeeded"
+  "assumptions": ["Repository read access is available."]
 }
