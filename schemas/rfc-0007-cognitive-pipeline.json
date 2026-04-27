@@ -2,67 +2,36 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Open CoT RFC 0007 - Runtime Boundary and Cognitive Pipeline",
   "type": "object",
-  "additionalProperties": true,
+  "additionalProperties": false,
   "properties": {
-    "version": {
-      "type": "string"
+    "plan_id": { "type": "string", "minLength": 1 },
+    "schema_version": { "type": "string", "enum": ["open-cot.execution-plan.v1"] },
+    "project_id": { "type": "string", "minLength": 1 },
+    "plan_version": { "type": "string", "minLength": 1 },
+    "goal": { "type": "string", "minLength": 1 },
+    "tasks": { "type": "array", "items": { "$ref": "#/$defs/scoped_task" } },
+    "assumptions": { "type": "array", "items": { "type": "string" } }
+  },
+  "required": ["plan_id", "schema_version", "project_id", "plan_version", "goal", "tasks", "assumptions"],
+  "$defs": {
+    "risk_level": {
+      "type": "string",
+      "enum": ["read", "write", "destructive", "external_side_effect"]
     },
-    "task": {
-      "type": "string"
-    },
-    "steps": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": true,
-        "required": [
-          "id",
-          "type",
-          "content"
-        ],
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "type": {
-            "type": "string"
-          },
-          "content": {
-            "type": "string"
-          },
-          "parent": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              }
-            ]
-          },
-          "tool_invocation": {
-            "type": "object",
-            "additionalProperties": true
-          }
-        }
+    "scoped_task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "title", "objective", "allowed_scopes", "allowed_capabilities", "max_risk_level"],
+      "properties": {
+        "task_id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "objective": { "type": "string", "minLength": 1 },
+        "allowed_scopes": { "type": "array", "items": { "type": "string" } },
+        "allowed_capabilities": { "type": "array", "items": { "type": "string" } },
+        "max_risk_level": { "$ref": "#/$defs/risk_level" }
       }
-    },
-    "final_answer": {
-      "type": "string"
-    },
-    "termination": {
-      "type": "string"
     }
   },
-  "required": [
-    "version",
-    "task",
-    "steps",
-    "final_answer"
-  ],
   "$id": "https://opencot.dev/schemas/rfc-0007-cognitive-pipeline.json",
   "x-opencot": {
     "rfc": "0007",
