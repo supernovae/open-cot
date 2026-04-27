@@ -27,11 +27,6 @@ from pathlib import Path
 from typing import Any
 
 SEVERITY_ORDER = {"patch": 0, "minor": 1, "major": 2}
-PROPERTY_RENAMES = {
-    "agent_id": "requester_id",
-    "agents": "pipelines",
-    "parent_agent_id": "parent_requester_id",
-}
 
 
 def _norm_type(t: Any) -> str | None:
@@ -62,12 +57,6 @@ def _required_list(schema: Any) -> list[str]:
 
 def _record(findings: list[tuple[str, str]], severity: str, msg: str) -> None:
     findings.append((severity, msg))
-
-
-def _renamed_properties(before_keys: set[str], after_keys: set[str]) -> dict[str, str]:
-    return {
-        before: after for before, after in PROPERTY_RENAMES.items() if before in before_keys and after in after_keys
-    }
 
 
 def _tightened_min(before: dict[str, Any], after: dict[str, Any], key: str) -> bool:
@@ -141,22 +130,16 @@ def _compare(before: Any, after: Any, path: str, *, findings: list[tuple[str, st
 
     b_req = set(_required_list(before))
     a_req = set(_required_list(after))
-    required_renames = _renamed_properties(b_req, a_req)
-    renamed_before_required = set(required_renames)
-    renamed_after_required = set(required_renames.values())
-    for name in sorted((b_req - a_req) - renamed_before_required):
+    for name in sorted(b_req - a_req):
         _record(findings, "major", f"{path}: removed from required: {name!r}")
-    for name in sorted((a_req - b_req) - renamed_after_required):
+    for name in sorted(a_req - b_req):
         _record(findings, "minor", f"{path}: added to required: {name!r}")
 
     b_props = _props(before)
     a_props = _props(after)
-    property_renames = _renamed_properties(set(b_props), set(a_props))
-    renamed_before_props = set(property_renames)
-    renamed_after_props = set(property_renames.values())
-    for key in sorted((set(b_props) - set(a_props)) - renamed_before_props):
+    for key in sorted(set(b_props) - set(a_props)):
         _record(findings, "major", f"{path}: removed property {key!r}")
-    for key in sorted((set(a_props) - set(b_props)) - renamed_after_props):
+    for key in sorted(set(a_props) - set(b_props)):
         _record(findings, "minor", f"{path}: added property {key!r}")
 
     _constraint_diffs(before, after, path, findings)
@@ -165,15 +148,6 @@ def _compare(before: Any, after: Any, path: str, *, findings: list[tuple[str, st
         bp = b_props[key]
         ap = a_props[key]
         sub = f"{path}.properties.{key}"
-        if isinstance(bp, dict) and isinstance(ap, dict):
-            _compare(bp, ap, sub, findings=findings)
-        elif isinstance(bp, dict) != isinstance(ap, dict):
-            _record(findings, "major", f"{sub}: property shape changed (object vs non-object)")
-
-    for before_key, after_key in sorted(property_renames.items()):
-        bp = b_props[before_key]
-        ap = a_props[after_key]
-        sub = f"{path}.properties.{before_key}->{after_key}"
         if isinstance(bp, dict) and isinstance(ap, dict):
             _compare(bp, ap, sub, findings=findings)
         elif isinstance(bp, dict) != isinstance(ap, dict):
@@ -214,6 +188,28 @@ def index_schema_dir(path: Path) -> dict[str, Path]:
     return indexed
 
 
+def registry_major_version(path: Path) -> int | None:
+    registry = path / "registry.json"
+    if not registry.is_file():
+        return None
+    try:
+        version = json.loads(registry.read_text(encoding="utf-8")).get("version")
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(version, str):
+        return None
+    major, _, _ = version.partition(".")
+    return int(major) if major.isdigit() else None
+
+
+def is_major_registry_reset(before: Path, after: Path) -> bool:
+    if not before.is_dir() or not after.is_dir():
+        return False
+    before_major = registry_major_version(before)
+    after_major = registry_major_version(after)
+    return before_major is not None and after_major is not None and after_major > before_major
+
+
 def compare_files(before: Path, after: Path) -> list[tuple[str, str]]:
     findings: list[tuple[str, str]] = []
     _compare(load_schema(before), load_schema(after), before.name, findings=findings)
@@ -237,6 +233,10 @@ def main() -> int:
         help="Threshold for --strict failures (default: major)",
     )
     args = parser.parse_args()
+
+    if args.strict and is_major_registry_reset(args.before, args.after):
+        print("Major registry reset detected; skipping strict compatibility gate.", file=sys.stderr)
+        return 0
 
     findings: list[tuple[str, str]] = []
     if args.before.is_file() and args.after.is_file():

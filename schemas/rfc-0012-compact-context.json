@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Open CoT RFC 0012 - Compact Context Serialization",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "type": "string",
+      "enum": [
+        "json",
+        "compact-json",
+        "toon"
+      ]
+    },
+    "schema_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "content": {
+      "type": "string"
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "format",
+    "schema_ref",
+    "content"
+  ],
+  "$id": "https://opencot.dev/schemas/rfc-0012-compact-context.json",
+  "x-opencot": {
+    "rfc": "0012",
+    "shortname": "compact_context",
+    "source_rfc": "rfcs/0012-compact-context.md"
+  }
+}

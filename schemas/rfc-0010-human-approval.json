@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Open CoT RFC 0010 - Human Approval, Yield, and Resume",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "approval_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "intent_id": {
+      "type": "string"
+    },
+    "requested_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "requested",
+        "approved",
+        "rejected",
+        "timeout",
+        "yielded"
+      ]
+    },
+    "prompt": {
+      "type": "string"
+    },
+    "response": {
+      "type": "string"
+    },
+    "resume_token": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "approval_id",
+    "requested_at",
+    "status",
+    "prompt"
+  ],
+  "$id": "https://opencot.dev/schemas/rfc-0010-human-approval.json",
+  "x-opencot": {
+    "rfc": "0010",
+    "shortname": "human_approval",
+    "source_rfc": "rfcs/0010-human-approval.md"
+  }
+}

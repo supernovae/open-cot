@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Open CoT RFC 0006 - Reconciliation Result and Error Taxonomy",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "reconciliation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "completed_with_errors",
+        "yielded",
+        "requires_approval",
+        "failed"
+      ]
+    },
+    "capability_snapshot": {
+      "$ref": "rfc-0002-capability-snapshot.json"
+    },
+    "artifact": {
+      "$ref": "rfc-0001-cognitive-artifact.json"
+    },
+    "executed_intents": {
+      "type": "array",
+      "items": {
+        "$ref": "rfc-0003-execution-intent.json"
+      }
+    },
+    "skipped_intents": {
+      "type": "array",
+      "items": {
+        "$ref": "rfc-0003-execution-intent.json"
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "$ref": "rfc-0005-observation-receipt.json#/$defs/observation"
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/reconciliation_error"
+      }
+    },
+    "final_message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "reconciliation_id",
+    "status",
+    "capability_snapshot",
+    "executed_intents",
+    "skipped_intents",
+    "observations",
+    "errors",
+    "final_message"
+  ],
+  "$defs": {
+    "error_code": {
+      "type": "string",
+      "enum": [
+        "INVALID_ARTIFACT",
+        "SNAPSHOT_MISMATCH",
+        "UNKNOWN_ENDPOINT",
+        "UNKNOWN_CAPABILITY",
+        "CAPABILITY_DIGEST_MISMATCH",
+        "SCHEMA_VALIDATION_FAILED",
+        "POLICY_DENIED",
+        "APPROVAL_REQUIRED",
+        "PRECONDITION_FAILED",
+        "BUDGET_EXCEEDED",
+        "ENDPOINT_EXECUTION_FAILED",
+        "RESULT_VALIDATION_FAILED",
+        "YIELDED"
+      ]
+    },
+    "reconciliation_error": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "message",
+        "observed_at"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/error_code"
+        },
+        "message": {
+          "type": "string"
+        },
+        "intent_id": {
+          "type": "string"
+        },
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "details": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0006-reconciliation-result.json",
+  "x-opencot": {
+    "rfc": "0006",
+    "shortname": "reconciliation_result",
+    "source_rfc": "rfcs/0006-reconciliation-result.md"
+  }
+}

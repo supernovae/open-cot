@@ -1,33 +1,72 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Open CoT RFC 0007 — Cognitive Pipeline Protocol Trace",
-  "description": "Reasoning trace emitted by a cognitive pipeline (RFC 0007). Extends RFC 0001 with optional tool_invocation on action steps (RFC 0003).",
-  "allOf": [
-    {
-      "$ref": "rfc-0001-reasoning.json"
+  "title": "Open CoT RFC 0007 - Runtime Boundary and Cognitive Pipeline",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "version": {
+      "type": "string"
     },
-    {
-      "type": "object",
-      "properties": {
-        "steps": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "tool_invocation": {
-                "type": "object",
-                "description": "Structured tool call when type is action (RFC 0003)."
+    "task": {
+      "type": "string"
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "id",
+          "type",
+          "content"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "parent": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               }
-            }
+            ]
+          },
+          "tool_invocation": {
+            "type": "object",
+            "additionalProperties": true
           }
         }
       }
+    },
+    "final_answer": {
+      "type": "string"
+    },
+    "termination": {
+      "type": "string"
     }
+  },
+  "required": [
+    "version",
+    "task",
+    "steps",
+    "final_answer"
   ],
   "$id": "https://opencot.dev/schemas/rfc-0007-cognitive-pipeline.json",
   "x-opencot": {
     "rfc": "0007",
     "shortname": "cognitive_pipeline",
-    "source_rfc": "rfcs/0007-cognitive-pipeline-protocol.md"
+    "source_rfc": "rfcs/0007-cognitive-pipeline.md"
   }
 }

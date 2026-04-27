@@ -1,0 +1,11 @@
+{
+  "intent_id": "intent-1",
+  "snapshot_id": "snapshot-1",
+  "endpoint_id": "repo-status",
+  "capability_name": "status",
+  "capability_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "risk_level": "read",
+  "requires_approval": false,
+  "idempotency_key": "idem-1",
+  "arguments": {}
+}

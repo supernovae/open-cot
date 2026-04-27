@@ -1,0 +1,32 @@
+{
+  "registry_version": "2.0",
+  "profile": "core",
+  "schemas": {
+    "cognitive_artifact": "schemas/rfc-0001-cognitive-artifact.json",
+    "capability_snapshot": "schemas/rfc-0002-capability-snapshot.json",
+    "execution_intent": "schemas/rfc-0003-execution-intent.json",
+    "policy_gate": "schemas/rfc-0004-policy-gate.json",
+    "observation_receipt": "schemas/rfc-0005-observation-receipt.json",
+    "reconciliation_result": "schemas/rfc-0006-reconciliation-result.json",
+    "cognitive_pipeline": "schemas/rfc-0007-cognitive-pipeline.json",
+    "execution_budget": "schemas/rfc-0008-execution-budget.json",
+    "requester_identity": "schemas/rfc-0009-requester-identity.json",
+    "human_approval": "schemas/rfc-0010-human-approval.json",
+    "conformance_registry": "schemas/rfc-0011-conformance-registry.json",
+    "compact_context": "schemas/rfc-0012-compact-context.json"
+  },
+  "required_examples": [
+    "cognitive_artifact",
+    "capability_snapshot",
+    "execution_intent",
+    "policy_gate",
+    "observation_receipt",
+    "reconciliation_result",
+    "cognitive_pipeline",
+    "execution_budget",
+    "requester_identity",
+    "human_approval",
+    "conformance_registry",
+    "compact_context"
+  ]
+}

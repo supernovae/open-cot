@@ -1,8 +1,7 @@
 /**
- * Open CoT Trace types — RFC 0001 (Reasoning) + RFC 0007 (Governed FSM).
+ * Open CoT trace types for the compact cognitive pipeline contract.
  *
- * These mirror the JSON Schemas in schemas/rfc-0001-reasoning.json and
- * the governed trace extension in RFC 0007.
+ * These mirror the runtime-facing schema in schemas/rfc-0007-cognitive-pipeline.json.
  */
 
 import type { CompletionStatus } from "./audit-envelope.js";

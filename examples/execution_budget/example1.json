@@ -1,0 +1,9 @@
+{
+  "budget_id": "budget-1",
+  "max_execution_intents": 3,
+  "max_endpoint_calls": 3,
+  "max_tokens": 2000,
+  "max_cost_usd": 0.25,
+  "valid_after": "2026-04-27T15:00:00Z",
+  "valid_until": "2026-04-27T16:00:00Z"
+}

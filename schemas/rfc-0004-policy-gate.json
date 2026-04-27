@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Open CoT RFC 0004 - Policy Gate and Permission Evaluation",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "evaluation_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "intent_id": {
+      "type": "string"
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "result": {
+      "type": "string",
+      "enum": [
+        "allow",
+        "deny",
+        "requires_approval",
+        "yield"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "budget_snapshot": {
+      "$ref": "rfc-0008-execution-budget.json"
+    }
+  },
+  "required": [
+    "evaluation_id",
+    "evaluated_at",
+    "result",
+    "reason"
+  ],
+  "$id": "https://opencot.dev/schemas/rfc-0004-policy-gate.json",
+  "x-opencot": {
+    "rfc": "0004",
+    "shortname": "policy_gate",
+    "source_rfc": "rfcs/0004-policy-gate.md"
+  }
+}

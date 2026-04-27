@@ -1,7 +1,7 @@
 /**
- * Telemetry types — RFC 0031 (Cognitive pipeline Observability & Telemetry).
+ * Telemetry types for local harness instrumentation.
  *
- * Mirrors schemas/rfc-0031-cognitive-pipeline-observability-telemetry.json.
+ * Telemetry is implementation-local until a compact core RFC promotes it.
  */
 
 export interface TelemetryMetrics {

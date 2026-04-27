@@ -20,15 +20,19 @@ if str(_REPO_ROOT) not in sys.path:
 from schema_lib import duplicate_rfc_ids, load_registry, registry_schema_paths  # noqa: E402
 from schema_resolver import SchemaResolver  # noqa: E402
 
-TIER_A_SHORTNAMES: tuple[str, ...] = (
-    "reasoning",
-    "verifier_output",
-    "tool_invocation",
-    "branching",
-    "reward",
-    "ensemble",
+CORE_SHORTNAMES: tuple[str, ...] = (
+    "cognitive_artifact",
+    "capability_snapshot",
+    "execution_intent",
+    "policy_gate",
+    "observation_receipt",
+    "reconciliation_result",
     "cognitive_pipeline",
-    "dataset_packaging",
+    "execution_budget",
+    "requester_identity",
+    "human_approval",
+    "conformance_registry",
+    "compact_context",
 )
 
 
@@ -127,64 +131,36 @@ def _validate_examples(resolver: SchemaResolver, reg: Any | None) -> list[str]:
                 Draft7Validator(schema, registry=reg).validate(instance)
             except Exception as e:
                 errors.append(f"{path.relative_to(_REPO_ROOT)}: instance invalid: {e}")
-        elif shortname == "reasoning":
-            try:
-                from reference.python.validator import validate_trace
-
-                validate_trace(instance)
-            except Exception as e:
-                errors.append(f"{path.relative_to(_REPO_ROOT)}: reasoning example invalid: {e}")
     return errors
 
 
-def _check_tier_a_example_coverage() -> list[str]:
+def _check_core_example_coverage() -> list[str]:
     errors: list[str] = []
     examples_root = _REPO_ROOT / "examples"
-    for shortname in TIER_A_SHORTNAMES:
+    for shortname in CORE_SHORTNAMES:
         p = examples_root / shortname
         if not p.is_dir():
-            errors.append(f"missing required Tier A examples folder: examples/{shortname}/")
+            errors.append(f"missing required core examples folder: examples/{shortname}/")
             continue
         has_json = any(x.is_file() and x.suffix == ".json" and not x.name.startswith("_") for x in p.glob("*.json"))
         if not has_json:
-            errors.append(f"Tier A examples folder has no JSON fixtures: examples/{shortname}/")
+            errors.append(f"Core examples folder has no JSON fixtures: examples/{shortname}/")
     return errors
 
 
 def _check_conformance_profiles() -> list[str]:
     errors: list[str] = []
-    examples_root = _REPO_ROOT / "examples"
-
-    # Profile A: core reasoning
-    if not any((examples_root / "reasoning").glob("*.json")):
-        errors.append("ProfileA failed: examples/reasoning/ must contain at least one fixture")
-
-    # Profile B: tool + verifier sidecars
-    if not any((examples_root / "tool_invocation").glob("*.json")):
-        errors.append("ProfileB failed: examples/tool_invocation/ must contain at least one fixture")
-    if not any((examples_root / "verifier_output").glob("*.json")):
-        errors.append("ProfileB failed: examples/verifier_output/ must contain at least one fixture")
-
-    # Profile C: dataset packaging
-    manifest_path = examples_root / "dataset_packaging" / "manifest.json"
-    if not manifest_path.is_file():
-        errors.append("ProfileC failed: examples/dataset_packaging/manifest.json is required")
-    else:
-        try:
-            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        except json.JSONDecodeError as e:
-            errors.append(f"ProfileC failed: manifest.json is not valid JSON: {e}")
-        else:
-            splits = manifest.get("splits")
-            if not isinstance(splits, list) or not all(isinstance(s, str) for s in splits):
-                errors.append("ProfileC failed: manifest.splits must be a list of strings")
-            else:
-                required = {"train", "validation", "test"}
-                missing = sorted(required - set(splits))
-                if missing:
-                    errors.append(f"ProfileC failed: manifest.splits missing required entries: {', '.join(missing)}")
-                if len(splits) != len(set(splits)):
-                    errors.append("ProfileC failed: manifest.splits contains duplicate values")
+    fixtures_root = _REPO_ROOT / "conformance" / "fixtures" / "profile_core"
+    required = {
+        "cognitive_artifact.json",
+        "capability_snapshot.json",
+        "reconciliation_result.json",
+    }
+    if not fixtures_root.is_dir():
+        return ["Core profile failed: conformance/fixtures/profile_core/ is required"]
+    present = {path.name for path in fixtures_root.glob("*.json")}
+    for missing in sorted(required - present):
+        errors.append(f"Core profile failed: conformance/fixtures/profile_core/{missing} is required")
 
     return errors
 
@@ -192,10 +168,17 @@ def _check_conformance_profiles() -> list[str]:
 def _cross_consistency(loaded: dict[str, dict[str, Any]]) -> list[str]:
     """Lightweight checks across known pairs."""
     warnings: list[str] = []
-    if "rfc-0007-cognitive-pipeline.json" in loaded:
-        s = json.dumps(loaded["rfc-0007-cognitive-pipeline.json"])
-        if "rfc-0001-reasoning.json" not in s:
-            warnings.append("rfc-0007-cognitive-pipeline.json should reference rfc-0001-reasoning.json")
+    if "rfc-0006-reconciliation-result.json" in loaded:
+        s = json.dumps(loaded["rfc-0006-reconciliation-result.json"])
+        expected_refs = (
+            "rfc-0001-cognitive-artifact.json",
+            "rfc-0002-capability-snapshot.json",
+            "rfc-0003-execution-intent.json",
+            "rfc-0005-observation-receipt.json",
+        )
+        for ref in expected_refs:
+            if ref not in s:
+                warnings.append(f"rfc-0006-reconciliation-result.json should reference {ref}")
     return warnings
 
 
@@ -221,7 +204,7 @@ def main() -> int:
     errs += _check_refs(resolver, loaded)
     if not args.no_examples:
         errs += _validate_examples(resolver, reg)
-        errs += _check_tier_a_example_coverage()
+        errs += _check_core_example_coverage()
     if not args.skip_conformance:
         errs += _check_conformance_profiles()
     for w in _cross_consistency(loaded):
@@ -232,7 +215,7 @@ def main() -> int:
             print(e, file=sys.stderr)
         return 1
     if not args.skip_conformance:
-        print("Conformance profiles: A/B/C checks passed.", file=sys.stderr)
+        print("Conformance profile: core checks passed.", file=sys.stderr)
     print(f"OK: {len(loaded)} schemas, registry loaded, validation passed.", file=sys.stderr)
     return 0
 

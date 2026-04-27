@@ -1,6 +1,6 @@
 # Open CoT Core Reference Package
 
-A TypeScript reference implementation that **proves the Open CoT standard is executable, testable, and operational**. The core package emits, consumes, and validates RFC-compliant reasoning traces — making the schema feel like a contract, not just documentation.
+A TypeScript reference implementation that **proves the Open CoT standard is executable, testable, and operational**. The core package emits, consumes, and validates RFC-compliant cognitive pipeline records, making the schema feel like a contract, not just documentation.
 
 ## Bidirectional verification
 
@@ -17,7 +17,7 @@ This feedback loop catches schema gaps early — if the core package can't expre
 
 ```
 src/
-  schemas/        TypeScript types mirroring the JSON Schemas (RFC 0001, 0003, 0007, 0017, 0031, 0038)
+  schemas/        TypeScript types mirroring the compact core JSON Schemas
   core/
     state.ts        Cognitive pipeline state: objective, phase, budgets, evidence, trace
     transitions.ts  FSM engine: plan -> inspect -> act -> verify -> repair -> summarize -> stop

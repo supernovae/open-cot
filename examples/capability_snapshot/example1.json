@@ -1,0 +1,18 @@
+{
+  "snapshot_id": "snapshot-1",
+  "created_at": "2026-04-27T15:00:00Z",
+  "capabilities_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "capabilities": [
+    {
+      "endpoint_id": "repo-status",
+      "capability_name": "status",
+      "description": "Read repository status.",
+      "input_schema": {
+        "type": "object"
+      },
+      "risk_level": "read",
+      "requires_approval": false,
+      "capability_digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ]
+}

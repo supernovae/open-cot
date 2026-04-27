@@ -1,0 +1,85 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Open CoT RFC 0002 - Capability Snapshot and Endpoint Descriptor",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "snapshot_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "capabilities_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "endpoint_id",
+          "capability_name",
+          "description",
+          "input_schema",
+          "risk_level",
+          "requires_approval",
+          "capability_digest"
+        ],
+        "properties": {
+          "endpoint_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "capability_name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string"
+          },
+          "input_schema": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "output_schema": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "risk_level": {
+            "type": "string",
+            "enum": [
+              "read",
+              "write",
+              "destructive",
+              "external_side_effect"
+            ]
+          },
+          "requires_approval": {
+            "type": "boolean"
+          },
+          "capability_digest": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "snapshot_id",
+    "created_at",
+    "capabilities_hash",
+    "capabilities"
+  ],
+  "$id": "https://opencot.dev/schemas/rfc-0002-capability-snapshot.json",
+  "x-opencot": {
+    "rfc": "0002",
+    "shortname": "capability_snapshot",
+    "source_rfc": "rfcs/0002-capability-snapshot.md"
+  }
+}

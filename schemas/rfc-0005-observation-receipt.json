@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Open CoT RFC 0005 - Observation, Receipt, and Audit Evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "observation": {
+      "$ref": "#/$defs/observation"
+    },
+    "receipt": {
+      "$ref": "#/$defs/receipt"
+    }
+  },
+  "$defs": {
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observation_id",
+        "status",
+        "summary",
+        "observed_at"
+      ],
+      "properties": {
+        "observation_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "intent_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "recorded",
+            "skipped",
+            "error"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "output": {},
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receipt_id",
+        "intent_id",
+        "endpoint_id",
+        "status",
+        "issued_at"
+      ],
+      "properties": {
+        "receipt_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "intent_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "endpoint_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "executed",
+            "skipped",
+            "failed"
+          ]
+        },
+        "input_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "output_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "issued_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "$id": "https://opencot.dev/schemas/rfc-0005-observation-receipt.json",
+  "x-opencot": {
+    "rfc": "0005",
+    "shortname": "observation_receipt",
+    "source_rfc": "rfcs/0005-observation-receipt.md"
+  }
+}

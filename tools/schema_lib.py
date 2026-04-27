@@ -16,78 +16,26 @@ SCHEMA_MARKER_END = "<!-- opencot:schema:end -->"
 
 # RFC id -> shortname (registry key). Filenames use shortname with underscores -> hyphens.
 RFC_SHORTNAME: dict[str, str] = {
-    "0001": "reasoning",
-    "0002": "verifier_output",
-    "0003": "tool_invocation",
-    "0004": "branching",
-    "0005": "reward",
-    "0006": "ensemble",
+    "0001": "cognitive_artifact",
+    "0002": "capability_snapshot",
+    "0003": "execution_intent",
+    "0004": "policy_gate",
+    "0005": "observation_receipt",
+    "0006": "reconciliation_result",
     "0007": "cognitive_pipeline",
-    "0008": "dataset_packaging",
-    "0009": "reward_fusion",
-    "0010": "cognitive_context",
-    "0011": "multi_party_cognition_protocol",
-    "0012": "dataset_streaming",
-    "0013": "memory_compression",
-    "0014": "memory_conflict_resolution",
-    "0015": "multi_party_reward_sharing",
-    "0016": "tool_capability_negotiation",
-    "0017": "runtime_safety_sandboxing",
-    "0018": "tool_error_taxonomy",
-    "0019": "collaborative_planning_graphs",
-    "0020": "verifiable_scratchpad_compression",
-    "0021": "capability_declaration",
-    "0022": "cognitive_evaluation_protocol",
-    "0023": "human_in_the_loop",
-    "0024": "multi_modal_reasoning",
-    "0025": "tool_marketplace_registry",
-    "0026": "requester_identity_auth",
-    "0027": "distributed_execution",
-    "0028": "capability_environment",
-    "0029": "cognitive_benchmark_dataset",
-    "0030": "runtime_lifecycle_versioning",
-    "0031": "cognitive_observability_telemetry",
-    "0032": "runtime_deployment_manifest",
-    "0033": "runtime_security_threat_model",
-    "0034": "cognitive_federation_protocol",
-    "0035": "data_provenance_tracking",
-    "0036": "cognitive_native_compression_delta",
-    "0037": "token_economy_cost_modeling",
-    "0038": "cost_aware_reasoning_budget",
-    "0039": "tool_cost_modeling",
-    "0040": "multi_party_economic_incentives",
-    "0041": "policy_enforcement",
-    "0042": "permission_acl",
-    "0043": "auditing_compliance_logs",
-    "0044": "governance_organizational_controls",
-    "0045": "ethics",
-    "0046": "experiment_cards",
-    "0047": "delegation_extension",
-    "0048": "execution_receipts_audit_envelopes",
-    "0049": "capability_manifest",
-    "0050": "toon_adapter",
-    "0051": "temporal_semantics",
-    "0052": "cognitive_artifact",
-    "0053": "reconciliation_result",
+    "0008": "execution_budget",
+    "0009": "requester_identity",
+    "0010": "human_approval",
+    "0011": "conformance_registry",
+    "0012": "compact_context",
 }
 
 # RFC ids where extraction must use explicit markers.
-STRICT_MARKER_RFC_IDS: set[str] = {"0001", "0002", "0003", "0004", "0005", "0006"}
+STRICT_MARKER_RFC_IDS: set[str] = set(RFC_SHORTNAME)
 
 
 # Basename slugs (after rfc-NNNN-) aligned with schemas/registry.json conventions.
-RFC_FILE_SLUG: dict[str, str] = {
-    "0001": "reasoning",
-    "0002": "verifier",
-    "0003": "tool",
-    "0004": "branching",
-    "0005": "reward",
-    "0006": "ensemble",
-    "0007": "cognitive-pipeline",
-    "0008": "dataset",
-    "0009": "reward-fusion",
-    "0010": "cognitive-context",
-}
+RFC_FILE_SLUG: dict[str, str] = {}
 
 
 def schema_filename(rfc_id: str, shortname: str) -> str:
