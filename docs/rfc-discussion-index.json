@@ -6,74 +6,74 @@
     "0001": {
       "rfc_title": "Cognitive Artifact & Reasoning Evidence",
       "rfc_path": "rfcs/0001-cognitive-artifact.md",
-      "discussion_title": "RFC 0001 - Cognitive Artifact & Reasoning Evidence",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/1"
+      "discussion_title": "RFC 0001 \u2014 Cognitive Artifact & Reasoning Evidence",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/60"
     },
     "0002": {
       "rfc_title": "Capability Snapshot & Endpoint Descriptor",
       "rfc_path": "rfcs/0002-capability-snapshot.md",
-      "discussion_title": "RFC 0002 - Capability Snapshot & Endpoint Descriptor",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/2"
+      "discussion_title": "RFC 0002 \u2014 Capability Snapshot & Endpoint Descriptor",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/61"
     },
     "0003": {
       "rfc_title": "Execution Intent & Endpoint Invocation",
       "rfc_path": "rfcs/0003-execution-intent.md",
-      "discussion_title": "RFC 0003 - Execution Intent & Endpoint Invocation",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/3"
+      "discussion_title": "RFC 0003 \u2014 Execution Intent & Endpoint Invocation",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/62"
     },
     "0004": {
       "rfc_title": "Policy Gate & Permission Evaluation",
       "rfc_path": "rfcs/0004-policy-gate.md",
-      "discussion_title": "RFC 0004 - Policy Gate & Permission Evaluation",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/4"
+      "discussion_title": "RFC 0004 \u2014 Policy Gate & Permission Evaluation",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/63"
     },
     "0005": {
       "rfc_title": "Observation, Receipt & Audit Evidence",
       "rfc_path": "rfcs/0005-observation-receipt.md",
-      "discussion_title": "RFC 0005 - Observation, Receipt & Audit Evidence",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/5"
+      "discussion_title": "RFC 0005 \u2014 Observation, Receipt & Audit Evidence",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/64"
     },
     "0006": {
       "rfc_title": "Reconciliation Result & Error Taxonomy",
       "rfc_path": "rfcs/0006-reconciliation-result.md",
-      "discussion_title": "RFC 0006 - Reconciliation Result & Error Taxonomy",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/6"
+      "discussion_title": "RFC 0006 \u2014 Reconciliation Result & Error Taxonomy",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/65"
     },
     "0007": {
       "rfc_title": "Runtime Boundary & Cognitive Pipeline",
       "rfc_path": "rfcs/0007-cognitive-pipeline.md",
-      "discussion_title": "RFC 0007 - Runtime Boundary & Cognitive Pipeline",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/7"
+      "discussion_title": "RFC 0007 \u2014 Runtime Boundary & Cognitive Pipeline",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/66"
     },
     "0008": {
       "rfc_title": "Budget, Cost & Temporal Bounds",
       "rfc_path": "rfcs/0008-execution-budget.md",
-      "discussion_title": "RFC 0008 - Budget, Cost & Temporal Bounds",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/8"
+      "discussion_title": "RFC 0008 \u2014 Budget, Cost & Temporal Bounds",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/67"
     },
     "0009": {
       "rfc_title": "Requester Identity & Governance Context",
       "rfc_path": "rfcs/0009-requester-identity.md",
-      "discussion_title": "RFC 0009 - Requester Identity & Governance Context",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/9"
+      "discussion_title": "RFC 0009 \u2014 Requester Identity & Governance Context",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/68"
     },
     "0010": {
       "rfc_title": "Human Approval, Yield & Resume",
       "rfc_path": "rfcs/0010-human-approval.md",
-      "discussion_title": "RFC 0010 - Human Approval, Yield & Resume",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/10"
+      "discussion_title": "RFC 0010 \u2014 Human Approval, Yield & Resume",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/69"
     },
     "0011": {
       "rfc_title": "Conformance, Registry & Compatibility Rules",
       "rfc_path": "rfcs/0011-conformance-registry.md",
-      "discussion_title": "RFC 0011 - Conformance, Registry & Compatibility Rules",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/11"
+      "discussion_title": "RFC 0011 \u2014 Conformance, Registry & Compatibility Rules",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/70"
     },
     "0012": {
       "rfc_title": "Compact Context Serialization",
       "rfc_path": "rfcs/0012-compact-context.md",
-      "discussion_title": "RFC 0012 - Compact Context Serialization",
-      "discussion_url": "https://github.com/supernovae/open-cot/discussions/12"
+      "discussion_title": "RFC 0012 \u2014 Compact Context Serialization",
+      "discussion_url": "https://github.com/supernovae/open-cot/discussions/71"
     }
   }
 }

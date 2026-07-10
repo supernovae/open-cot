@@ -4,7 +4,7 @@
 **Author:** Open CoT Community
 **Created:** 2026-04-27
 **Target Version:** Core v1.0
-**Discussion:** https://github.com/supernovae/open-cot/discussions/5
+**Discussion:** https://github.com/supernovae/open-cot/discussions/64
 
 ---
 
